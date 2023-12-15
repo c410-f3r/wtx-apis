@@ -1,0 +1,42 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  internal-tests:
+    name: Internal tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: clippy,rustfmt
+          override: true
+          profile: minimal
+          toolchain: nightly-2023-10-15
+
+      - uses: Swatinem/rust-cache@v2
+
+      - run: .scripts/internal-tests.sh
+
+  integration-tests:
+    name: Integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          components: clippy,rustfmt
+          override: true
+          profile: minimal
+          toolchain: nightly-2023-10-15
+
+      - uses: Swatinem/rust-cache@v2
+
+      - run: .scripts/integration-tests.sh

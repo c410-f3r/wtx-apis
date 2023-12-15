@@ -1,0 +1,56 @@
+[dependencies]
+arrayvec = { default-features = false, features = ["serde"], version = "0.7" }
+base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.21" }
+bincode = { default-features = false, optional = true, version = "1.0" }
+bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
+cl-aux = { default-features = false, features = ["alloc", "arrayvec", "serde"], version = "4.0" }
+ed25519-dalek = { default-features = false, features = ["u64_backend"], optional = true, version = "1.0" }
+ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
+ethereum-types = { default-features = false, features = ["serialize"], optional = true, version = "0.14" }
+hex = { default-features = false, optional = true, version = "0.4" }
+primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
+serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
+solana-program = { default-features = false, optional = true, version = "1.17" }
+wtx = { default-features = false, features = ["arrayvec", "client-api-framework", "web-socket"], path = "../wtx/wtx" }
+wtx-macros = { default-features = false, path = "../wtx/wtx-macros" }
+
+[dev-dependencies]
+reqwest = { default-features = false, features = ["rustls-tls"], version = "0.11" }
+serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
+tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.33" }
+tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
+wtx = { default-features = false, features = ["client-api-framework", "reqwest", "serde_json", "tokio", "tracing", "web-socket-handshake"], path = "../wtx/wtx" }
+
+[features]
+
+# API
+
+aptos = []
+ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
+json-placeholder = []
+nager-date = []
+rick-and-morty = []
+solana = ["base64", "bincode", "bs58"]
+
+# Etc
+
+async-send = ["wtx/async-send", "wtx/async-send"]
+default = []
+ed25519-dalek = ["dep:ed25519-dalek", "std"]
+std = []
+_integration-tests = []
+
+[package]
+categories = ["asynchronous", "data-structures", "encoding", "network-programming", "no-std"]
+description = "A set of API collections based on the wtx framework"
+edition = "2021"
+keywords = ["api", "client", "io", "network", "serialization"]
+license = "Apache-2.0"
+name = "wtx-apis"
+readme = "README.md"
+repository = "https://github.com/c410-f3r/wtx-apis"
+rust-version = "1.65"
+version = "0.2.0"
+
+[package.metadata.docs.rs]
+all-features = true
