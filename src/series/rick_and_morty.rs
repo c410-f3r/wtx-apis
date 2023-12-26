@@ -7,7 +7,7 @@
 //! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
 //! use wtx_apis::series::rick_and_morty::{PkgsAux, RickAndMorty};
 //!
-//! let mut pkgs_aux = PkgsAux::from_minimum(RickAndMorty, SerdeJson, HttpParams::from_url("URL")?);
+//! let mut pkgs_aux = PkgsAux::from_minimum(RickAndMorty, SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.character().data(&mut String::new(), 1)?.build();
 //! # Ok(()) }
 //! ```

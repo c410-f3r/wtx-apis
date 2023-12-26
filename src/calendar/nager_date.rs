@@ -7,7 +7,7 @@
 //! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
 //! use wtx_apis::calendar::nager_date::{NagerDate, PkgsAux};
 //!
-//! let mut pkgs_aux = PkgsAux::from_minimum(NagerDate, SerdeJson, HttpParams::from_url("URL")?);
+//! let mut pkgs_aux = PkgsAux::from_minimum(NagerDate, SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.v3_country_info().params("es").build();
 //! # Ok(()) }
 //! ```

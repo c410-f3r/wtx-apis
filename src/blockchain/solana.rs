@@ -8,7 +8,7 @@
 //! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_url("URL")?);
+//!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.get_slot().data(None).build();
 //! # Ok(()) }
 //! ```

@@ -8,7 +8,7 @@
 //! use wtx_apis::blockchain::aptos::{Aptos, PkgsAux};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(Aptos::new(None), SerdeJson, HttpParams::from_url("URL")?);
+//!   PkgsAux::from_minimum(Aptos::new(None), SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.check_basic_node_health().params(None).build();
 //! # Ok(()) }
 //! ```

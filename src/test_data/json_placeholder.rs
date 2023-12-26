@@ -11,7 +11,7 @@
 //! use wtx_apis::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(JsonPlaceholder, SerdeJson, (HttpParams::from_url("URL")?));
+//!   PkgsAux::from_minimum(JsonPlaceholder, SerdeJson, (HttpParams::from_uri("URL")));
 //! let _ = pkgs_aux.albums().params(GenericParams::new(None, HttpMethod::Get, None, &[])).build();
 //! # Ok(()) }
 //! ```

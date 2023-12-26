@@ -9,7 +9,7 @@
 //! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
 //! use wtx_apis::blockchain::ethereum::{Ethereum, PkgsAux};
 //!
-//! let mut pkgs_aux = PkgsAux::from_minimum(Ethereum, SerdeJson, HttpParams::from_url("URL")?);
+//! let mut pkgs_aux = PkgsAux::from_minimum(Ethereum, SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.eth_block_number().build();
 //! # Ok(()) }
 //! ```

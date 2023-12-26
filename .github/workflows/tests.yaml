@@ -40,3 +40,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - run: .scripts/integration-tests.sh
+        env:
+          ALICE_PK: ${{ secrets.ALICE_PK }}
+          ALICE_SK: ${{ secrets.ALICE_SK }}

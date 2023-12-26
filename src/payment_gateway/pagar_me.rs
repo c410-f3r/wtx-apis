@@ -8,7 +8,7 @@
 //! use wtx_apis::payment_gateway::pagar_me::{PagarMe, PkgsAux};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(PagarMe::new("KEY")?, SerdeJson, HttpParams::from_url("URL")?);
+//!   PkgsAux::from_minimum(PagarMe::new("KEY")?, SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.recipient_balance().params("0").build();
 //! # Ok(()) }
 //! ```
