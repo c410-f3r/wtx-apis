@@ -1,11 +1,10 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getLeaderSchedule")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::blockchain::solana::{Commitment, SolanaBlockhash, SolanaHttpPkgsAux};
+  use crate::blockchain::solana::{Commitment, HttpPkgsAux, SolanaBlockhash};
   use alloc::{collections::BTreeMap, string::String, vec::Vec};
   use wtx::misc::AsyncBounds;
 
@@ -23,7 +22,7 @@ pub(crate) mod pkg {
     S: AsyncBounds;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[pkg::res_data]
   pub type GetLeaderScheduleRes = Option<BTreeMap<String, Vec<usize>>>;

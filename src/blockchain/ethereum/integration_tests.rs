@@ -1,7 +1,4 @@
-use crate::{
-  blockchain::ethereum::{BlockNumber, Ethereum},
-  misc::{init_test_cfg, PkgsAux},
-};
+use crate::blockchain::ethereum::{BlockNumber, Ethereum, PkgsAux};
 use wtx::client_api_framework::{
   dnsn::SerdeJson,
   network::{transport::Transport, HttpParams},
@@ -52,5 +49,5 @@ create_http_test!(Ethereum, http(), eth_get_balance, |pkgs_aux, trans| async {
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_url("https://cloudflare-eth.com").unwrap())
+  (SerdeJson, HttpParams::from_uri("https://cloudflare-eth.com"))
 }

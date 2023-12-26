@@ -1,9 +1,4 @@
-#[wtx_macros::pkg(
-  api(crate::calendar::nager_date::NagerDate),
-  data_format(json),
-  error(crate::Error),
-  transport(http)
-)]
+#[wtx_macros::pkg(api(crate::calendar::nager_date::NagerDate), data_format(json), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::NagerDateHttpPkgsAux;
   use alloc::{boxed::Box, vec::Vec};
@@ -18,7 +13,7 @@ pub(crate) mod pkg {
     params: &mut V3CountryInfoParams<'_>,
     req_params: &mut HttpReqParams,
   ) -> crate::Result<()> {
-    req_params.url.push_path(format_args!("/api/v3/CountryInfo/{}", params.country))?;
+    req_params.uri.push_path(format_args!("/api/v3/CountryInfo/{}", params.country))?;
     Ok(())
   }
 

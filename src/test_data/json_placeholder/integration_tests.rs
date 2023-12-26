@@ -1,7 +1,4 @@
-use crate::{
-  misc::{init_test_cfg, PkgsAux},
-  test_data::json_placeholder::{GenericParams, JsonPlaceholder},
-};
+use crate::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux};
 use wtx::client_api_framework::{
   dnsn::SerdeJson,
   network::{transport::Transport, HttpMethod, HttpParams},
@@ -55,5 +52,5 @@ create_http_test!(JsonPlaceholder, http(), users, |pkgs_aux, trans| async {
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_url("https://jsonplaceholder.typicode.com").unwrap())
+  (SerdeJson, HttpParams::from_uri("https://jsonplaceholder.typicode.com"))
 }

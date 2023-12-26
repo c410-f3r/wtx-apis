@@ -4,11 +4,10 @@ mod concat_array_str;
 mod slice_by_commas;
 
 use arrayvec::ArrayString;
-pub use concat_array_str::*;
+pub use concat_array_str::ConcatArrayStr;
 use core::{fmt::Display, str::FromStr};
 use serde::{de::IntoDeserializer, Deserialize, Deserializer, Serialize, Serializer};
-pub use slice_by_commas::*;
-use wtx::create_packages_aux_wrapper;
+pub use slice_by_commas::SliceByCommas;
 
 const MAX_ASSET_ABBR_LEN: usize = 10;
 const MAX_NUMBER_LEN: usize = 31;
@@ -32,8 +31,6 @@ _create_blockchain_constants!(
   pub transaction_hash: MaxTransactionHash = 64,
   pub transaction_hash_str: MaxTransactionHashStr = 90
 );
-
-create_packages_aux_wrapper!();
 
 /// Deserializes an Base58 string as an array of bytes.
 #[cfg(feature = "bs58")]

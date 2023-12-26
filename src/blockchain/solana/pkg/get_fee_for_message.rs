@@ -1,18 +1,17 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getFeeForMessage")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    Commitment, JsonRpcResponseResultWithContext, MessageInput, SolanaHttpPkgsAux,
+    Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, MessageInput,
   };
   use alloc::string::String;
   use base64::Engine;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {
     #[pkg::aux_data]
     fn get_fee_for_message_data(
       &mut self,

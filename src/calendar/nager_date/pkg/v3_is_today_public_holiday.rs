@@ -1,9 +1,4 @@
-#[wtx_macros::pkg(
-  api(crate::calendar::nager_date::NagerDate),
-  data_format(json),
-  error(crate::Error),
-  transport(http)
-)]
+#[wtx_macros::pkg(api(crate::calendar::nager_date::NagerDate), data_format(json), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::NagerDateHttpPkgsAux;
   use wtx::client_api_framework::network::{HttpReqParams, HttpResParams, StatusCode};
@@ -26,10 +21,10 @@ pub(crate) mod pkg {
     req_params: &mut HttpReqParams,
   ) -> crate::Result<()> {
     req_params
-      .url
+      .uri
       .push_path(format_args!("/api/v3/IsTodayPublicHoliday/{}", params.country_code))?;
     let _ = req_params
-      .url
+      .uri
       .query_writer()?
       .write_opt("countyCode", params.county_code)?
       .write_opt("offset", params.offset)?;

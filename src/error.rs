@@ -1,4 +1,3 @@
-use alloc::borrow::Cow;
 #[allow(unused_imports)]
 use alloc::string::String;
 use core::fmt::{Debug, Display, Formatter};
@@ -8,14 +7,9 @@ use wtx::client_api_framework::network::StatusCode;
 #[derive(Debug)]
 pub enum Error {
   // External
-  /// See [base64::DecodeError].
-  #[cfg(feature = "solana")]
-  Base64(base64::DecodeError),
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
-  /// See [arrayvec::CapacityError].
-  CapacityError(arrayvec::CapacityError<()>),
   /// See [ed25519_dalek::SignatureError].
   #[cfg(feature = "ed25519-dalek")]
   Ed25519Dalek(ed25519_dalek::SignatureError),
@@ -25,8 +19,6 @@ pub enum Error {
   /// See [primitive_types::Error].
   #[cfg(feature = "ethereum")]
   PrimitiveTypes(primitive_types::Error),
-  /// See [core::num::TryFromIntError].
-  TryFromIntError(core::num::TryFromIntError),
   /// See [wtx::Error].
   Wtx(wtx::Error),
 
@@ -67,17 +59,9 @@ pub enum Error {
   /// An submitted transaction could not be confirmed by an external actor.
   CouldNotConfirmTransaction,
   /// For third-party dependencies that throws strings errors
-  Generic(Cow<'static, str>),
+  Generic(&'static str),
   /// Request was expecting a different HTTP status code.
   IncompatibleStatusCode(StatusCode, StatusCode),
-}
-
-#[cfg(feature = "solana")]
-impl From<base64::DecodeError> for Error {
-  #[inline]
-  fn from(from: base64::DecodeError) -> Self {
-    Self::Base64(from)
-  }
 }
 
 #[cfg(feature = "solana")]
@@ -85,13 +69,6 @@ impl From<bincode::Error> for Error {
   #[inline]
   fn from(from: bincode::Error) -> Self {
     Self::Bincode(from)
-  }
-}
-
-impl<T> From<arrayvec::CapacityError<T>> for Error {
-  #[inline]
-  fn from(_: arrayvec::CapacityError<T>) -> Self {
-    Self::CapacityError(arrayvec::CapacityError::new(()))
   }
 }
 
@@ -116,13 +93,6 @@ impl From<primitive_types::Error> for Error {
   #[inline]
   fn from(from: primitive_types::Error) -> Self {
     Self::PrimitiveTypes(from)
-  }
-}
-
-impl From<core::num::TryFromIntError> for Error {
-  #[inline]
-  fn from(from: core::num::TryFromIntError) -> Self {
-    Self::TryFromIntError(from)
   }
 }
 

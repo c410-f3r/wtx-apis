@@ -1,16 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::aptos::Aptos),
-  data_format(verbatim),
-  error(crate::Error),
-  transport(http)
-)]
+#[wtx_macros::pkg(api(crate::blockchain::aptos::Aptos), data_format(verbatim), transport(http))]
 pub(crate) mod pkg {
-  use crate::blockchain::aptos::AptosHttpPkgsAux;
+  use crate::blockchain::aptos::HttpPkgsAux;
   use serde::de::IgnoredAny;
   use wtx::client_api_framework::network::{HttpReqParams, HttpResParams, StatusCode};
 
   #[pkg::aux]
-  impl<DRSR> AptosHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[pkg::after_sending]
   async fn after_sending(
@@ -31,8 +26,8 @@ pub(crate) mod pkg {
     req_params: &mut HttpReqParams,
   ) -> crate::Result<()> {
     req_params.headers.push_str("accept", "application/json, application/x-bcs")?;
-    req_params.url.push_path(format_args!("/-/healthy"))?;
-    let _ = req_params.url.query_writer()?.write_opt("duration_secs", params.duration_secs)?;
+    req_params.uri.push_path(format_args!("/-/healthy"))?;
+    let _ = req_params.uri.query_writer()?.write_opt("duration_secs", params.duration_secs)?;
     Ok(())
   }
 

@@ -15,10 +15,10 @@ use alloc::vec::Vec;
 use detokenize::*;
 use ethabi::Address;
 use ethereum_types::{H256, U256};
-use wtx::{
+use wtx::client_api_framework::{
   data_format::{JsonRpcRequest, JsonRpcResponse},
   dnsn::{Deserialize, Serialize},
-  misc::{Pair},
+  misc::Pair,
   network::{transport::Transport, HttpParams},
   pkg::Package,
 };
@@ -285,7 +285,7 @@ mod tests {
   };
   use ethabi::{Address, Token};
   use ethereum_types::{H256, U256};
-  use wtx::{
+  use wtx::client_api_framework::{
     data_format::{JsonRpcRequest, JsonRpcResponse},
     dnsn::SerdeJson,
     misc::Pair,

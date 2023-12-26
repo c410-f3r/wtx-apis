@@ -1,7 +1,4 @@
-use crate::{
-  misc::{init_test_cfg, PkgsAux},
-  series::rick_and_morty::RickAndMorty,
-};
+use crate::series::rick_and_morty::{PkgsAux, RickAndMorty};
 use wtx::client_api_framework::{
   dnsn::SerdeJson,
   network::{transport::Transport, HttpParams},
@@ -125,5 +122,5 @@ create_http_test!(RickAndMorty, http(), locations_by_ids, |pkgs_aux, trans| asyn
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_url("https://rickandmortyapi.com/graphql").unwrap())
+  (SerdeJson, HttpParams::from_uri("https://rickandmortyapi.com/graphql"))
 }

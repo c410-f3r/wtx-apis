@@ -1,18 +1,17 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getSignatureStatuses")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    Commitment, JsonRpcResponseResultWithContext, SolanaHttpPkgsAux, TransactionError,
+    Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, TransactionError,
   };
   use alloc::vec::Vec;
   use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

@@ -13,9 +13,11 @@ pub mod blockchain;
 pub mod calendar;
 mod error;
 pub mod misc;
+pub mod payment_gateway;
 pub mod series;
 pub mod test_data;
 
 pub use error::Error;
+
 /// Alias of `core::result::Result<T, wtx_apis::Error>`
 pub type Result<T> = core::result::Result<T, Error>;

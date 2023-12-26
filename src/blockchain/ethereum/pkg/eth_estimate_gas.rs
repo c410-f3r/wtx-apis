@@ -1,7 +1,6 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::ethereum::Ethereum),
   data_format(json_rpc("eth_estimateGas")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {

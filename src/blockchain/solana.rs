@@ -4,14 +4,16 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{dnsn::SerdeJson, network::HttpParams};
-//! use wtx_apis::{blockchain::solana::Solana, misc::PkgsAux};
+//! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
+//! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
 //!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_url("URL")?);
 //! let _ = pkgs_aux.get_slot().data(None).build();
 //! # Ok(()) }
 //! ```
+
+wtx::create_packages_aux_wrapper!();
 
 #[macro_use]
 mod macros;
@@ -30,7 +32,7 @@ mod short_vec;
 mod slot_update;
 mod transaction;
 
-use crate::{blockchain::ConfirmTransactionOptions, misc::PkgsAux};
+use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
 use arrayvec::ArrayString;
@@ -84,19 +86,19 @@ impl Solana {
   /// successful or expired.
   pub async fn confirm_transaction<'th, DRSR, T>(
     cto: ConfirmTransactionOptions,
-    pair: &mut PairMut<'_, SolanaHttpPkgsAux<DRSR>, T>,
+    pair: &mut PairMut<'_, SolanaMutHttpPkgsAux<'_, DRSR>, T>,
     tx_hash: &'th str,
   ) -> crate::Result<()>
   where
     DRSR: AsyncBounds,
     T: AsyncBounds + Transport<DRSR, Params = HttpParams>,
-    GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>: Package<
-      DRSR,
-      T::Params,
-      Api = Solana,
-      Error = crate::Error,
-      ExternalResponseContent = JsonRpcResponse<GetSignatureStatusesRes>,
-    >,
+    for<'instance> GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>:
+      Package<
+        &'instance mut Solana,
+        DRSR,
+        T::Params,
+        ExternalResponseContent = JsonRpcResponse<GetSignatureStatusesRes>,
+      >,
   {
     macro_rules! call {
       () => {{
@@ -171,13 +173,13 @@ impl Solana {
 
   /// Sometimes a received blockhash is not valid so this function tries to perform additional calls
   /// with different blockhashes.
-  pub async fn try_with_blockhashes<A, DRSR, E, O, T>(
+  pub async fn try_with_blockhashes<'pa, A, DRSR, E, O, T>(
     mut aux: A,
     additional_tries: u8,
     initial_blockhash: SolanaBlockhash,
-    pair: &mut Pair<PkgsAux<Solana, DRSR, HttpParams>, T>,
+    pair: &mut Pair<SolanaMutHttpPkgsAux<'pa, DRSR>, T>,
     mut cb: impl for<'any> FnMutFut<
-      (u8, &'any mut A, SolanaBlockhash, &'any mut Pair<PkgsAux<Solana, DRSR, HttpParams>, T>),
+      (u8, &'any mut A, SolanaBlockhash, &'any mut Pair<SolanaMutHttpPkgsAux<'pa, DRSR>, T>),
       Result<O, E>,
     >,
   ) -> Result<O, E>
@@ -186,10 +188,9 @@ impl Solana {
     E: From<crate::Error>,
     T: AsyncBounds + Transport<DRSR, Params = HttpParams>,
     GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: Package<
+      &'pa mut Solana,
       DRSR,
       HttpParams,
-      Api = Solana,
-      Error = crate::Error,
       ExternalResponseContent = JsonRpcResponse<GetLatestBlockhashRes>,
     >,
   {

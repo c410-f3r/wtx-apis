@@ -1,7 +1,4 @@
-use crate::{
-  calendar::nager_date::NagerDate,
-  misc::{init_test_cfg, PkgsAux},
-};
+use crate::calendar::nager_date::{NagerDate, PkgsAux};
 use wtx::client_api_framework::{
   dnsn::SerdeJson,
   network::{transport::Transport, HttpParams},
@@ -65,5 +62,5 @@ create_http_test!(NagerDate, http(), v3_public_holidays, |pkgs_aux, trans| async
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_url("https://date.nager.at").unwrap())
+  (SerdeJson, HttpParams::from_uri("https://date.nager.at"))
 }

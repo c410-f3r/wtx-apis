@@ -1,7 +1,6 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::ethereum::Ethereum),
   data_format(json_rpc("eth_sendTransaction")),
-  error(crate::Error),
   transport(http, stub)
 )]
 pub(crate) mod pkg {

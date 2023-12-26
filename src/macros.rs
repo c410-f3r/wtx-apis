@@ -1,7 +1,7 @@
 /// Utility for generic tests
 #[macro_export]
 macro_rules! create_generic_test {
-  ($executor:ident, $test:ident, $pair:expr, $parts_cb:expr, $rslt_cb:expr) => {
+  ($api:expr, $drsr_exp:expr, $executor:ident, $test:ident, $parts_cb:expr, $rslt_cb:expr, $trans:expr) => {
     #[$executor::test]
     async fn $test() {
       fn parts_cb_infer<'pair, API, DRSR, O, T>(
@@ -25,8 +25,16 @@ macro_rules! create_generic_test {
       {
         cb(pkgs_aux, trans, rslt)
       }
-      init_test_cfg();
-      let mut pair = $pair;
+      #[cfg(test)]
+      $crate::misc::init_test_cfg();
+      #[cfg(test)]
+      let _path = dotenv::dotenv();
+      let api = $api;
+      let (drsr, ext_req_params) = $drsr_exp;
+      let mut pair = wtx::client_api_framework::misc::Pair::new(
+        PkgsAux::from_minimum(api, drsr, ext_req_params),
+        $trans,
+      );
       let (pkg, pkgs_aux) = pair.parts_mut();
       let rslt = parts_cb_infer(pkg, pkgs_aux, $parts_cb).await;
       rslt_cb_infer(pkg, pkgs_aux, rslt, $rslt_cb).await;
@@ -37,19 +45,15 @@ macro_rules! create_generic_test {
 /// Utility for HTTP tests
 #[macro_export]
 macro_rules! create_http_test {
-  ($api:expr, $drsr_erp:expr, $test:ident, $cb:expr) => {
+  ($api:expr, $drsr_exp:expr, $test:ident, $cb:expr) => {
     $crate::create_generic_test! {
+      $api,
+      $drsr_exp,
       tokio,
       $test,
-      {
-        let (drsr, ext_req_params) = $drsr_erp;
-        wtx::client_api_framework::misc::Pair::new(
-          PkgsAux::from_minimum($api, drsr, ext_req_params),
-          reqwest::Client::default()
-        )
-      },
       $cb,
-      |_, _, _| async {}
+      |_, _, _| async {},
+      reqwest::Client::default()
     }
   };
 }
@@ -58,44 +62,42 @@ macro_rules! create_http_test {
 #[macro_export]
 macro_rules! create_ws_test {
   (
-    $url:expr,
+    $uri:expr,
     $api:expr,
-    $drsr_erp:expr,
-    $sub:ident,
+    $drsr_exp:expr,
+    $test:ident,
     ($($unsub:ident),+),
     $cb:expr
   ) => {
     $crate::create_generic_test! {
+      $api,
+      $drsr_exp,
       tokio,
-      $sub,
+      $test,
+      $cb,
+      |pkgs_aux, trans, subs| async move {
+        let mut iter = subs.into_iter();
+        let ids = &mut [$( pkgs_aux.$unsub().data(iter.next().unwrap()).build(), )+][..];
+        let _res = trans.send(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
+      },
       {
         use wtx::web_socket::handshake::WebSocketConnect;
-        let uri_parts = wtx::misc::UriParts::from($url);
-        let (drsr, ext_req_params) = $drsr_erp;
+        let uri = wtx::misc::Uri::new($uri);
         let mut fb = wtx::web_socket::FrameBufferVec::default();
         let trans = wtx::web_socket::handshake::WebSocketConnectRaw {
           compression: (),
           fb: &mut fb,
           headers_buffer: &mut <_>::default(),
           rng: wtx::rng::StaticRng::default(),
-          stream: tokio::net::TcpStream::connect(uri_parts.host()).await.unwrap(),
-          uri: $url,
+          stream: wtx::misc::tls_stream_from_host(uri.host(), uri.hostname(), None).await.unwrap(),
+          uri: &uri,
           wsb: wtx::web_socket::WebSocketBuffer::default(),
         }
         .connect()
         .await
         .unwrap()
         .1;
-        wtx::client_api_framework::misc::Pair::new(
-          PkgsAux::from_minimum($api, drsr, ext_req_params),
-          (fb, trans)
-        )
-      },
-      $cb,
-      |pkgs_aux, trans, subs| async move {
-        let mut iter = subs.into_iter();
-        let ids = &mut [$( pkgs_aux.$unsub().data(iter.next().unwrap()).build(), )+][..];
-        let _res = trans.send(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
+      (fb, trans)
       }
     }
   };

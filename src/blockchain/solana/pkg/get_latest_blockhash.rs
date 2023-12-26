@@ -1,12 +1,11 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getLatestBlockhash")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    Commitment, JsonRpcResponseResultWithContext, SolanaBlockhash, SolanaHttpPkgsAux,
+    Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, SolanaBlockhash,
   };
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
@@ -18,7 +17,7 @@ pub(crate) mod pkg {
   );
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[pkg::res_data]
   pub type GetLatestBlockhashRes = JsonRpcResponseResultWithContext<GetLatestBlockhash>;

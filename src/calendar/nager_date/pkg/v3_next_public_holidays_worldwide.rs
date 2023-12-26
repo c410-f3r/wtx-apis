@@ -1,9 +1,4 @@
-#[wtx_macros::pkg(
-  api(crate::calendar::nager_date::NagerDate),
-  data_format(json),
-  error(crate::Error),
-  transport(http)
-)]
+#[wtx_macros::pkg(api(crate::calendar::nager_date::NagerDate), data_format(json), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::{NagerDateHttpPkgsAux, V3PublicHoliday};
   use alloc::vec::Vec;
@@ -14,7 +9,7 @@ pub(crate) mod pkg {
 
   #[pkg::before_sending]
   async fn before_sending(req_params: &mut HttpReqParams) -> crate::Result<()> {
-    req_params.url.push_path(format_args!("/api/v3/NextPublicHolidaysWorldwide"))?;
+    req_params.uri.push_path(format_args!("/api/v3/NextPublicHolidaysWorldwide"))?;
     Ok(())
   }
 

@@ -4,14 +4,16 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{dnsn::SerdeJson, network::HttpParams};
-//! use wtx_apis::{blockchain::aptos::Aptos, misc::PkgsAux};
+//! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
+//! use wtx_apis::blockchain::aptos::{Aptos, PkgsAux};
 //!
 //! let mut pkgs_aux =
 //!   PkgsAux::from_minimum(Aptos::new(None), SerdeJson, HttpParams::from_url("URL")?);
 //! let _ = pkgs_aux.check_basic_node_health().params(None).build();
 //! # Ok(()) }
 //! ```
+
+wtx::create_packages_aux_wrapper!();
 
 #[cfg(all(test, feature = "_integration-tests"))]
 mod integration_tests;
@@ -23,7 +25,7 @@ use wtx::client_api_framework::{misc::RequestThrottling, network::HttpResParams,
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_types(pkgs_aux(crate::misc::PkgsAux), transport(http))]
+#[wtx_macros::api_types(pkgs_aux(PkgsAux), transport(http))]
 pub struct Aptos {
   /// See [FormattedHttpResponseHeaders].
   pub fhrh: FormattedHttpResponseHeaders,

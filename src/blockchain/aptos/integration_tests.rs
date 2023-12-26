@@ -1,7 +1,4 @@
-use crate::{
-  blockchain::aptos::Aptos,
-  misc::{init_test_cfg, PkgsAux},
-};
+use crate::blockchain::aptos::{Aptos, PkgsAux};
 use wtx::client_api_framework::network::{transport::Transport, HttpParams};
 
 create_http_test!(
@@ -21,5 +18,5 @@ create_http_test!(
 );
 
 fn http_verbatim() -> ((), HttpParams) {
-  ((), HttpParams::from_url("https://fullnode.devnet.aptoslabs.com/v1").unwrap())
+  ((), HttpParams::from_uri("https://fullnode.devnet.aptoslabs.com/v1"))
 }

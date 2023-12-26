@@ -1,15 +1,14 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("accountSubscribe")),
-  error(crate::Error),
   transport(ws)
 )]
 pub(crate) mod sub {
-  use crate::blockchain::solana::{AccountEncoding, Commitment, SolanaWsPkgsAux};
+  use crate::blockchain::solana::{AccountEncoding, Commitment, WsPkgsAux};
   use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
-  impl<DRSR> SolanaWsPkgsAux<DRSR> {}
+  impl<A, DRSR> WsPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
@@ -40,14 +39,13 @@ pub(crate) mod sub {
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("accountUnsubscribe")),
-  error(crate::Error),
   transport(ws)
 )]
 pub(crate) mod unsub {
-  use crate::blockchain::solana::SolanaWsPkgsAux;
+  use crate::blockchain::solana::WsPkgsAux;
 
   #[pkg::aux]
-  impl<DRSR> SolanaWsPkgsAux<DRSR> {}
+  impl<A, DRSR> WsPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

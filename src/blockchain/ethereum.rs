@@ -6,13 +6,15 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{dnsn::SerdeJson, network::HttpParams};
-//! use wtx_apis::{blockchain::ethereum::Ethereum, misc::PkgsAux};
+//! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
+//! use wtx_apis::blockchain::ethereum::{Ethereum, PkgsAux};
 //!
 //! let mut pkgs_aux = PkgsAux::from_minimum(Ethereum, SerdeJson, HttpParams::from_url("URL")?);
 //! let _ = pkgs_aux.eth_block_number().build();
 //! # Ok(()) }
 //! ```
+
+wtx::create_packages_aux_wrapper!();
 
 mod access_list;
 mod access_list_item;
@@ -47,7 +49,7 @@ use wtx::client_api_framework::Api;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_types(pkgs_aux(crate::misc::PkgsAux), transport(http, ws))]
+#[wtx_macros::api_types(pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Ethereum;
 
 impl Api for Ethereum {

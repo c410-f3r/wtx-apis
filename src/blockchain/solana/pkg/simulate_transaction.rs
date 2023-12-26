@@ -1,27 +1,26 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("simulateTransaction")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    AccountEncoding, Commitment, SendTransactionEncoding, SolanaHttpPkgsAux, TransactionInput,
+    AccountEncoding, Commitment, HttpPkgsAux, SendTransactionEncoding, TransactionInput,
   };
   use alloc::string::String;
   use base64::Engine;
   use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {
     #[pkg::aux_data]
-    fn simulate_transaction_data<A>(
+    fn simulate_transaction_data<ADDR>(
       &mut self,
-      config: Option<SimulateTransactionConfig<A>>,
+      config: Option<SimulateTransactionConfig<ADDR>>,
       tx: &TransactionInput,
-    ) -> crate::Result<SimulateTransactionReq<A>>
+    ) -> crate::Result<SimulateTransactionReq<ADDR>>
     where
-      A: AsyncBounds,
+      ADDR: AsyncBounds,
     {
       self.byte_buffer.clear();
       bincode::serialize_into(&mut self.byte_buffer, tx)?;
@@ -41,9 +40,9 @@ pub(crate) mod pkg {
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
-  pub struct SimulateTransactionReq<A>(String, Option<SimulateTransactionConfig<A>>)
+  pub struct SimulateTransactionReq<ADDR>(String, Option<SimulateTransactionConfig<ADDR>>)
   where
-    A: AsyncBounds;
+    ADDR: AsyncBounds;
 
   #[pkg::res_data]
   pub type SimulateTransactionRes = ();
@@ -51,7 +50,7 @@ pub(crate) mod pkg {
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]
   #[serde(rename_all = "camelCase")]
-  pub struct SimulateTransactionConfig<A> {
+  pub struct SimulateTransactionConfig<ADDR> {
     /// If true the transaction signatures will be verified
     pub sig_verify: bool,
     #[doc = commitment_doc!()]
@@ -62,7 +61,7 @@ pub(crate) mod pkg {
     pub encoding: Option<SendTransactionEncoding>,
     /// Accounts configuration
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub accounts: Option<SimulateTransactionAccounts<A>>,
+    pub accounts: Option<SimulateTransactionAccounts<ADDR>>,
     /// If true, the transaction recent blockhash will be replaced with the most recent blockhash.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replace_recent_blockhash: Option<bool>,
@@ -73,8 +72,8 @@ pub(crate) mod pkg {
 
   /// Accounts configuration
   #[derive(Debug, serde::Serialize)]
-  pub struct SimulateTransactionAccounts<A> {
-    addresses: A,
+  pub struct SimulateTransactionAccounts<ADDR> {
+    addresses: ADDR,
     encoding: AccountEncoding,
   }
 }

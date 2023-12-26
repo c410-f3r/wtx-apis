@@ -1,7 +1,6 @@
 #[wtx_macros::pkg(
   api(crate::test_data::json_placeholder::JsonPlaceholder),
   data_format(json),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {

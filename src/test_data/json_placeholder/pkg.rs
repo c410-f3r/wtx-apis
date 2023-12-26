@@ -73,13 +73,13 @@ impl<'any> GenericParams<'any> {
   ) -> crate::Result<()> {
     req_params.method = self.method;
     match (self.id_opt, self.nested_opt) {
-      (None, None) | (None, Some(_)) => req_params.url.push_path(format_args!("/{endpoint}"))?,
-      (Some(id), None) => req_params.url.push_path(format_args!("/{endpoint}/{id}"))?,
+      (None, None) | (None, Some(_)) => req_params.uri.push_path(format_args!("/{endpoint}"))?,
+      (Some(id), None) => req_params.uri.push_path(format_args!("/{endpoint}/{id}"))?,
       (Some(id), Some(nested)) => {
-        req_params.url.push_path(format_args!("/{endpoint}/{id}/{nested}"))?
+        req_params.uri.push_path(format_args!("/{endpoint}/{id}/{nested}"))?
       }
     }
-    let mut query_writer = req_params.url.query_writer()?;
+    let mut query_writer = req_params.uri.query_writer()?;
     for (key, value) in self.query {
       query_writer = query_writer.write(key, value)?;
     }

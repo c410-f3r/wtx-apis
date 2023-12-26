@@ -1,17 +1,16 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getRecentPrioritizationFees")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::blockchain::solana::SolanaHttpPkgsAux;
+  use crate::blockchain::solana::HttpPkgsAux;
   use alloc::vec::Vec;
   use serde::Serialize;
   use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

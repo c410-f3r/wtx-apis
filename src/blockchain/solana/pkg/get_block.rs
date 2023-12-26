@@ -1,16 +1,15 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getBlock")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    Block, Commitment, SolanaHttpPkgsAux, TransactionDetails, TransactionEncoding,
+    Block, Commitment, HttpPkgsAux, TransactionDetails, TransactionEncoding,
   };
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

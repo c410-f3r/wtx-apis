@@ -1,7 +1,6 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::ethereum::Ethereum),
   data_format(json_rpc("eth_getBalance")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {

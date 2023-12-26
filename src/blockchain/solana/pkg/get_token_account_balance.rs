@@ -1,18 +1,16 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getTokenAccountBalance")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    program::spl_token::AccountBalance, Commitment, JsonRpcResponseResultWithContext,
-    SolanaHttpPkgsAux,
+    program::spl_token::AccountBalance, Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext,
   };
   use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

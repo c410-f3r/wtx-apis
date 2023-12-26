@@ -1,16 +1,15 @@
 #[wtx_macros::pkg(
   api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getClusterNodes")),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::blockchain::solana::{SolanaAddressHashStr, SolanaHttpPkgsAux};
+  use crate::blockchain::solana::{HttpPkgsAux, SolanaAddressHashStr};
   use alloc::vec::Vec;
   use arrayvec::ArrayString;
 
   #[pkg::aux]
-  impl<DRSR> SolanaHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

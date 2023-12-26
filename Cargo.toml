@@ -11,34 +11,30 @@ hex = { default-features = false, optional = true, version = "0.4" }
 primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 solana-program = { default-features = false, optional = true, version = "1.17" }
-wtx = { default-features = false, features = ["arrayvec", "client-api-framework", "web-socket"], path = "../wtx/wtx" }
-wtx-macros = { default-features = false, path = "../wtx/wtx-macros" }
+wtx = { default-features = false, features = ["arrayvec", "client-api-framework", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
+wtx-macros = { default-features = false, git = "https://github.com/c410-f3r/wtx" }
 
 [dev-dependencies]
+dotenv = { default-features = false, version = "0.15" }
 reqwest = { default-features = false, features = ["rustls-tls"], version = "0.11" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
-tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.33" }
+tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
-wtx = { default-features = false, features = ["client-api-framework", "reqwest", "serde_json", "tokio", "tracing", "web-socket-handshake"], path = "../wtx/wtx" }
+wtx = { default-features = false, features = ["_tokio-rustls-client", "client-api-framework", "reqwest", "serde_json", "tokio", "tracing", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
 
 [features]
-
-# API
-
+_integration-tests = []
 aptos = []
-ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
-json-placeholder = []
-nager-date = []
-rick-and-morty = []
-solana = ["base64", "bincode", "bs58"]
-
-# Etc
-
 async-send = ["wtx/async-send", "wtx/async-send"]
 default = []
 ed25519-dalek = ["dep:ed25519-dalek", "std"]
+ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
+json-placeholder = []
+nager-date = []
+pagar-me = ["base64", "wtx/serde"]
+rick-and-morty = []
+solana = ["base64", "bincode", "bs58"]
 std = []
-_integration-tests = []
 
 [package]
 categories = ["asynchronous", "data-structures", "encoding", "network-programming", "no-std"]
@@ -54,3 +50,7 @@ version = "0.2.0"
 
 [package.metadata.docs.rs]
 all-features = true
+
+[patch.crates-io]
+aes-gcm-siv = { git = "https://github.com/RustCrypto/AEADs", rev = "6105d7a5591aefa646a95d12b5e8d3f55a9214ef" }
+curve25519-dalek = { git = "https://github.com/dalek-cryptography/curve25519-dalek", rev = "8274d5cbb6fc3f38cdc742b4798173895cd2a290" }

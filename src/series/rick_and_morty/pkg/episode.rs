@@ -1,7 +1,6 @@
 #[wtx_macros::pkg(
   api(crate::series::rick_and_morty::RickAndMorty),
   data_format(json),
-  error(crate::Error),
   transport(http)
 )]
 pub(crate) mod pkg {
