@@ -11,8 +11,8 @@ hex = { default-features = false, optional = true, version = "0.4" }
 primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 solana-program = { default-features = false, optional = true, version = "1.17" }
-wtx = { default-features = false, features = ["arrayvec", "client-api-framework", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
-wtx-macros = { default-features = false, git = "https://github.com/c410-f3r/wtx" }
+wtx = { default-features = false, features = ["arrayvec", "client-api-framework", "reqwest", "serde", "web-socket"], version = "0.13" }
+wtx-macros = { default-features = false, version = "0.1" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
@@ -20,11 +20,10 @@ reqwest = { default-features = false, features = ["rustls-tls"], version = "0.11
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
-wtx = { default-features = false, features = ["_tokio-rustls-client", "client-api-framework", "reqwest", "serde_json", "tokio", "tracing", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
+wtx = { default-features = false, features = ["_tokio-rustls-client", "client-api-framework", "pool-manager", "serde_json", "tokio", "tracing", "web-socket-handshake"], version = "0.13" }
 
 [features]
 _integration-tests = []
-aptos = []
 async-send = ["wtx/async-send", "wtx/async-send"]
 default = []
 ed25519-dalek = ["dep:ed25519-dalek", "std"]

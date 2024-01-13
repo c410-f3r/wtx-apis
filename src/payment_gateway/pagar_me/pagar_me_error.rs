@@ -1,10 +1,10 @@
 use alloc::{boxed::Box, string::String};
-use wtx::client_api_framework::network::HttpMethod;
+use wtx::http::Method;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct PagarMeErrors {
   pub errors: Box<[PagarMeError]>,
-  pub method: HttpMethod,
+  pub method: Method,
   pub url: Box<str>,
 }
 

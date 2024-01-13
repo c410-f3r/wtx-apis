@@ -1,18 +1,18 @@
 //! Fake data for testing and prototyping.
 //!
-//! <http://jsonplaceholder.typicode.com>
+//! <https://jsonplaceholder.typicode.com>
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::client_api_framework::{
-//!   dnsn::SerdeJson,
-//!   network::{HttpMethod, HttpParams},
+//! use wtx::{
+//!   client_api_framework::{dnsn::SerdeJson, network::HttpParams},
+//!   http::Method,
 //! };
 //! use wtx_apis::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux};
 //!
 //! let mut pkgs_aux =
 //!   PkgsAux::from_minimum(JsonPlaceholder, SerdeJson, (HttpParams::from_uri("URL")));
-//! let _ = pkgs_aux.albums().params(GenericParams::new(None, HttpMethod::Get, None, &[])).build();
+//! let _ = pkgs_aux.albums().params(GenericParams::new(None, Method::Get, None, &[])).build();
 //! # Ok(()) }
 //! ```
 

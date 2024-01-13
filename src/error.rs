@@ -22,11 +22,6 @@ pub enum Error {
   /// See [wtx::Error].
   Wtx(wtx::Error),
 
-  // Aptos
-  /// Some endpoints require a minimum set of response headers.
-  #[cfg(feature = "aptos")]
-  MandatoryResponseHeadersWereNotFound,
-
   // Ethereum
   /// Bad data serialization
   #[cfg(feature = "ethereum")]

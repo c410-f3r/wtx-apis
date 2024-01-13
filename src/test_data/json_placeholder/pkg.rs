@@ -13,7 +13,7 @@ pub use todos::pkg::*;
 pub use users::pkg::*;
 
 use alloc::{boxed::Box, vec::Vec};
-use wtx::client_api_framework::network::{HttpMethod, HttpReqParams};
+use wtx::{client_api_framework::network::HttpReqParams, http::Method};
 
 /// Generic response used by all packages.
 #[derive(Debug, serde::Deserialize)]
@@ -49,7 +49,7 @@ pub enum GenericRes {
 #[derive(Debug)]
 pub struct GenericParams<'any> {
   id_opt: Option<u32>,
-  method: HttpMethod,
+  method: Method,
   nested_opt: Option<&'any str>,
   query: &'any [(&'any str, &'any str)],
 }
@@ -59,7 +59,7 @@ impl<'any> GenericParams<'any> {
   #[inline]
   pub const fn new(
     id_opt: Option<u32>,
-    method: HttpMethod,
+    method: Method,
     nested_opt: Option<&'any str>,
     query: &'any [(&'any str, &'any str)],
   ) -> Self {

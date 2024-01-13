@@ -16,6 +16,8 @@
 wtx::create_packages_aux_wrapper!();
 
 mod address;
+//#[cfg(all(test, feature = "_integration-tests"))]
+//mod integration_tests;
 mod pagar_me_error;
 mod pagar_me_response;
 mod phone;
@@ -31,9 +33,12 @@ use core::{
 pub use pagar_me_response::PagarMeResponse;
 pub use phone::*;
 pub use pkg::*;
-use wtx::client_api_framework::{
-  misc::{RequestLimit, RequestThrottling},
-  Api,
+use wtx::{
+  client_api_framework::{
+    misc::{RequestLimit, RequestThrottling},
+    Api,
+  },
+  misc::from_utf8_basic_rslt,
 };
 
 const MAX_API_KEY_LEN: usize = 64;
@@ -65,7 +70,7 @@ impl PagarMe {
           *last = b':';
           let mut base64_buffer = [0; MAX_API_KEY_LEN];
           let n = STANDARD.encode_slice(total, &mut base64_buffer).ok()?;
-          str::from_utf8(base64_buffer.get(..n)?).ok()?.try_into().ok()
+          from_utf8_basic_rslt(base64_buffer.get(..n)?).ok()?.try_into().ok()
         };
         fun().unwrap_or_default()
       },

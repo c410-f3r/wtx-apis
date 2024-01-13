@@ -1,10 +1,13 @@
 use crate::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux};
-use wtx::client_api_framework::{
-  dnsn::SerdeJson,
-  network::{transport::Transport, HttpMethod, HttpParams},
+use wtx::{
+  client_api_framework::{
+    dnsn::SerdeJson,
+    network::{transport::Transport, HttpParams},
+  },
+  http::Method,
 };
 
-const DEFAULT_GP: GenericParams<'_> = GenericParams::new(None, HttpMethod::Get, None, &[]);
+const DEFAULT_GP: GenericParams<'_> = GenericParams::new(None, Method::Get, None, &[]);
 
 create_http_test!(JsonPlaceholder, http(), albums, |pkgs_aux, trans| async {
   let _res = trans

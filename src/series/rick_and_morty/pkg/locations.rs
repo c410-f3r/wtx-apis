@@ -9,9 +9,12 @@ pub(crate) mod pkg {
   };
   use alloc::{string::String, vec::Vec};
   use core::fmt::Write;
-  use wtx::client_api_framework::{
-    data_format::{GraphQlRequest, GraphQlResponse},
-    network::{transport::TransportParams, HttpMethod},
+  use wtx::{
+    client_api_framework::{
+      data_format::{GraphQlRequest, GraphQlResponse},
+      network::transport::TransportParams,
+    },
+    http::Method,
   };
 
   #[pkg::aux]
@@ -60,7 +63,7 @@ pub(crate) mod pkg {
           "#
         ))
         .map_err(wtx::Error::from)?;
-      self.tp.ext_req_params_mut().method = HttpMethod::Post;
+      self.tp.ext_req_params_mut().method = Method::Post;
       Ok(LocationsReq { operation_name: None, query: buffer, variables: None })
     }
   }

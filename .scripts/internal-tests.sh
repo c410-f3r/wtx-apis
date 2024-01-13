@@ -14,7 +14,6 @@ $rt rustfmt
 $rt clippy
 
 $rt check-generic .
-$rt check-with-features . aptos
 $rt check-with-features . async-send
 $rt check-with-features . base64
 $rt check-with-features . bincode

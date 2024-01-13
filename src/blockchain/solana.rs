@@ -84,21 +84,21 @@ impl Solana {
 
   /// Make successive HTTP requests over a period defined in `cto` until the transaction is
   /// successful or expired.
-  pub async fn confirm_transaction<'th, DRSR, T>(
+  pub async fn confirm_transaction<'th, A, DRSR, T>(
     cto: ConfirmTransactionOptions,
-    pair: &mut PairMut<'_, SolanaMutHttpPkgsAux<'_, DRSR>, T>,
+    pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
     tx_hash: &'th str,
-  ) -> crate::Result<()>
+  ) -> Result<(), A::Error>
   where
+    A: Api<Error = crate::Error>,
     DRSR: AsyncBounds,
     T: AsyncBounds + Transport<DRSR, Params = HttpParams>,
-    for<'instance> GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>:
-      Package<
-        &'instance mut Solana,
-        DRSR,
-        T::Params,
-        ExternalResponseContent = JsonRpcResponse<GetSignatureStatusesRes>,
-      >,
+    GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>: Package<
+      A,
+      DRSR,
+      T::Params,
+      ExternalResponseContent = JsonRpcResponse<GetSignatureStatusesRes>,
+    >,
   {
     macro_rules! call {
       () => {{
@@ -173,22 +173,23 @@ impl Solana {
 
   /// Sometimes a received blockhash is not valid so this function tries to perform additional calls
   /// with different blockhashes.
-  pub async fn try_with_blockhashes<'pa, A, DRSR, E, O, T>(
-    mut aux: A,
+  pub async fn try_with_blockhashes<AUX, API, DRSR, E, O, T>(
+    mut aux: AUX,
     additional_tries: u8,
     initial_blockhash: SolanaBlockhash,
-    pair: &mut Pair<SolanaMutHttpPkgsAux<'pa, DRSR>, T>,
+    pair: &mut Pair<HttpPkgsAux<API, DRSR>, T>,
     mut cb: impl for<'any> FnMutFut<
-      (u8, &'any mut A, SolanaBlockhash, &'any mut Pair<SolanaMutHttpPkgsAux<'pa, DRSR>, T>),
+      (u8, &'any mut AUX, SolanaBlockhash, &'any mut Pair<HttpPkgsAux<API, DRSR>, T>),
       Result<O, E>,
     >,
   ) -> Result<O, E>
   where
+    API: Api<Error = crate::Error>,
     DRSR: AsyncBounds,
     E: From<crate::Error>,
     T: AsyncBounds + Transport<DRSR, Params = HttpParams>,
     GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: Package<
-      &'pa mut Solana,
+      API,
       DRSR,
       HttpParams,
       ExternalResponseContent = JsonRpcResponse<GetLatestBlockhashRes>,

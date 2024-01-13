@@ -81,6 +81,7 @@ macro_rules! create_ws_test {
         let _res = trans.send(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
       },
       {
+        use std::net::ToSocketAddrs;
         use wtx::web_socket::handshake::WebSocketConnect;
         let uri = wtx::misc::Uri::new($uri);
         let mut fb = wtx::web_socket::FrameBufferVec::default();
@@ -89,7 +90,13 @@ macro_rules! create_ws_test {
           fb: &mut fb,
           headers_buffer: &mut <_>::default(),
           rng: wtx::rng::StaticRng::default(),
-          stream: wtx::misc::tls_stream_from_host(uri.host(), uri.hostname(), None).await.unwrap(),
+          stream: wtx::misc::TokioRustlsConnector::from_webpki_roots()
+            .with_tcp_stream(
+              uri.host().to_socket_addrs().unwrap().next().unwrap(),
+              uri.hostname()
+            )
+            .await
+            .unwrap(),
           uri: &uri,
           wsb: wtx::web_socket::WebSocketBuffer::default(),
         }
