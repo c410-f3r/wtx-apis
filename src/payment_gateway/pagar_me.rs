@@ -38,7 +38,7 @@ use wtx::{
     misc::{RequestLimit, RequestThrottling},
     Api,
   },
-  misc::from_utf8_basic_rslt,
+  misc::from_utf8_basic,
 };
 
 const MAX_API_KEY_LEN: usize = 64;
@@ -70,7 +70,7 @@ impl PagarMe {
           *last = b':';
           let mut base64_buffer = [0; MAX_API_KEY_LEN];
           let n = STANDARD.encode_slice(total, &mut base64_buffer).ok()?;
-          from_utf8_basic_rslt(base64_buffer.get(..n)?).ok()?.try_into().ok()
+          from_utf8_basic(base64_buffer.get(..n)?).ok()?.try_into().ok()
         };
         fun().unwrap_or_default()
       },

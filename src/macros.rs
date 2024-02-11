@@ -100,7 +100,7 @@ macro_rules! create_ws_test {
           uri: &uri,
           wsb: wtx::web_socket::WebSocketBuffer::default(),
         }
-        .connect()
+        .connect([])
         .await
         .unwrap()
         .1;
