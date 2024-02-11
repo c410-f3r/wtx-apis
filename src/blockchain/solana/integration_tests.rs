@@ -949,7 +949,7 @@ async fn latest_blockhash(
 async fn pool_resource() -> MappedMutexGuard<'static, Solana> {
   type Rm = SimpleRM<crate::Error, (), Solana>;
 
-  static POOL: OnceLock<StaticPool<Mutex<Option<Solana>>, Rm, 8>> = OnceLock::new();
+  static POOL: OnceLock<StaticPool<Mutex<Option<Solana>>, Rm, 6>> = OnceLock::new();
 
   fn cb(_: &()) -> crate::Result<Solana> {
     Ok(Solana::new(None))
