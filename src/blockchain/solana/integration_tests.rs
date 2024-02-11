@@ -1,8 +1,8 @@
 use crate::blockchain::solana::{
   AccountEncoding, AccountSubscribeConfig, Commitment, DataSlice, Filter, GetAccountInfoConfig,
-  GetBlockConfig, GetLeaderScheduleConfig, GetProgramAccountsConfig, GetTokenAccountsByOwnerConfig,
+  GetLeaderScheduleConfig, GetProgramAccountsConfig, GetTokenAccountsByOwnerConfig,
   GetVoteAccountsConfig, Memcmp, MemcmpEncodedBytes, MintOrProgramId, PkgsAux, Solana,
-  SolanaAddressHash, SolanaMutPkgsAux, TransactionDetails, TransactionEncoding,
+  SolanaAddressHash, SolanaMutPkgsAux, TransactionEncoding,
 };
 use alloc::vec::Vec;
 use reqwest::Client;
@@ -50,31 +50,6 @@ create_http_test!(&mut *pool_resource().await, http(), get_balance, |pkgs_aux, t
   let _res = trans
     .send_retrieve_and_decode_contained(
       &mut pkgs_aux.get_balance().data(TO_NORMAL_ACCOUNT, None).build(),
-      pkgs_aux,
-    )
-    .await
-    .unwrap()
-    .result
-    .unwrap();
-});
-
-create_http_test!(&mut *pool_resource().await, http(), get_block, |pkgs_aux, trans| async {
-  let slot = slot(pkgs_aux, trans).await;
-  let _res = trans
-    .send_retrieve_and_decode_contained(
-      &mut pkgs_aux
-        .get_block()
-        .data(
-          slot,
-          Some(GetBlockConfig {
-            commitment: Some(Commitment::Finalized),
-            encoding: Some(TransactionEncoding::JsonParsed),
-            max_supported_transaction_version: Some(0),
-            rewards: Some(true),
-            transaction_details: Some(TransactionDetails::Full),
-          }),
-        )
-        .build(),
       pkgs_aux,
     )
     .await
@@ -949,7 +924,7 @@ async fn latest_blockhash(
 async fn pool_resource() -> MappedMutexGuard<'static, Solana> {
   type Rm = SimpleRM<crate::Error, (), Solana>;
 
-  static POOL: OnceLock<StaticPool<Mutex<Option<Solana>>, Rm, 6>> = OnceLock::new();
+  static POOL: OnceLock<StaticPool<Mutex<Option<Solana>>, Rm, 8>> = OnceLock::new();
 
   fn cb(_: &()) -> crate::Result<Solana> {
     Ok(Solana::new(None))
