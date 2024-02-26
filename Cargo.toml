@@ -10,7 +10,7 @@ ethereum-types = { default-features = false, features = ["serialize"], optional 
 hex = { default-features = false, optional = true, version = "0.4" }
 primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
-solana-program = { default-features = false, optional = true, version = "1.17" }
+solana-program = { default-features = false, optional = true, version = "1.18" }
 wtx = { default-features = false, features = ["arrayvec", "client-api-framework", "reqwest", "serde", "web-socket"], version = "0.14" }
 wtx-macros = { default-features = false, version = "0.1" }
 
