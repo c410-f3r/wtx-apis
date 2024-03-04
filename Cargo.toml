@@ -1,6 +1,6 @@
 [dependencies]
 arrayvec = { default-features = false, features = ["serde"], version = "0.7" }
-base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.21" }
+base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
 cl-aux = { default-features = false, features = ["alloc", "arrayvec", "serde"], version = "4.0" }
