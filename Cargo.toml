@@ -16,7 +16,7 @@ wtx-macros = { default-features = false, version = "0.1" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
-reqwest = { default-features = false, features = ["rustls-tls"], version = "0.11" }
+reqwest = { default-features = false, features = ["rustls-tls"], version = "0.12" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
