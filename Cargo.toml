@@ -13,7 +13,7 @@ primitive-types = { default-features = false, features = ["serde"], optional = t
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
-wtx-macros = { default-features = false, version = "0.1", path = "../wtx/wtx-macros" }
+wtx-macros = { default-features = false, version = "0.1", git = "https://github.com/c410-f3r/wtx" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
