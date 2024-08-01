@@ -1,12 +1,19 @@
 use crate::blockchain::ethereum::{BlockNumber, Ethereum, PkgsAux};
-use wtx::client_api_framework::{
-  dnsn::SerdeJson,
-  network::{transport::Transport, HttpParams},
+use std::sync::LazyLock;
+use wtx::{
+  client_api_framework::{
+    dnsn::SerdeJson,
+    network::{transport::Transport, HttpParams},
+  },
+  http::ClientTokioRustls,
 };
 
-create_http_test!(Ethereum, http(), eth_block_number, |pkgs_aux, trans| async {
+static CLIENT: LazyLock<ClientTokioRustls> =
+  LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
+
+create_http_test!(Ethereum, http(), eth_block_number, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(&mut pkgs_aux.eth_block_number().build(), pkgs_aux)
+    .send_recv_decode_contained(&mut pkgs_aux.eth_block_number().build(), pkgs_aux)
     .await
     .unwrap()
     .result
@@ -17,9 +24,10 @@ create_http_test!(
   Ethereum,
   http(),
   eth_block_transaction_count_by_number,
+  &*CLIENT,
   |pkgs_aux, trans| async {
     let _res = trans
-      .send_retrieve_and_decode_contained(
+      .send_recv_decode_contained(
         &mut pkgs_aux
           .eth_block_transaction_count_by_number()
           .data([&BlockNumber::Number(15228994)])
@@ -33,9 +41,9 @@ create_http_test!(
   }
 );
 
-create_http_test!(Ethereum, http(), eth_get_balance, |pkgs_aux, trans| async {
+create_http_test!(Ethereum, http(), eth_get_balance, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(
+    .send_recv_decode_contained(
       &mut pkgs_aux
         .eth_get_balance()
         .data("0xd6216fc19db775df9774a6e33526131da7d19a2c", &BlockNumber::Latest)
@@ -49,5 +57,5 @@ create_http_test!(Ethereum, http(), eth_get_balance, |pkgs_aux, trans| async {
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://cloudflare-eth.com"))
+  (SerdeJson, HttpParams::from_uri("https://cloudflare-eth.com:443"))
 }

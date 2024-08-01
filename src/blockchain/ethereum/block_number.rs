@@ -23,9 +23,9 @@ where
 
 mod serde {
   use crate::blockchain::ethereum::BlockNumber;
-  use arrayvec::ArrayString;
   use core::fmt::Write;
   use serde::{ser::Error, Serialize, Serializer};
+  use wtx::misc::ArrayString;
 
   impl Serialize for BlockNumber {
     #[inline]

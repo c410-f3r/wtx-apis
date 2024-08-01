@@ -9,7 +9,6 @@ pub(crate) mod pkg {
   };
   use alloc::string::String;
   use base64::Engine;
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {
@@ -18,10 +17,7 @@ pub(crate) mod pkg {
       &mut self,
       config: Option<SimulateTransactionConfig<ADDR>>,
       tx: &TransactionInput,
-    ) -> crate::Result<SimulateTransactionReq<ADDR>>
-    where
-      ADDR: AsyncBounds,
-    {
+    ) -> crate::Result<SimulateTransactionReq<ADDR>> {
       self.byte_buffer.clear();
       bincode::serialize_into(&mut self.byte_buffer, tx)?;
       let encoded = if let Some(SimulateTransactionConfig {
@@ -40,9 +36,7 @@ pub(crate) mod pkg {
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
-  pub struct SimulateTransactionReq<ADDR>(String, Option<SimulateTransactionConfig<ADDR>>)
-  where
-    ADDR: AsyncBounds;
+  pub struct SimulateTransactionReq<ADDR>(String, Option<SimulateTransactionConfig<ADDR>>);
 
   #[pkg::res_data]
   pub type SimulateTransactionRes = ();

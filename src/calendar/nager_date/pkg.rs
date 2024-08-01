@@ -15,7 +15,7 @@ pub use v3_next_public_holidays_worldwide::pkg::*;
 pub use v3_public_holidays::pkg::*;
 
 use alloc::vec::Vec;
-use arrayvec::ArrayString;
+use wtx::misc::ArrayString;
 
 /// The type of a public holiday
 #[derive(Debug, serde::Deserialize)]

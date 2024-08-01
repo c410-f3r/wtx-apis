@@ -9,7 +9,7 @@ pub(crate) mod pkg {
     phone::{PhoneOwned, PhoneRef},
     PagarMeHttpPkgsAux,
   };
-  use arrayvec::{ArrayString, ArrayVec};
+  use wtx::misc::{ArrayString, ArrayVector};
 
   #[pkg::aux]
   impl<DRSR> PagarMeHttpPkgsAux<DRSR> {}
@@ -39,7 +39,7 @@ pub(crate) mod pkg {
   #[pkg::res_data]
   pub struct CustomerRes {
     /// See [AddressOwned]
-    pub addresses: ArrayVec<AddressOwned, 4>,
+    pub addresses: ArrayVector<AddressOwned, 4>,
     /// DDMMYYYY
     pub born_at: ArrayString<8>,
     /// DDMMYYYY
@@ -57,7 +57,7 @@ pub(crate) mod pkg {
     /// Name
     pub name: ArrayString<64>,
     /// See [PhoneOwned]
-    pub phones: ArrayVec<PhoneOwned, 4>,
+    pub phones: ArrayVector<PhoneOwned, 4>,
   }
 
   #[derive(Debug, serde::Deserialize)]

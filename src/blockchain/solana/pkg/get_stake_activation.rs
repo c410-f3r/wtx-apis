@@ -5,7 +5,6 @@
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux, StakeActivationState};
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -17,9 +16,7 @@ pub(crate) mod pkg {
     #[pkg::field(name = "conf")]
     #[serde(skip_serializing_if = "Option::is_none")]
     Option<GetStakeActivationConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[derive(Debug, serde::Deserialize)]
   #[pkg::res_data]

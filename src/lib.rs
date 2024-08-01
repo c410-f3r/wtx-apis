@@ -2,9 +2,11 @@
 //!
 //! Most of the API structures are markers used to guide different type implementations.
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 extern crate alloc;
+#[cfg(feature = "std")]
+extern crate std;
 
 #[macro_use]
 mod macros;
@@ -16,6 +18,8 @@ pub mod misc;
 pub mod payment_gateway;
 pub mod series;
 pub mod test_data;
+#[cfg(all(feature = "std", test))]
+mod tests;
 
 pub use error::Error;
 

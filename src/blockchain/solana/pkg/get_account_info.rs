@@ -7,7 +7,6 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Account, AccountEncoding, Commitment, DataSlice, HttpPkgsAux, JsonRpcResponseResultWithContext,
   };
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -19,9 +18,7 @@ pub(crate) mod pkg {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[pkg::field(name = "config")]
     Option<GetAccountInfoConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type GetAccountInfoRes = JsonRpcResponseResultWithContext<Option<Account>>;

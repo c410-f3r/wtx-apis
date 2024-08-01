@@ -1,8 +1,8 @@
 use crate::blockchain::ethereum::{contract::TokenizableItem, Bytes};
 use alloc::{format, string::String, vec::Vec};
-use arrayvec::ArrayVec;
 use ethabi::{Address, Token};
 use ethereum_types::{H256, U128, U256};
+use wtx::misc::ArrayVector;
 
 /// Simplified output type for single value.
 pub trait Tokenizable {
@@ -23,15 +23,14 @@ where
   fn from_token(token: Token) -> crate::Result<Self> {
     if let Token::FixedArray(tokens) = token {
       let len = tokens.len();
-      let mut array = ArrayVec::<T, N>::new();
-      for elem in tokens.into_iter().take(N).flat_map(T::from_token) {
-        array.try_push(elem)?;
-      }
-      return array.into_inner().map_err(|_err| {
-        crate::Error::TokensInvalidOutputType(format!(
-          "Expected `FixedArray({N})`, got FixedArray({len})"
-        ))
-      });
+      return ArrayVector::from_iter(tokens.into_iter().flat_map(T::from_token))
+        .map_err(wtx::Error::from)?
+        .into_inner()
+        .map_err(|_err| {
+          crate::Error::TokensInvalidOutputType(format!(
+            "Expected `FixedArray({N})`, got FixedArray({len})"
+          ))
+        });
     }
     Err(crate::Error::TokensInvalidOutputType(
       format!("Expected `FixedArray({N})`, got {token:?}",),
@@ -40,7 +39,7 @@ where
 
   #[inline]
   fn into_token(self) -> Token {
-    Token::FixedArray(ArrayVec::from(self).into_iter().map(T::into_token).collect())
+    Token::FixedArray(self.into_iter().map(T::into_token).collect())
   }
 }
 
@@ -115,7 +114,7 @@ impl Tokenizable for Bytes {
 
   #[inline]
   fn into_token(self) -> Token {
-    Token::Bytes(self.0)
+    Token::Bytes(self.0.into())
   }
 }
 

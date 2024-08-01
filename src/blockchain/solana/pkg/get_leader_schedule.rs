@@ -6,7 +6,6 @@
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux, SolanaBlockhash};
   use alloc::{collections::BTreeMap, string::String, vec::Vec};
-  use wtx::misc::AsyncBounds;
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
@@ -17,9 +16,7 @@ pub(crate) mod pkg {
     #[pkg::field(name = "conf")]
     #[serde(skip_serializing_if = "Option::is_none")]
     Option<GetLeaderScheduleConfig<S>>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

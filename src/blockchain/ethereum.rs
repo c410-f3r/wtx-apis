@@ -21,7 +21,7 @@ mod access_list_item;
 mod block_id;
 mod block_number;
 mod call_request;
-//mod contract;
+pub mod contract;
 #[cfg(all(test, feature = "_integration-tests"))]
 mod integration_tests;
 mod pkg;
@@ -32,24 +32,23 @@ mod transaction_condition;
 mod transaction_request;
 mod types;
 
-pub use access_list::*;
-pub use access_list_item::*;
-pub use block_id::*;
-pub use block_number::*;
-pub use call_request::*;
-//pub use contract::Contract;
+pub use access_list::AccessList;
+pub use access_list_item::AccessListItem;
+pub use block_id::BlockId;
+pub use block_number::BlockNumber;
+pub use call_request::CallRequest;
 pub use pkg::*;
-pub use raw_transaction::*;
-pub use receipt::*;
-pub use transaction::*;
-pub use transaction_condition::*;
-pub use transaction_request::*;
+pub use raw_transaction::RawTransaction;
+pub use receipt::Receipt;
+pub use transaction::Transaction;
+pub use transaction_condition::TransactionCondition;
+pub use transaction_request::TransactionRequest;
 pub use types::*;
 use wtx::client_api_framework::Api;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_types(pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Ethereum;
 
 impl Api for Ethereum {

@@ -3,11 +3,11 @@
 mod concat_array_str;
 mod slice_by_commas;
 
-use arrayvec::ArrayString;
 pub use concat_array_str::ConcatArrayStr;
 use core::{fmt::Display, str::FromStr};
 use serde::{de::IntoDeserializer, Deserialize, Deserializer, Serialize, Serializer};
 pub use slice_by_commas::SliceByCommas;
+use wtx::misc::ArrayString;
 
 const MAX_ASSET_ABBR_LEN: usize = 10;
 const MAX_NUMBER_LEN: usize = 31;

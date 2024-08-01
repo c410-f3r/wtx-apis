@@ -6,7 +6,6 @@
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux};
   use alloc::vec::Vec;
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -18,9 +17,7 @@ pub(crate) mod pkg {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[pkg::field(name = "config")]
     Option<GetInflationRewardConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type GetInflationRewardRes = Vec<GetInflationReward>;

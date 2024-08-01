@@ -1,5 +1,6 @@
 use crate::blockchain::solana::{SolanaSignatureHash, VersionedMessageInput};
-use alloc::{vec, vec::Vec};
+use alloc::vec;
+use wtx::misc::Vector;
 #[cfg(feature = "ed25519-dalek")]
 use {
   crate::blockchain::solana::SolanaBlockhash,
@@ -12,7 +13,7 @@ use {
 pub struct TransactionInput {
   #[serde(with = "crate::blockchain::solana::short_vec")]
   /// Signatures
-  pub signatures: Vec<SolanaSignatureHash>,
+  pub signatures: Vector<SolanaSignatureHash>,
   /// Message
   pub message: VersionedMessageInput,
 }
@@ -22,7 +23,7 @@ impl TransactionInput {
   /// submission.
   #[cfg(feature = "ed25519-dalek")]
   pub fn new<'keypair>(
-    buffer: &mut Vec<u8>,
+    buffer: &mut Vector<u8>,
     blockhash: SolanaBlockhash,
     message: VersionedMessageInput,
     keypairs: impl Clone + IntoIterator<Item = &'keypair Keypair>,
@@ -58,7 +59,7 @@ impl TransactionInput {
   pub fn sign<'keypair>(
     &mut self,
     blockhash: SolanaBlockhash,
-    buffer: &mut Vec<u8>,
+    buffer: &mut Vector<u8>,
     keypairs: impl Clone + IntoIterator<Item = &'keypair Keypair>,
   ) -> crate::Result<()> {
     let VersionedMessageInput::V0(message) = &mut self.message;
@@ -73,7 +74,7 @@ impl TransactionInput {
   #[cfg(feature = "ed25519-dalek")]
   fn do_sign<'keypair>(
     &mut self,
-    mut buffer: &mut Vec<u8>,
+    mut buffer: &mut Vector<u8>,
     keypairs: impl Clone + IntoIterator<Item = &'keypair Keypair>,
   ) -> crate::Result<()> {
     buffer.clear();
@@ -109,7 +110,7 @@ impl TransactionInput {
   fn _set_empty_signatures(&mut self) -> crate::Result<()> {
     let VersionedMessageInput::V0(message) = &self.message;
     let len: usize = message.header.num_required_signatures.into();
-    self.signatures = vec![SolanaSignatureHash::default(); len];
+    self.signatures = Vector::from_vec(vec![SolanaSignatureHash::default(); len]);
     Ok(())
   }
 }

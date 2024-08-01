@@ -81,35 +81,6 @@ enum VisitStatus {
   More(u16),
 }
 
-struct ShortVec<T>(T);
-
-impl<'de, T> Deserialize<'de> for ShortVec<T>
-where
-  T: Push<T::Item> + SingleTypeStorage + WithCapacity<Input = usize>,
-  T::Item: Deserialize<'de>,
-{
-  fn deserialize<D>(deserializer: D) -> Result<ShortVec<T>, D::Error>
-  where
-    D: Deserializer<'de>,
-  {
-    deserialize(deserializer).map(ShortVec)
-  }
-}
-
-impl<T> Serialize for ShortVec<T>
-where
-  T: Serialize,
-  T: AsRef<[T::Item]> + SingleTypeStorage,
-  T::Item: Serialize,
-{
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where
-    S: Serializer,
-  {
-    serialize(self.0.as_ref(), serializer)
-  }
-}
-
 fn visit_byte(elem: u8, val: u16, nth_byte: usize) -> Result<VisitStatus, VisitError> {
   if elem == 0 && nth_byte != 0 {
     return Err(VisitError::Alias);

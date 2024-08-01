@@ -1,12 +1,12 @@
-use alloc::vec::Vec;
+use wtx::misc::Vector;
 
 /// Raw bytes wrapper
 #[derive(Debug, Default, Eq, PartialEq)]
-pub struct Bytes(pub Vec<u8>);
+pub struct Bytes(pub Vector<u8>);
 
 impl<T> From<T> for Bytes
 where
-  T: Into<Vec<u8>>,
+  T: Into<Vector<u8>>,
 {
   #[inline]
   fn from(data: T) -> Self {
@@ -17,7 +17,7 @@ where
 mod serde {
   use crate::blockchain::ethereum::Bytes;
   use alloc::string::String;
-  use core::fmt::{Formatter, Write};
+  use core::fmt::{Display, Formatter};
   use serde::{
     de::{Unexpected, Visitor},
     Deserialize, Deserializer, Serialize, Serializer,
@@ -39,11 +39,7 @@ mod serde {
     where
       S: Serializer,
     {
-      let mut serialized = String::new();
-      serialized
-        .write_fmt(format_args!("0x{}", &hex::encode(&self.0)))
-        .map_err(|err| serde::ser::Error::custom(err))?;
-      serializer.serialize_str(serialized.as_ref())
+      serializer.collect_str(&HexDisplay(&self.0))
     }
   }
 
@@ -52,26 +48,44 @@ mod serde {
   impl<'de> Visitor<'de> for BytesVisitor {
     type Value = Bytes;
 
+    #[inline]
     fn expecting(&self, formatter: &mut Formatter<'_>) -> core::fmt::Result {
       write!(formatter, "a 0x-prefixed hex-encoded vector of bytes")
     }
 
+    #[inline]
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
     where
       E: serde::de::Error,
     {
       if value.len() >= 2 && value.get(..2).unwrap_or_default() == "0x" {
-        Ok(Bytes(hex::decode(value.get(2..).unwrap_or_default()).map_err(|err| E::custom(err))?))
+        Ok(Bytes(
+          hex::decode(value.get(2..).unwrap_or_default()).map_err(|err| E::custom(err))?.into(),
+        ))
       } else {
         Err(E::invalid_value(Unexpected::Str(value), &"0x prefix"))
       }
     }
 
+    #[inline]
     fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
     where
       E: serde::de::Error,
     {
       self.visit_str(value.as_ref())
+    }
+  }
+
+  struct HexDisplay<'bytes>(&'bytes [u8]);
+
+  impl<'bytes> Display for HexDisplay<'bytes> {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+      write!(f, "0x")?;
+      for &byte in self.0.iter() {
+        write!(f, "{:02x}", byte)?;
+      }
+      Ok(())
     }
   }
 }

@@ -10,36 +10,36 @@ use ethereum_types::{U256, U64};
 #[derive(Debug, Default, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CallRequest {
+  /// Access list
+  #[serde(default, skip_serializing_if = "Option::is_none")]
+  pub access_list: Option<AccessList>,
+  /// Data (None for empty data)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub data: Option<Bytes>,
   /// Sender address (None for arbitrary address)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub from: Option<Address>,
-  /// To address (None allowed for eth_estimateGas)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub to: Option<Address>,
   /// Supplied gas (None for sensible default)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub gas: Option<U256>,
   /// Gas price (None for sensible default)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub gas_price: Option<U256>,
-  /// Transfered value (None for no transfer)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub value: Option<U256>,
-  /// Data (None for empty data)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub data: Option<Bytes>,
-  /// Transaction type, Some(1) for AccessList transaction, None for Legacy
-  #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
-  pub ty: Option<U64>,
-  /// Access list
-  #[serde(default, skip_serializing_if = "Option::is_none")]
-  pub access_list: Option<AccessList>,
   /// Max fee per gas
   #[serde(default, skip_serializing_if = "Option::is_none")]
   pub max_fee_per_gas: Option<U256>,
   /// miner bribe
   #[serde(default, skip_serializing_if = "Option::is_none")]
   pub max_priority_fee_per_gas: Option<U256>,
+  /// To address (None allowed for eth_estimateGas)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub to: Option<Address>,
+  /// Transaction type, Some(1) for AccessList transaction, None for Legacy
+  #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+  pub ty: Option<U64>,
+  /// Transfered value (None for no transfer)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub value: Option<U256>,
 }
 
 #[cfg(test)]
@@ -50,24 +50,24 @@ mod tests {
   #[test]
   fn should_serialize_call_request() {
     let call_request = CallRequest {
-      from: None,
-      to: Some(Address::from_low_u64_be(5)),
-      gas: Some(21_000.into()),
-      gas_price: None,
-      value: Some(5_000_000.into()),
-      data: Some(hex::decode("010203").unwrap().into()),
-      ty: None,
       access_list: None,
+      data: Some(hex::decode("010203").unwrap().into()),
+      from: None,
+      gas_price: None,
+      gas: Some(21_000.into()),
       max_fee_per_gas: None,
       max_priority_fee_per_gas: None,
+      to: Some(Address::from_low_u64_be(5)),
+      ty: None,
+      value: Some(5_000_000.into()),
     };
     assert_eq!(
       serde_json::to_string_pretty(&call_request).unwrap(),
       r#"{
-  "to": "0x0000000000000000000000000000000000000005",
+  "data": "0x010203",
   "gas": "0x5208",
-  "value": "0x4c4b40",
-  "data": "0x010203"
+  "to": "0x0000000000000000000000000000000000000005",
+  "value": "0x4c4b40"
 }"#
     );
   }

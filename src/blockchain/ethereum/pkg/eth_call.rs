@@ -12,7 +12,9 @@ pub(crate) mod pkg {
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
   pub struct EthCallReq<'any>(
-    #[pkg::field(name = "block_id")] Option<&'any BlockId>,
+    #[pkg::field(name = "block_id")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    Option<&'any BlockId>,
     #[pkg::field(name = "cr")] &'any CallRequest,
   );
 

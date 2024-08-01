@@ -5,7 +5,6 @@
 )]
 pub(crate) mod sub {
   use crate::blockchain::solana::{AccountEncoding, Commitment, TransactionDetails, WsPkgsAux};
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> WsPkgsAux<A, DRSR> {}
@@ -17,9 +16,7 @@ pub(crate) mod sub {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[pkg::field(name = "config")]
     Option<BlockSubscribeConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type BlockSubscribeRes = u64;

@@ -1,15 +1,19 @@
 use crate::payment_gateway::pagar_me::{PagarMe, PkgsAux};
-use wtx::client_api_framework::{
-  dnsn::SerdeJson,
-  network::{transport::Transport, HttpParams},
+use std::sync::LazyLock;
+use wtx::{
+  client_api_framework::{
+    dnsn::SerdeJson,
+    network::{transport::Transport, HttpParams},
+  },
+  http::ClientTokioRustls,
 };
 
-create_http_test!(instance(), http(), balance, |pkgs_aux, trans| async {
+static CLIENT: LazyLock<ClientTokioRustls> =
+  LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
+
+create_http_test!(instance(), http(), balance, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(
-      &mut pkgs_aux.recipient_balance().params("0").build(),
-      pkgs_aux,
-    )
+    .send_recv_decode_contained(&mut pkgs_aux.recipient_balance().params("0").build(), pkgs_aux)
     .await
     .unwrap()
     .data

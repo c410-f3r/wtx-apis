@@ -6,41 +6,41 @@ use ethereum_types::{U256, U64};
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionRequest {
+  /// Access list
+  #[serde(default, skip_serializing_if = "Option::is_none")]
+  pub access_list: Option<AccessList>,
+  /// Min block inclusion (None for include immediately)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub condition: Option<TransactionCondition>,
+  /// Transaction data (None for empty bytes)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub data: Option<Bytes>,
   /// Sender address
   pub from: Address,
-  /// Recipient address (None for contract creation)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub to: Option<Address>,
   /// Supplied gas (None for sensible default)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub gas: Option<U256>,
   /// Gas price (None for sensible default)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub gas_price: Option<U256>,
-  /// Transfered value (None for no transfer)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub value: Option<U256>,
-  /// Transaction data (None for empty bytes)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub data: Option<Bytes>,
-  /// Transaction nonce (None for next available nonce)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub nonce: Option<U256>,
-  /// Min block inclusion (None for include immediately)
-  #[serde(skip_serializing_if = "Option::is_none")]
-  pub condition: Option<TransactionCondition>,
-  /// Transaction type, Some(1) for AccessList transaction, None for Legacy
-  #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
-  pub ty: Option<U64>,
-  /// Access list
-  #[serde(default, skip_serializing_if = "Option::is_none")]
-  pub access_list: Option<AccessList>,
   /// Max fee per gas
   #[serde(skip_serializing_if = "Option::is_none")]
   pub max_fee_per_gas: Option<U256>,
   /// miner bribe
   #[serde(skip_serializing_if = "Option::is_none")]
   pub max_priority_fee_per_gas: Option<U256>,
+  /// Transaction nonce (None for next available nonce)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub nonce: Option<U256>,
+  /// Recipient address (None for contract creation)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub to: Option<Address>,
+  /// Transaction type, Some(1) for AccessList transaction, None for Legacy
+  #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+  pub ty: Option<U64>,
+  /// Transfered value (None for no transfer)
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub value: Option<U256>,
 }
 
 #[cfg(test)]
@@ -68,13 +68,13 @@ mod tests {
     assert_eq!(
       serde_json::to_string_pretty(&tx_request).unwrap(),
       r#"{
-  "from": "0x0000000000000000000000000000000000000005",
-  "gas": "0x5208",
-  "value": "0x4c4b40",
-  "data": "0x010203",
   "condition": {
     "block": 5
-  }
+  },
+  "data": "0x010203",
+  "from": "0x0000000000000000000000000000000000000005",
+  "gas": "0x5208",
+  "value": "0x4c4b40"
 }"#
     );
   }

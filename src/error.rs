@@ -1,7 +1,7 @@
-#[allow(unused_imports)]
+#[allow(unused_imports, reason = "optional features")]
 use alloc::string::String;
 use core::fmt::{Debug, Display, Formatter};
-use wtx::client_api_framework::network::StatusCode;
+use wtx::http::StatusCode;
 
 /// All possible errors are grouped here
 #[derive(Debug)]
@@ -19,7 +19,7 @@ pub enum Error {
   /// See [primitive_types::Error].
   #[cfg(feature = "ethereum")]
   PrimitiveTypes(primitive_types::Error),
-  /// See [wtx::Error].
+  /// See [`wtx::Error`].
   Wtx(wtx::Error),
 
   // Ethereum
