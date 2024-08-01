@@ -8,8 +8,7 @@ pub(crate) mod pkg {
     Account, AccountEncoding, Commitment, DataSlice, Filter, HttpPkgsAux,
   };
   use alloc::vec::Vec;
-  use arrayvec::ArrayString;
-  use wtx::misc::AsyncBounds;
+  use wtx::misc::ArrayString;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -21,9 +20,7 @@ pub(crate) mod pkg {
     #[pkg::field(name = "config")]
     #[serde(skip_serializing_if = "Option::is_none")]
     Option<GetProgramAccountsConfig<'bytes, 'filter>>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type GetProgramAccountsRes = Vec<GetProgramAccounts>;

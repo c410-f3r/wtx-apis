@@ -6,7 +6,7 @@
 pub(crate) mod pkg {
   use crate::blockchain::solana::{HttpPkgsAux, SolanaAddressHashStr};
   use alloc::vec::Vec;
-  use arrayvec::ArrayString;
+  use wtx::misc::ArrayString;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -26,7 +26,7 @@ pub(crate) mod pkg {
     /// Node Base58 public key.
     pub pubkey: SolanaAddressHashStr,
     /// JSON RPC network address of the node.
-    pub rpc: Option<ArrayString<21>>,
+    pub rpc: Option<ArrayString<32>>,
     /// TPU network address.
     pub tpu: Option<ArrayString<21>>,
     /// The software version of the node.

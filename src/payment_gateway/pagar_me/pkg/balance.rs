@@ -5,7 +5,10 @@
 )]
 pub(crate) mod pkg {
   use crate::payment_gateway::pagar_me::{PagarMeHttpPkgsAux, PagarMeResponse};
-  use wtx::client_api_framework::network::HttpReqParams;
+  use wtx::{
+    client_api_framework::network::HttpReqParams,
+    http::{Header, KnownHeaderName},
+  };
 
   #[pkg::aux]
   impl<DRSR> PagarMeHttpPkgsAux<DRSR> {}
@@ -17,9 +20,15 @@ pub(crate) mod pkg {
     req_params: &mut HttpReqParams,
   ) -> crate::Result<()> {
     api.rt_150.rc.update_params(&api.rt_150.rl).await?;
-    req_params
-      .headers
-      .push_fmt(format_args!("authorization"), format_args!("Basic {}", &api.api_key))?;
+    req_params.headers.push_front(
+      Header {
+        is_sensitive: false,
+        is_trailer: false,
+        name: KnownHeaderName::Authorization.into(),
+        value: b"Basic ",
+      },
+      api.api_key.as_bytes(),
+    )?;
     req_params.uri.push_path(format_args!("/recipients/{}/balance", params.recipient_id))?;
     Ok(())
   }

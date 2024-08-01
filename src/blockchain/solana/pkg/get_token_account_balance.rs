@@ -7,7 +7,6 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     program::spl_token::AccountBalance, Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext,
   };
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -19,9 +18,7 @@ pub(crate) mod pkg {
     #[pkg::field(name = "config")]
     #[serde(skip_serializing_if = "Option::is_none")]
     Option<GetTokenAccountBalanceConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type GetTokenAccountBalanceRes = JsonRpcResponseResultWithContext<AccountBalance>;

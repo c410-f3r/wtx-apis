@@ -1,4 +1,4 @@
-use arrayvec::ArrayString;
+use wtx::misc::ArrayString;
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

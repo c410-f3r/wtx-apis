@@ -5,8 +5,7 @@
 )]
 pub(crate) mod pkg {
   use crate::test_data::json_placeholder::{GenericParams, GenericRes, JsonPlaceholderHttpPkgsAux};
-  use arrayvec::ArrayString;
-  use wtx::client_api_framework::network::HttpReqParams;
+  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
 
   #[pkg::aux]
   impl<DRSR> JsonPlaceholderHttpPkgsAux<DRSR> {}

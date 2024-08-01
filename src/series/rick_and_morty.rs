@@ -28,7 +28,7 @@ use wtx::client_api_framework::Api;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_types(pkgs_aux(PkgsAux), transport(http))]
+#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http))]
 pub struct RickAndMorty;
 
 impl Api for RickAndMorty {

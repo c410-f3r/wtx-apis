@@ -11,7 +11,6 @@ pub(crate) mod pkg {
     misc::MaxNumberStr,
   };
   use alloc::vec::Vec;
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -24,9 +23,7 @@ pub(crate) mod pkg {
     #[pkg::field(name = "conf")]
     #[serde(skip_serializing_if = "Option::is_none")]
     Option<GetTokenLargestAccountsConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type GetTokenLargestAccountsRes =

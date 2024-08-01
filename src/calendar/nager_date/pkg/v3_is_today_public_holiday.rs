@@ -1,7 +1,10 @@
 #[wtx_macros::pkg(api(crate::calendar::nager_date::NagerDate), data_format(json), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::NagerDateHttpPkgsAux;
-  use wtx::client_api_framework::network::{HttpReqParams, HttpResParams, StatusCode};
+  use wtx::{
+    client_api_framework::network::{HttpReqParams, HttpResParams},
+    http::StatusCode,
+  };
 
   #[pkg::aux]
   impl<DRSR> NagerDateHttpPkgsAux<DRSR> {}

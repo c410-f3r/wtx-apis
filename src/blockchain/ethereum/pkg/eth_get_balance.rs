@@ -6,7 +6,6 @@
 pub(crate) mod pkg {
   use crate::blockchain::ethereum::{BlockNumber, EthereumHttpPkgsAux};
   use ethereum_types::U256;
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<DRSR> EthereumHttpPkgsAux<DRSR> {}
@@ -16,9 +15,7 @@ pub(crate) mod pkg {
   pub struct EthGetBalanceReq<'any, S>(
     #[pkg::field(name = "addr")] S,
     #[pkg::field(name = "block_number")] &'any BlockNumber,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type EthGetBalanceRes = Option<U256>;

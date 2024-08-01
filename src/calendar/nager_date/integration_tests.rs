@@ -1,29 +1,33 @@
 use crate::calendar::nager_date::{NagerDate, PkgsAux};
-use wtx::client_api_framework::{
-  dnsn::SerdeJson,
-  network::{transport::Transport, HttpParams},
+use std::sync::LazyLock;
+use wtx::{
+  client_api_framework::{
+    dnsn::SerdeJson,
+    network::{transport::Transport, HttpParams},
+  },
+  http::ClientTokioRustls,
 };
 
-create_http_test!(NagerDate, http(), v3_available_countries, |pkgs_aux, trans| async {
+static CLIENT: LazyLock<ClientTokioRustls> =
+  LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
+
+create_http_test!(NagerDate, http(), v3_available_countries, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(&mut pkgs_aux.v3_available_countries().build(), pkgs_aux)
+    .send_recv_decode_contained(&mut pkgs_aux.v3_available_countries().build(), pkgs_aux)
     .await
     .unwrap();
 });
 
-create_http_test!(NagerDate, http(), v3_country_info, |pkgs_aux, trans| async {
+create_http_test!(NagerDate, http(), v3_country_info, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(
-      &mut pkgs_aux.v3_country_info().params("es").build(),
-      pkgs_aux,
-    )
+    .send_recv_decode_contained(&mut pkgs_aux.v3_country_info().params("es").build(), pkgs_aux)
     .await
     .unwrap();
 });
 
-create_http_test!(NagerDate, http(), v3_long_weekend, |pkgs_aux, trans| async {
+create_http_test!(NagerDate, http(), v3_long_weekend, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(
+    .send_recv_decode_contained(
       &mut pkgs_aux.v3_long_weekend().params(2020, "es").build(),
       pkgs_aux,
     )
@@ -31,19 +35,25 @@ create_http_test!(NagerDate, http(), v3_long_weekend, |pkgs_aux, trans| async {
     .unwrap();
 });
 
-create_http_test!(NagerDate, http(), v3_next_public_holidays_worldwide, |pkgs_aux, trans| async {
-  let _res = trans
-    .send_retrieve_and_decode_contained(
-      &mut pkgs_aux.v3_next_public_holidays_worldwide().build(),
-      pkgs_aux,
-    )
-    .await
-    .unwrap();
-});
+create_http_test!(
+  NagerDate,
+  http(),
+  v3_next_public_holidays_worldwide,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let _res = trans
+      .send_recv_decode_contained(
+        &mut pkgs_aux.v3_next_public_holidays_worldwide().build(),
+        pkgs_aux,
+      )
+      .await
+      .unwrap();
+  }
+);
 
-create_http_test!(NagerDate, http(), v3_next_public_holidays, |pkgs_aux, trans| async {
+create_http_test!(NagerDate, http(), v3_next_public_holidays, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(
+    .send_recv_decode_contained(
       &mut pkgs_aux.v3_next_public_holidays().params("es").build(),
       pkgs_aux,
     )
@@ -51,9 +61,9 @@ create_http_test!(NagerDate, http(), v3_next_public_holidays, |pkgs_aux, trans| 
     .unwrap();
 });
 
-create_http_test!(NagerDate, http(), v3_public_holidays, |pkgs_aux, trans| async {
+create_http_test!(NagerDate, http(), v3_public_holidays, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
-    .send_retrieve_and_decode_contained(
+    .send_recv_decode_contained(
       &mut pkgs_aux.v3_public_holidays().params(2000, "es").build(),
       pkgs_aux,
     )
@@ -62,5 +72,5 @@ create_http_test!(NagerDate, http(), v3_public_holidays, |pkgs_aux, trans| async
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://date.nager.at"))
+  (SerdeJson, HttpParams::from_uri("https://date.nager.at:443"))
 }

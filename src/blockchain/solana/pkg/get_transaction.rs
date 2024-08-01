@@ -7,7 +7,6 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, TransactionEncoding, TransactionOutput,
   };
-  use wtx::misc::AsyncBounds;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -19,9 +18,7 @@ pub(crate) mod pkg {
     #[pkg::field(name = "config")]
     #[serde(skip_serializing_if = "Option::is_none")]
     Option<GetTransactionConfig>,
-  )
-  where
-    S: AsyncBounds;
+  );
 
   #[pkg::res_data]
   pub type GetTransactionRes = TransactionOutput;

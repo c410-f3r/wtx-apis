@@ -22,7 +22,7 @@ mod account;
 mod address_lookup_table_account;
 mod block;
 mod filter;
-#[cfg(all(test, feature = "_integration-tests"))]
+#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
 mod integration_tests;
 mod notification;
 mod pkg;
@@ -35,7 +35,6 @@ mod transaction;
 use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
-use arrayvec::ArrayString;
 pub use block::*;
 pub use filter::*;
 pub use notification::*;
@@ -51,7 +50,7 @@ use wtx::{
     pkg::Package,
     Api,
   },
-  misc::{AsyncBounds, FnMutFut},
+  misc::{ArrayString, FnMutFut},
 };
 
 pub(crate) type Epoch = u64;
@@ -70,7 +69,7 @@ _create_blockchain_constants!(
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_types(pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Solana {
   /// If some, tells that each request must respect calling intervals.
   pub rt: Option<RequestThrottling>,
@@ -91,8 +90,7 @@ impl Solana {
   ) -> Result<(), A::Error>
   where
     A: Api<Error = crate::Error>,
-    DRSR: AsyncBounds,
-    T: AsyncBounds + Transport<DRSR, Params = HttpParams>,
+    T: Transport<DRSR, Params = HttpParams>,
     GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>: Package<
       A,
       DRSR,
@@ -107,7 +105,7 @@ impl Solana {
           confirmation_status: Commitment::Finalized, ..
         })) = pair
           .trans
-          .send_retrieve_and_decode_contained(
+          .send_recv_decode_contained(
             &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
             &mut pair.pkgs_aux,
           )
@@ -185,9 +183,8 @@ impl Solana {
   ) -> Result<O, E>
   where
     API: Api<Error = crate::Error>,
-    DRSR: AsyncBounds,
     E: From<crate::Error>,
-    T: AsyncBounds + Transport<DRSR, Params = HttpParams>,
+    T: Transport<DRSR, Params = HttpParams>,
     GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: Package<
       API,
       DRSR,
@@ -199,7 +196,7 @@ impl Solana {
       ($local_pair:expr) => {
         $local_pair
           .trans
-          .send_retrieve_and_decode_contained(
+          .send_recv_decode_contained(
             &mut $local_pair.pkgs_aux.get_latest_blockhash().data(None).build(),
             &mut $local_pair.pkgs_aux,
           )

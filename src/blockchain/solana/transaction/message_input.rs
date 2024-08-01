@@ -27,30 +27,6 @@ pub struct InstructionInput {
   pub program_id: SolanaAddressHash,
 }
 
-#[cfg(feature = "solana-program")]
-impl TryFrom<solana_program::instruction::Instruction> for InstructionInput {
-  type Error = crate::Error;
-
-  fn try_from(from: solana_program::instruction::Instruction) -> Result<Self, Self::Error> {
-    Ok(Self {
-      accounts: from.accounts.into_iter().map(|elem| elem.into()).collect(),
-      data: from.data,
-      program_id: from.program_id.to_bytes(),
-    })
-  }
-}
-
-#[cfg(feature = "solana-program")]
-impl From<InstructionInput> for solana_program::instruction::Instruction {
-  fn from(from: InstructionInput) -> Self {
-    Self {
-      accounts: from.accounts.into_iter().map(|elem| elem.into()).collect(),
-      data: from.data.into_iter().collect(),
-      program_id: from.program_id.into(),
-    }
-  }
-}
-
 /// Account information.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -82,24 +58,6 @@ impl InstructionAccountInput {
   /// Account is writable but not signer.
   pub fn writable(pubkey: SolanaAddressHash) -> Self {
     Self { pubkey, is_signer: false, is_writable: true }
-  }
-}
-
-#[cfg(feature = "solana-program")]
-impl From<solana_program::instruction::AccountMeta> for InstructionAccountInput {
-  fn from(from: solana_program::instruction::AccountMeta) -> Self {
-    Self {
-      is_signer: from.is_signer,
-      is_writable: from.is_writable,
-      pubkey: from.pubkey.to_bytes(),
-    }
-  }
-}
-
-#[cfg(feature = "solana-program")]
-impl From<InstructionAccountInput> for solana_program::instruction::AccountMeta {
-  fn from(from: InstructionAccountInput) -> Self {
-    Self { is_signer: from.is_signer, is_writable: from.is_writable, pubkey: from.pubkey.into() }
   }
 }
 

@@ -1,43 +1,37 @@
 /// Utility for generic tests
 #[macro_export]
 macro_rules! create_generic_test {
-  ($api:expr, $drsr_exp:expr, $executor:ident, $test:ident, $parts_cb:expr, $rslt_cb:expr, $trans:expr) => {
-    #[$executor::test]
-    async fn $test() {
-      fn parts_cb_infer<'pair, API, DRSR, O, T>(
-        pkgs_aux: &'pair mut PkgsAux<API, DRSR, T::Params>,
-        trans: &'pair mut T,
-        cb: impl FnOnce(&'pair mut PkgsAux<API, DRSR, T::Params>, &'pair mut T) -> O,
-      ) -> O
-      where
-        T: Transport<DRSR>,
-      {
-        cb(pkgs_aux, trans)
-      }
-      fn rslt_cb_infer<'pair, API, DRSR, O, R, T>(
-        pkgs_aux: &'pair mut PkgsAux<API, DRSR, T::Params>,
-        trans: &'pair mut T,
-        rslt: R,
-        cb: impl FnOnce(&'pair mut PkgsAux<API, DRSR, T::Params>, &'pair mut T, R) -> O,
-      ) -> O
-      where
-        T: Transport<DRSR>,
-      {
-        cb(pkgs_aux, trans, rslt)
-      }
-      #[cfg(test)]
-      $crate::misc::init_test_cfg();
-      #[cfg(test)]
-      let _path = dotenv::dotenv();
-      let api = $api;
-      let (drsr, ext_req_params) = $drsr_exp;
-      let mut pair = wtx::client_api_framework::misc::Pair::new(
-        PkgsAux::from_minimum(api, drsr, ext_req_params),
-        $trans,
-      );
-      let (pkg, pkgs_aux) = pair.parts_mut();
-      let rslt = parts_cb_infer(pkg, pkgs_aux, $parts_cb).await;
-      rslt_cb_infer(pkg, pkgs_aux, rslt, $rslt_cb).await;
+  (
+    $api:expr,
+    $drsr_exp:expr,
+    $test:ident,
+    |$parts_cb_pkgs_aux:ident, $parts_cb_trans:ident| $parts_cb:expr,
+    |$rslt_cb_pkgs_aux:ident, $rslt_cb_trans:ident, $rslt_cb_parts:ident| $rslt_cb:expr,
+    $trans:expr
+  ) => {
+    #[test]
+    fn $test() {
+      $crate::tests::RUNTIME.block_on(async {
+        #[cfg(test)]
+        $crate::misc::init_test_cfg();
+        #[cfg(test)]
+        let _path = dotenv::dotenv();
+        let api = $api;
+        let (drsr, ext_req_params) = $drsr_exp;
+        let mut pair = wtx::client_api_framework::misc::Pair::new(
+          PkgsAux::from_minimum(api, drsr, ext_req_params),
+          $trans,
+        );
+        let (pkgs_aux, trans) = pair.parts_mut();
+        let $parts_cb_pkgs_aux = pkgs_aux;
+        let $parts_cb_trans = trans;
+
+        let $rslt_cb_parts = $parts_cb.await;
+
+        let $rslt_cb_pkgs_aux = $parts_cb_pkgs_aux;
+        let $rslt_cb_trans = $parts_cb_trans;
+        $rslt_cb.await;
+      });
     }
   };
 }
@@ -45,20 +39,25 @@ macro_rules! create_generic_test {
 /// Utility for HTTP tests
 #[macro_export]
 macro_rules! create_http_test {
-  ($api:expr, $drsr_exp:expr, $test:ident, $cb:expr) => {
+  (
+    $api:expr,
+    $drsr_exp:expr,
+    $test:ident,
+    $client:expr,
+    |$parts_cb_pkgs_aux:ident, $parts_cb_trans:ident| $parts_cb:expr
+  ) => {
     $crate::create_generic_test! {
       $api,
       $drsr_exp,
-      tokio,
       $test,
-      $cb,
-      |_, _, _| async {},
-      reqwest::Client::default()
+      |$parts_cb_pkgs_aux, $parts_cb_trans| $parts_cb,
+      |_pkgs_aux, _trans, _rslt| async {},
+      $client
     }
   };
 }
 
-/// Utility for WebSocket tests
+/// Utility for `WebSocket` tests
 #[macro_export]
 macro_rules! create_ws_test {
   (
@@ -67,34 +66,29 @@ macro_rules! create_ws_test {
     $drsr_exp:expr,
     $test:ident,
     ($($unsub:ident),+),
-    $cb:expr
+    |$parts_cb_pkgs_aux:ident, $parts_cb_trans:ident| $parts_cb:expr
   ) => {
     $crate::create_generic_test! {
       $api,
       $drsr_exp,
-      tokio,
       $test,
-      $cb,
+      |$parts_cb_pkgs_aux, $parts_cb_trans| $parts_cb,
       |pkgs_aux, trans, subs| async move {
         let mut iter = subs.into_iter();
         let ids = &mut [$( pkgs_aux.$unsub().data(iter.next().unwrap()).build(), )+][..];
         let _res = trans.send(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
       },
       {
-        use std::net::ToSocketAddrs;
         use wtx::web_socket::handshake::WebSocketConnect;
         let uri = wtx::misc::Uri::new($uri);
         let mut fb = wtx::web_socket::FrameBufferVec::default();
         let trans = wtx::web_socket::handshake::WebSocketConnectRaw {
           compression: (),
           fb: &mut fb,
-          headers_buffer: &mut <_>::default(),
+          headers_buffer: &mut wtx::web_socket::handshake::HeadersBuffer::default(),
           rng: wtx::rng::StaticRng::default(),
           stream: wtx::misc::TokioRustlsConnector::from_webpki_roots()
-            .with_tcp_stream(
-              uri.host().to_socket_addrs().unwrap().next().unwrap(),
-              uri.hostname()
-            )
+            .with_tcp_stream(uri.host(), uri.hostname())
             .await
             .unwrap(),
           uri: &uri,
@@ -124,22 +118,22 @@ macro_rules! _create_blockchain_constants {
     /// Address hash as bytes
     $address_hash_vis type $address_hash = [u8; $_1];
     /// Address hash as an encoded string
-    $address_hash_str_vis type $address_hash_str = ::arrayvec::ArrayString<$_2>;
+    $address_hash_str_vis type $address_hash_str = ::wtx::misc::ArrayString<$_2>;
 
     /// Block hash as bytes
     $block_hash_vis type $block_hash = [u8; $_3];
     /// Block hash as an encoded string
-    $block_hash_str_vis type $block_hash_str = ::arrayvec::ArrayString<$_4>;
+    $block_hash_str_vis type $block_hash_str = ::wtx::misc::ArrayString<$_4>;
 
     /// Signature hash as bytes
     $signature_hash_vis type $signature_hash = ::cl_aux::ArrayWrapper<u8, $_5>;
     /// Signature hash as an encoded string
-    $signature_hash_str_vis type $signature_hash_str = ::arrayvec::ArrayString<$_6>;
+    $signature_hash_str_vis type $signature_hash_str = ::wtx::misc::ArrayString<$_6>;
 
     /// Transaction hash as bytes
     $transaction_hash_vis type $transaction_hash = ::cl_aux::ArrayWrapper<u8, $_7>;
     /// Transaction hash as an encoded string
-    $transaction_hash_str_vis type $transaction_hash_str = ::arrayvec::ArrayString<$_8>;
+    $transaction_hash_str_vis type $transaction_hash_str = ::wtx::misc::ArrayString<$_8>;
   };
 }
 

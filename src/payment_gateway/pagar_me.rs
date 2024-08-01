@@ -23,13 +23,14 @@ mod pagar_me_response;
 mod phone;
 mod pkg;
 
-use arrayvec::ArrayString;
+pub use address::{AddressOwned, AddressRef};
 use base64::{engine::general_purpose::STANDARD, Engine};
 use core::{
   fmt::{Debug, Formatter},
   str,
   time::Duration,
 };
+pub use pagar_me_error::{PagarMeError, PagarMeErrors};
 pub use pagar_me_response::PagarMeResponse;
 pub use phone::*;
 pub use pkg::*;
@@ -38,13 +39,13 @@ use wtx::{
     misc::{RequestLimit, RequestThrottling},
     Api,
   },
-  misc::from_utf8_basic,
+  misc::{from_utf8_basic, ArrayString},
 };
 
 const MAX_API_KEY_LEN: usize = 64;
 
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_types(pkgs_aux(PkgsAux), transport(http))]
+#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http))]
 pub struct PagarMe {
   api_key: ArrayString<MAX_API_KEY_LEN>,
   rt_150: RequestThrottling,
@@ -74,7 +75,7 @@ impl PagarMe {
         };
         fun().unwrap_or_default()
       },
-      rt_150: RequestThrottling::from_rl(RequestLimit::new(150, _1_MIN)?)?,
+      rt_150: RequestThrottling::from_rl(RequestLimit::new(150, _1_MIN)?),
     })
   }
 }

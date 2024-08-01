@@ -6,7 +6,7 @@ use crate::blockchain::solana::{
   SolanaAddressHashStr, SolanaBlockhashStr, SolanaProgramName, SolanaSignatureHashStr,
 };
 use alloc::{string::String, vec::Vec};
-use arrayvec::ArrayString;
+use wtx::misc::ArrayString;
 
 /// A json instruction can be expressed in different formats.
 #[allow(

@@ -13,7 +13,9 @@ pub(crate) mod pkg {
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
   pub struct EthEstimateGasReq<'any>(
-    #[pkg::field(name = "block_number")] Option<&'any BlockNumber>,
+    #[pkg::field(name = "block_number")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    Option<&'any BlockNumber>,
     #[pkg::field(name = "cr")] &'any CallRequest,
   );
 

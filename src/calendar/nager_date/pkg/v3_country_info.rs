@@ -2,8 +2,7 @@
 pub(crate) mod pkg {
   use crate::calendar::nager_date::NagerDateHttpPkgsAux;
   use alloc::{boxed::Box, vec::Vec};
-  use arrayvec::ArrayString;
-  use wtx::client_api_framework::network::HttpReqParams;
+  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
 
   #[pkg::aux]
   impl<DRSR> NagerDateHttpPkgsAux<DRSR> {}
