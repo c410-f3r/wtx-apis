@@ -11,7 +11,7 @@ macro_rules! create_generic_test {
   ) => {
     #[test]
     fn $test() {
-      $crate::tests::RUNTIME.block_on(async {
+      $crate::tests::_RUNTIME.block_on(async {
         #[cfg(test)]
         $crate::misc::init_test_cfg();
         #[cfg(test)]
