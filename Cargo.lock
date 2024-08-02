@@ -166,9 +166,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "cl-aux"
-version = "5.0.0"
+version = "5.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6250f1186b49cf971d8af9c1c450e6c7bdda29abb1826d4cf8f9e2d8e9c662f6"
+checksum = "5b3d3768cd9a63d040f842cebcd257c0ca78fc9acfc97b6b1a9d88b5648ee7ae"
 dependencies = [
  "serde",
  "tinyvec",
