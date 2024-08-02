@@ -4,11 +4,11 @@
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::blockchain::ethereum::{EthereumHttpPkgsAux, Filter, Log};
+  use crate::blockchain::ethereum::{Filter, HttpPkgsAux, Log};
   use alloc::vec::Vec;
 
   #[pkg::aux]
-  impl<DRSR> EthereumHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

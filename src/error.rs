@@ -10,6 +10,8 @@ pub enum Error {
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
+  /// See [`cl_aux::Error`].
+  ClAux(cl_aux::Error),
   /// See [ed25519_dalek::SignatureError].
   #[cfg(feature = "ed25519-dalek")]
   Ed25519Dalek(ed25519_dalek::SignatureError),
@@ -64,6 +66,13 @@ impl From<bincode::Error> for Error {
   #[inline]
   fn from(from: bincode::Error) -> Self {
     Self::Bincode(from)
+  }
+}
+
+impl From<cl_aux::Error> for Error {
+  #[inline]
+  fn from(from: cl_aux::Error) -> Self {
+    Self::ClAux(from)
   }
 }
 

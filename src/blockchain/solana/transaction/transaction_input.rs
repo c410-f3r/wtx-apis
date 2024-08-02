@@ -4,7 +4,7 @@ use wtx::misc::Vector;
 #[cfg(feature = "ed25519-dalek")]
 use {
   crate::blockchain::solana::SolanaBlockhash,
-  ed25519_dalek::{Keypair, Signer},
+  ed25519_dalek::{Signer, SigningKey},
 };
 
 /// Transport format suitable for user input.
@@ -22,11 +22,11 @@ impl TransactionInput {
   /// Takes all the necessary parameters to validate and transform data into a suitable format for
   /// submission.
   #[cfg(feature = "ed25519-dalek")]
-  pub fn new<'keypair>(
+  pub fn new<'sk>(
     buffer: &mut Vector<u8>,
     blockhash: SolanaBlockhash,
     message: VersionedMessageInput,
-    keypairs: impl Clone + IntoIterator<Item = &'keypair Keypair>,
+    sk: impl Clone + IntoIterator<Item = &'sk SigningKey>,
   ) -> crate::Result<Self> {
     let mut this = Self { signatures: <_>::default(), message };
     let VersionedMessageInput::V0(message) = &mut this.message;
@@ -34,7 +34,7 @@ impl TransactionInput {
       message.recent_blockhash = blockhash;
     }
     this._set_empty_signatures()?;
-    this.do_sign(buffer, keypairs)?;
+    this.do_sign(buffer, sk)?;
     Ok(this)
   }
 
@@ -56,26 +56,26 @@ impl TransactionInput {
 
   /// Signs or re-signs the contained message with the provided `blockhash` and `keypairs`.
   #[cfg(feature = "ed25519-dalek")]
-  pub fn sign<'keypair>(
+  pub fn sign<'sk>(
     &mut self,
     blockhash: SolanaBlockhash,
     buffer: &mut Vector<u8>,
-    keypairs: impl Clone + IntoIterator<Item = &'keypair Keypair>,
+    sk: impl Clone + IntoIterator<Item = &'sk SigningKey>,
   ) -> crate::Result<()> {
     let VersionedMessageInput::V0(message) = &mut self.message;
     if blockhash != message.recent_blockhash {
       message.recent_blockhash = blockhash;
       self.signatures.iter_mut().for_each(|signature| *signature = SolanaSignatureHash::default());
     }
-    self.do_sign(buffer, keypairs)?;
+    self.do_sign(buffer, sk)?;
     Ok(())
   }
 
   #[cfg(feature = "ed25519-dalek")]
-  fn do_sign<'keypair>(
+  fn do_sign<'sk>(
     &mut self,
     mut buffer: &mut Vector<u8>,
-    keypairs: impl Clone + IntoIterator<Item = &'keypair Keypair>,
+    sk: impl Clone + IntoIterator<Item = &'sk SigningKey>,
   ) -> crate::Result<()> {
     buffer.clear();
     bincode::serialize_into(&mut buffer, &self.message)?;
@@ -85,11 +85,11 @@ impl TransactionInput {
         .account_keys
         .get(0..message.header.num_required_signatures.into())
         .unwrap_or_default();
-      keypairs.clone().into_iter().map(|keypair| {
-        signed_keys.iter().position(|signed_key| keypair.public.as_bytes() == signed_key)
+      sk.clone().into_iter().map(|keypair| {
+        signed_keys.iter().position(|signed_key| keypair.verifying_key().as_ref() == signed_key)
       })
     };
-    for (opt, keypair) in signing_keypair_positions.zip(keypairs) {
+    for (opt, keypair) in signing_keypair_positions.zip(sk) {
       let signature = keypair.try_sign(buffer.as_ref())?.to_bytes();
       let signature_mut = match opt.and_then(|idx| self.signatures.get_mut(idx)) {
         None => {
