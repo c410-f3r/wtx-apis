@@ -799,12 +799,12 @@ create_http_test!(
   http_get_latest_blockhash_send_transaction_and_get_transaction,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let from_keypair = ed25519_dalek::Keypair::from_bytes(&alice_keypair()[..]).unwrap();
+    let from_keypair = ed25519_dalek::SigningKey::from_bytes(&ALICE_SK);
     let blockhash = latest_blockhash(pkgs_aux, trans).await;
     let tx = crate::blockchain::solana::TransactionInput::new(
       &mut pkgs_aux.byte_buffer,
       blockhash,
-      transfer_message(blockhash, from_keypair.public.to_bytes()).into(),
+      transfer_message(blockhash, *ALICE_PK).into(),
       &[from_keypair],
     )
     .unwrap();
@@ -982,14 +982,6 @@ create_ws_test!(
     [*buffer[0].result.as_ref().unwrap(), *buffer[1].result.as_ref().unwrap()]
   }
 );
-
-#[cfg(feature = "ed25519-dalek")]
-fn alice_keypair() -> [u8; 64] {
-  let mut array = [0; 64];
-  array[..32].copy_from_slice(&*ALICE_SK);
-  array[32..].copy_from_slice(&*ALICE_PK);
-  array
-}
 
 fn http() -> (SerdeJson, HttpParams) {
   (SerdeJson, HttpParams::from_uri(HTTP_URI))

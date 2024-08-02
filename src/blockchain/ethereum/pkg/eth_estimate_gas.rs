@@ -4,11 +4,11 @@
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::blockchain::ethereum::{BlockNumber, CallRequest, EthereumHttpPkgsAux};
+  use crate::blockchain::ethereum::{BlockNumber, CallRequest, HttpPkgsAux};
   use ethereum_types::U256;
 
   #[pkg::aux]
-  impl<DRSR> EthereumHttpPkgsAux<DRSR> {}
+  impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

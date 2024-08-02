@@ -5,7 +5,7 @@ base64 = { default-features = false, features = ["alloc"], optional = true, vers
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
 cl-aux = { default-features = false, features = ["alloc", "serde"], version = "5.0" }
-ed25519-dalek = { default-features = false, features = ["u64_backend"], optional = true, version = "1.0" }
+ed25519-dalek = { default-features = false, optional = true, version = "2.0" }
 ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
 ethereum-types = { default-features = false, features = ["serialize"], optional = true, version = "0.14" }
 hex = { default-features = false, optional = true, version = "0.4" }
@@ -28,7 +28,7 @@ base64 = ["dep:base64"]
 bincode = ["dep:bincode"]
 bs58 = ["dep:bs58"]
 default = []
-ed25519-dalek = ["dep:ed25519-dalek", "std"]
+ed25519-dalek = ["dep:ed25519-dalek"]
 ethabi = ["dep:ethabi"]
 ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
 ethereum-types = ["dep:ethereum-types"]

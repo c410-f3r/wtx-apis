@@ -9,7 +9,8 @@
 //! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
 //! use wtx_apis::blockchain::ethereum::{Ethereum, PkgsAux};
 //!
-//! let mut pkgs_aux = PkgsAux::from_minimum(Ethereum, SerdeJson, HttpParams::from_uri("URL"));
+//! let mut pkgs_aux =
+//!   PkgsAux::from_minimum(Ethereum::new(None), SerdeJson, HttpParams::from_uri("URL"));
 //! let _ = pkgs_aux.eth_block_number().build();
 //! # Ok(()) }
 //! ```
@@ -44,13 +45,30 @@ pub use transaction::Transaction;
 pub use transaction_condition::TransactionCondition;
 pub use transaction_request::TransactionRequest;
 pub use types::*;
-use wtx::client_api_framework::Api;
+use wtx::client_api_framework::{misc::RequestThrottling, Api};
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
 #[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http, ws))]
-pub struct Ethereum;
+pub struct Ethereum {
+  /// If some, tells that each request must respect calling intervals.
+  pub rt: Option<RequestThrottling>,
+}
+
+impl Ethereum {
+  /// If desired, it is possible to instantiate directly instead of using this method.
+  pub const fn new(rt: Option<RequestThrottling>) -> Self {
+    Self { rt }
+  }
+}
 
 impl Api for Ethereum {
   type Error = crate::Error;
+
+  async fn before_sending(&mut self) -> Result<(), Self::Error> {
+    if let Some(ref mut rt) = self.rt {
+      rt.rc.update_params(&rt.rl).await?;
+    }
+    Ok(())
+  }
 }

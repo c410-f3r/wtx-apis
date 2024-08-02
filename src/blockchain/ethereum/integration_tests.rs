@@ -1,8 +1,11 @@
 use crate::blockchain::ethereum::{BlockNumber, Ethereum, PkgsAux};
+use core::time::Duration;
 use std::sync::LazyLock;
+use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::{
     dnsn::SerdeJson,
+    misc::{RequestLimit, RequestThrottling},
     network::{transport::Transport, HttpParams},
   },
   http::ClientTokioRustls,
@@ -10,18 +13,29 @@ use wtx::{
 
 static CLIENT: LazyLock<ClientTokioRustls> =
   LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
-
-create_http_test!(Ethereum, http(), eth_block_number, &*CLIENT, |pkgs_aux, trans| async {
-  let _res = trans
-    .send_recv_decode_contained(&mut pkgs_aux.eth_block_number().build(), pkgs_aux)
-    .await
-    .unwrap()
-    .result
-    .unwrap();
+static ETHEREUM: LazyLock<Mutex<Ethereum>> = LazyLock::new(|| {
+  Mutex::new(Ethereum::new(Some(RequestThrottling::from_rl(
+    RequestLimit::new(1, Duration::from_secs(2)).unwrap(),
+  ))))
 });
 
 create_http_test!(
-  Ethereum,
+  &mut *ETHEREUM.lock().await,
+  http(),
+  eth_block_number,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let _res = trans
+      .send_recv_decode_contained(&mut pkgs_aux.eth_block_number().build(), pkgs_aux)
+      .await
+      .unwrap()
+      .result
+      .unwrap();
+  }
+);
+
+create_http_test!(
+  &mut *ETHEREUM.lock().await,
   http(),
   eth_block_transaction_count_by_number,
   &*CLIENT,
@@ -41,20 +55,26 @@ create_http_test!(
   }
 );
 
-create_http_test!(Ethereum, http(), eth_get_balance, &*CLIENT, |pkgs_aux, trans| async {
-  let _res = trans
-    .send_recv_decode_contained(
-      &mut pkgs_aux
-        .eth_get_balance()
-        .data("0xd6216fc19db775df9774a6e33526131da7d19a2c", &BlockNumber::Latest)
-        .build(),
-      pkgs_aux,
-    )
-    .await
-    .unwrap()
-    .result
-    .unwrap();
-});
+create_http_test!(
+  &mut *ETHEREUM.lock().await,
+  http(),
+  eth_get_balance,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let _res = trans
+      .send_recv_decode_contained(
+        &mut pkgs_aux
+          .eth_get_balance()
+          .data("0xd6216fc19db775df9774a6e33526131da7d19a2c", &BlockNumber::Latest)
+          .build(),
+        pkgs_aux,
+      )
+      .await
+      .unwrap()
+      .result
+      .unwrap();
+  }
+);
 
 fn http() -> (SerdeJson, HttpParams) {
   (SerdeJson, HttpParams::from_uri("https://cloudflare-eth.com:443"))

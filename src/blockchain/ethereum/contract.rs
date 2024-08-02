@@ -441,7 +441,7 @@ mod tests {
     trans: &mut Mock<str, HttpParams>,
   ) -> Contract<SerdeJson, &mut Mock<str, HttpParams>> {
     let pair = Pair::new(
-      EthereumPkgsAux::from_minimum(Ethereum, SerdeJson, HttpParams::from_uri("")),
+      EthereumPkgsAux::from_minimum(Ethereum::new(None), SerdeJson, HttpParams::from_uri("")),
       trans,
     );
     Contract::from_json(Address::from_low_u64_be(1), pair, include_bytes!("./resources/token.json"))
