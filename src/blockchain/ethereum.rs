@@ -6,7 +6,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
+//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
 //! use wtx_apis::blockchain::ethereum::{Ethereum, PkgsAux};
 //!
 //! let mut pkgs_aux =

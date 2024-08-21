@@ -5,8 +5,7 @@
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
 //! use wtx::{
-//!   client_api_framework::{dnsn::SerdeJson, network::HttpParams},
-//!   http::Method,
+//!   client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson, http::Method,
 //! };
 //! use wtx_apis::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux};
 //!

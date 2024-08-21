@@ -16,7 +16,7 @@ static CLIENT: LazyLock<ClientFrameworkTokioRustls> =
 static ETHEREUM: LazyLock<Mutex<Ethereum>> = LazyLock::new(|| {
   Mutex::new(Ethereum::new(Some(RequestThrottling::from_rl(RequestLimit::new(
     1,
-    Duration::from_secs(2),
+    Duration::from_secs(1),
   )))))
 });
 
@@ -78,5 +78,5 @@ create_http_test!(
 );
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://cloudflare-eth.com:443"))
+  (SerdeJson, HttpParams::from_uri("https://eth-mainnet.public.blastapi.io:443"))
 }

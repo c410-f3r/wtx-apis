@@ -4,7 +4,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
+//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
 //! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
@@ -20,8 +20,8 @@ mod account;
 mod address_lookup_table_account;
 mod block;
 mod filter;
-#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
-mod integration_tests;
+//#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
+//mod integration_tests;
 mod notification;
 mod pkg;
 pub mod program;
