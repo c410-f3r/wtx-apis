@@ -11,11 +11,11 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::{
-    dnsn::SerdeJson,
     misc::{RequestLimit, RequestThrottling},
     network::{transport::Transport, HttpParams, WsParams},
   },
-  http::ClientTokioRustls,
+  data_transformation::dnsn::SerdeJson,
+  http::ClientFrameworkTokioRustls,
   misc::Vector,
 };
 
@@ -47,12 +47,13 @@ static BOB_PK: SolanaAddressHash = [
   24, 147, 209, 196, 197, 185, 156, 48, 170, 96, 192, 119, 193, 150, 129, 12, 221, 102, 119, 84,
   33, 221, 67, 224, 185, 107, 130, 157, 207, 85, 161, 30,
 ];
-static CLIENT: LazyLock<ClientTokioRustls> =
-  LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
+static CLIENT: LazyLock<ClientFrameworkTokioRustls> =
+  LazyLock::new(|| ClientFrameworkTokioRustls::tokio_rustls(1).build());
 static SOLANA: LazyLock<Mutex<Solana>> = LazyLock::new(|| {
-  Mutex::new(Solana::new(Some(RequestThrottling::from_rl(
-    RequestLimit::new(3, Duration::from_secs(1)).unwrap(),
-  ))))
+  Mutex::new(Solana::new(Some(RequestThrottling::from_rl(RequestLimit::new(
+    3,
+    Duration::from_secs(1),
+  )))))
 });
 
 create_http_test!(
@@ -990,7 +991,7 @@ fn http() -> (SerdeJson, HttpParams) {
 #[cfg(feature = "ed25519-dalek")]
 async fn latest_blockhash(
   pkgs_aux: &mut SolanaMutPkgsAux<'_, SerdeJson, HttpParams>,
-  mut trans: &ClientTokioRustls,
+  mut trans: &ClientFrameworkTokioRustls,
 ) -> SolanaAddressHash {
   trans
     .send_recv_decode_contained(&mut pkgs_aux.get_latest_blockhash().data(None).build(), pkgs_aux)
@@ -1004,7 +1005,7 @@ async fn latest_blockhash(
 
 async fn slot(
   pkgs_aux: &mut SolanaMutPkgsAux<'_, SerdeJson, HttpParams>,
-  mut trans: &ClientTokioRustls,
+  mut trans: &ClientFrameworkTokioRustls,
 ) -> u64 {
   trans
     .send_recv_decode_contained(&mut pkgs_aux.get_slot().data(None).build(), pkgs_aux)

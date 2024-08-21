@@ -19,12 +19,16 @@ pub use options::Options;
 pub use tokenizable::Tokenizable;
 pub use tokenizable_item::TokenizableItem;
 pub use tokenize::Tokenize;
-use wtx::client_api_framework::{
-  data_format::{JsonRpcRequest, JsonRpcResponse},
-  dnsn::{Deserialize, Serialize},
-  misc::Pair,
-  network::{transport::Transport, HttpParams},
-  pkg::Package,
+use wtx::{
+  client_api_framework::{
+    misc::Pair,
+    network::{transport::Transport, HttpParams},
+    pkg::Package,
+  },
+  data_transformation::{
+    dnsn::{Deserialize, Serialize},
+    format::{JsonRpcRequest, JsonRpcResponse},
+  },
 };
 
 /// Ethereum Contract Interface
@@ -86,7 +90,7 @@ where
   where
     FP: Tokenize,
     for<'tr> JsonRpcRequest<EthSendTransactionReq<'tr>>: Serialize<DRSR>,
-    JsonRpcResponse<EthSendTransactionRes>: Deserialize<DRSR>,
+    JsonRpcResponse<EthSendTransactionRes>: for<'de> Deserialize<'de, DRSR>,
   {
     let data = self.abi.function(func)?.encode_input(&func_params.into_tokens())?.into();
     let Options {
@@ -131,7 +135,7 @@ where
   where
     FP: Tokenize,
     for<'any> JsonRpcRequest<EthEstimateGasReq<'any>>: Serialize<DRSR>,
-    JsonRpcResponse<U256>: Deserialize<DRSR>,
+    JsonRpcResponse<U256>: for<'de> Deserialize<'de, DRSR>,
   {
     let data = self.abi.function(func)?.encode_input(&func_params.into_tokens())?.into();
     let call_request = CallRequest {
@@ -166,7 +170,7 @@ where
     CC: Tokenize,
     R: Detokenize,
     for<'filter> JsonRpcRequest<EthGetLogsReq<'filter>>: Serialize<DRSR>,
-    JsonRpcResponse<Option<Vec<Log>>>: Deserialize<DRSR>,
+    JsonRpcResponse<Option<Vec<Log>>>: for<'de> Deserialize<'de, DRSR>,
   {
     fn to_topic<A: Tokenize>(x: A) -> ethabi::Topic<ethabi::Token> {
       let tokens = x.into_tokens();
@@ -214,11 +218,11 @@ where
   where
     FP: Tokenize,
     R: Detokenize,
-    for<'any> EthCallPkg<JsonRpcRequest<EthCallReq<'any>>>: Package<
+    for<'any, 'de> EthCallPkg<JsonRpcRequest<EthCallReq<'any>>>: Package<
       Ethereum,
       DRSR,
       T::Params,
-      ExternalResponseContent = JsonRpcResponse<Option<crate::blockchain::ethereum::Bytes>>,
+      ExternalResponseContent<'de> = JsonRpcResponse<Option<crate::blockchain::ethereum::Bytes>>,
     >,
   {
     let function = self.abi.function(func)?;
@@ -262,11 +266,15 @@ mod tests {
   use ethabi::{Address, Token};
   use ethereum_types::{H256, U256};
   use serde::Serialize;
-  use wtx::client_api_framework::{
-    data_format::{JsonRpcRequest, JsonRpcResponse},
-    dnsn::SerdeJson,
-    misc::Pair,
-    network::{transport::Mock, HttpParams},
+  use wtx::{
+    client_api_framework::{
+      misc::Pair,
+      network::{transport::Mock, HttpParams},
+    },
+    data_transformation::{
+      dnsn::SerdeJson,
+      format::{JsonRpcRequest, JsonRpcResponse},
+    },
   };
 
   const HELLO_WORLD: &str =

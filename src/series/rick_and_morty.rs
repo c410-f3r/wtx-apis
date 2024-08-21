@@ -4,7 +4,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::client_api_framework::{dnsn::SerdeJson, network::HttpParams};
+//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
 //! use wtx_apis::series::rick_and_morty::{PkgsAux, RickAndMorty};
 //!
 //! let mut pkgs_aux = PkgsAux::from_minimum(RickAndMorty, SerdeJson, HttpParams::from_uri("URL"));
@@ -17,11 +17,11 @@
 //! The architecture here is purposely "REST-ish" to avoid third-party dependencies and quickly
 //! exercise the actual format expected by GraphQL requests and responses for `wtx`.
 
-wtx::create_packages_aux_wrapper!();
-
 #[cfg(all(test, feature = "_integration-tests"))]
 mod integration_tests;
 mod pkg;
+
+wtx::create_packages_aux_wrapper!();
 
 pub use pkg::*;
 use wtx::client_api_framework::Api;

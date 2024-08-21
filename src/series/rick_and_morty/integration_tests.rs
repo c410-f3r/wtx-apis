@@ -2,15 +2,13 @@ use crate::series::rick_and_morty::{PkgsAux, RickAndMorty};
 use alloc::string::String;
 use std::sync::LazyLock;
 use wtx::{
-  client_api_framework::{
-    dnsn::SerdeJson,
-    network::{transport::Transport, HttpParams},
-  },
-  http::ClientTokioRustls,
+  client_api_framework::network::{transport::Transport, HttpParams},
+  data_transformation::dnsn::SerdeJson,
+  http::ClientFrameworkTokioRustls,
 };
 
-static CLIENT: LazyLock<ClientTokioRustls> =
-  LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
+static CLIENT: LazyLock<ClientFrameworkTokioRustls> =
+  LazyLock::new(|| ClientFrameworkTokioRustls::tokio_rustls(1).build());
 
 create_http_test!(RickAndMorty, http(), character, &*CLIENT, |pkgs_aux, trans| async {
   let _res = trans
