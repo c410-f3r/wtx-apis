@@ -13,8 +13,6 @@
 //! # Ok(()) }
 //! ```
 
-wtx::create_packages_aux_wrapper!();
-
 #[macro_use]
 mod macros;
 
@@ -32,6 +30,8 @@ mod short_vec;
 mod slot_update;
 mod transaction;
 
+wtx::create_packages_aux_wrapper!();
+
 use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
@@ -44,12 +44,12 @@ pub use slot_update::*;
 pub use transaction::*;
 use wtx::{
   client_api_framework::{
-    data_format::{JsonRpcRequest, JsonRpcResponse},
     misc::{Pair, PairMut, RequestThrottling},
     network::{transport::Transport, HttpParams},
     pkg::Package,
     Api,
   },
+  data_transformation::format::{JsonRpcRequest, JsonRpcResponse},
   misc::{ArrayString, FnMutFut},
 };
 
@@ -91,12 +91,13 @@ impl Solana {
   where
     A: Api<Error = crate::Error>,
     T: Transport<DRSR, Params = HttpParams>,
-    GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>: Package<
-      A,
-      DRSR,
-      T::Params,
-      ExternalResponseContent = JsonRpcResponse<GetSignatureStatusesRes>,
-    >,
+    GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>:
+      for<'de> Package<
+        A,
+        DRSR,
+        T::Params,
+        ExternalResponseContent<'de> = JsonRpcResponse<GetSignatureStatusesRes>,
+      >,
   {
     macro_rules! call {
       () => {{
@@ -185,11 +186,11 @@ impl Solana {
     API: Api<Error = crate::Error>,
     E: From<crate::Error>,
     T: Transport<DRSR, Params = HttpParams>,
-    GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: Package<
+    GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: for<'de> Package<
       API,
       DRSR,
       HttpParams,
-      ExternalResponseContent = JsonRpcResponse<GetLatestBlockhashRes>,
+      ExternalResponseContent<'de> = JsonRpcResponse<GetLatestBlockhashRes>,
     >,
   {
     macro_rules! local_blockhash {

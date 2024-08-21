@@ -11,10 +11,8 @@ pub(crate) mod pkg {
   use alloc::{string::String, vec::Vec};
   use core::fmt::Write;
   use wtx::{
-    client_api_framework::{
-      data_format::{GraphQlRequest, GraphQlResponse},
-      network::transport::TransportParams,
-    },
+    client_api_framework::network::transport::TransportParams,
+    data_transformation::format::{GraphQlRequest, GraphQlResponse},
     http::Method,
   };
 

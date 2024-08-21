@@ -79,22 +79,25 @@ macro_rules! create_ws_test {
         let _res = trans.send(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
       },
       {
-        use wtx::web_socket::handshake::WebSocketConnect;
         let uri = wtx::misc::Uri::new($uri);
         let mut fb = wtx::web_socket::FrameBufferVec::default();
-        let trans = wtx::web_socket::handshake::WebSocketConnectRaw {
-          compression: (),
-          fb: &mut fb,
-          headers_buffer: &mut wtx::web_socket::handshake::HeadersBuffer::default(),
-          rng: wtx::rng::StaticRng::default(),
-          stream: wtx::misc::TokioRustlsConnector::from_webpki_roots()
-            .with_tcp_stream(uri.host(), uri.hostname())
+        let trans = wtx::web_socket::WebSocketClient::connect(
+          (),
+          &mut fb,
+          [],
+          &mut wtx::web_socket::HeadersBuffer::default(),
+          wtx::misc::NoStdRng::default(),
+          wtx::misc::TokioRustlsConnector::from_auto()
+            .unwrap()
+            .connect_without_client_auth(
+              uri.hostname(),
+              tokio::net::TcpStream::connect(uri.host()).await.unwrap()
+            )
             .await
             .unwrap(),
-          uri: &uri,
-          wsb: wtx::web_socket::WebSocketBuffer::default(),
-        }
-        .connect([])
+          &uri,
+          wtx::web_socket::WebSocketBuffer::default(),
+        )
         .await
         .unwrap()
         .1;

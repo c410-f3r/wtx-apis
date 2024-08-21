@@ -4,19 +4,20 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::{
-    dnsn::SerdeJson,
     misc::{RequestLimit, RequestThrottling},
     network::{transport::Transport, HttpParams},
   },
-  http::ClientTokioRustls,
+  data_transformation::dnsn::SerdeJson,
+  http::ClientFrameworkTokioRustls,
 };
 
-static CLIENT: LazyLock<ClientTokioRustls> =
-  LazyLock::new(|| ClientTokioRustls::tokio_rustls(1).build());
+static CLIENT: LazyLock<ClientFrameworkTokioRustls> =
+  LazyLock::new(|| ClientFrameworkTokioRustls::tokio_rustls(1).build());
 static ETHEREUM: LazyLock<Mutex<Ethereum>> = LazyLock::new(|| {
-  Mutex::new(Ethereum::new(Some(RequestThrottling::from_rl(
-    RequestLimit::new(1, Duration::from_secs(2)).unwrap(),
-  ))))
+  Mutex::new(Ethereum::new(Some(RequestThrottling::from_rl(RequestLimit::new(
+    1,
+    Duration::from_secs(2),
+  )))))
 });
 
 create_http_test!(

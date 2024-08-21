@@ -13,8 +13,6 @@
 //! # Ok(()) }
 //! ```
 
-wtx::create_packages_aux_wrapper!();
-
 mod address;
 //#[cfg(all(test, feature = "_integration-tests"))]
 //mod integration_tests;
@@ -22,6 +20,8 @@ mod pagar_me_error;
 mod pagar_me_response;
 mod phone;
 mod pkg;
+
+wtx::create_packages_aux_wrapper!();
 
 pub use address::{AddressOwned, AddressRef};
 use base64::{engine::general_purpose::STANDARD, Engine};
@@ -75,7 +75,7 @@ impl PagarMe {
         };
         fun().unwrap_or_default()
       },
-      rt_150: RequestThrottling::from_rl(RequestLimit::new(150, _1_MIN)?),
+      rt_150: RequestThrottling::from_rl(RequestLimit::new(150, _1_MIN)),
     })
   }
 }

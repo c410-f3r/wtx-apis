@@ -12,11 +12,11 @@
 //! # Ok(()) }
 //! ```
 
-wtx::create_packages_aux_wrapper!();
-
 #[cfg(all(test, feature = "_integration-tests"))]
 mod integration_tests;
 mod pkg;
+
+wtx::create_packages_aux_wrapper!();
 
 pub use pkg::*;
 use wtx::client_api_framework::Api;

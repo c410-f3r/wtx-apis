@@ -17,11 +17,11 @@
 //! The architecture here is purposely "REST-ish" to avoid third-party dependencies and quickly
 //! exercise the actual format expected by GraphQL requests and responses for `wtx`.
 
-wtx::create_packages_aux_wrapper!();
-
 #[cfg(all(test, feature = "_integration-tests"))]
 mod integration_tests;
 mod pkg;
+
+wtx::create_packages_aux_wrapper!();
 
 pub use pkg::*;
 use wtx::client_api_framework::Api;
