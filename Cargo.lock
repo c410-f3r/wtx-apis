@@ -1220,9 +1220,9 @@ dependencies = [
 
 [[package]]
 name = "wtx"
-version = "0.15.0"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdae293299038fbf1e3f8e10acdea1a591164ddf9391c17681b7f1e507660e80"
+checksum = "16e4fdfcdda6e97435a314e0c59e546a85229728450c452730e3f3b6fcd59c41"
 dependencies = [
  "ahash",
  "atoi",
