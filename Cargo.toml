@@ -18,7 +18,7 @@ wtx-macros = { default-features = false, version = "0.2" }
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
-tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
+tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.40" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
 wtx = { default-features = false, features = ["client-api-framework", "http-client-framework", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], version = "0.15" }
 
