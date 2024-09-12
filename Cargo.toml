@@ -9,7 +9,7 @@ ed25519-dalek = { default-features = false, optional = true, version = "2.0" }
 ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
 ethereum-types = { default-features = false, features = ["serialize"], optional = true, version = "0.14" }
 hex = { default-features = false, optional = true, version = "0.4" }
-primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
+primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.13" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "serde", "web-socket"], version = "0.15" }
