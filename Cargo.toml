@@ -12,7 +12,7 @@ hex = { default-features = false, optional = true, version = "0.4" }
 primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
-wtx = { default-features = false, features = ["client-api-framework", "serde", "web-socket"], version = "0.15" }
+wtx = { default-features = false, features = ["client-api-framework", "serde", "web-socket"], version = "0.18" }
 wtx-macros = { default-features = false, version = "0.2" }
 
 [dev-dependencies]
@@ -20,7 +20,7 @@ dotenv = { default-features = false, version = "0.15" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
-wtx = { default-features = false, features = ["client-api-framework", "http-client-framework", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], version = "0.15" }
+wtx = { default-features = false, features = ["client-api-framework", "http-client-framework", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], version = "0.18" }
 
 [features]
 _integration-tests = []
