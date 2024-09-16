@@ -91,7 +91,7 @@ macro_rules! create_ws_test {
             .unwrap()
             .connect_without_client_auth(
               uri.hostname(),
-              tokio::net::TcpStream::connect(uri.host()).await.unwrap()
+              tokio::net::TcpStream::connect(uri.hostname_with_implied_port()).await.unwrap()
             )
             .await
             .unwrap(),

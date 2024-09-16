@@ -20,15 +20,10 @@ pub(crate) mod pkg {
     req_params: &mut HttpReqParams,
   ) -> crate::Result<()> {
     api.rt_150.rc.update_params(&api.rt_150.rl).await?;
-    req_params.headers.push_front(
-      Header {
-        is_sensitive: false,
-        is_trailer: false,
-        name: KnownHeaderName::Authorization.into(),
-        value: b"Basic ",
-      },
-      api.api_key.as_bytes(),
-    )?;
+    req_params.headers.push_from_iter(Header::from_name_and_value(
+      KnownHeaderName::Authorization.into(),
+      ["Basic ".as_bytes(), api.api_key.as_bytes()],
+    ))?;
     req_params.uri.push_path(format_args!("/recipients/{}/balance", params.recipient_id))?;
     Ok(())
   }

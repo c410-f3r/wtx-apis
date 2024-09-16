@@ -4,7 +4,7 @@ use std::sync::LazyLock;
 use wtx::{
   client_api_framework::network::{transport::Transport, HttpParams},
   data_transformation::dnsn::SerdeJson,
-  http::ClientFrameworkTokioRustls,
+  http::client_framework::ClientFrameworkTokioRustls,
 };
 
 static CLIENT: LazyLock<ClientFrameworkTokioRustls> =
@@ -128,5 +128,5 @@ create_http_test!(RickAndMorty, http(), locations_by_ids, &*CLIENT, |pkgs_aux, t
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://rickandmortyapi.com:443/graphql"))
+  (SerdeJson, HttpParams::from_uri("https://rickandmortyapi.com/graphql".into()))
 }
