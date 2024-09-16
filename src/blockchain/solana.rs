@@ -8,7 +8,7 @@
 //! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_uri("URL"));
+//!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_uri("URL".into()));
 //! let _ = pkgs_aux.get_slot().data(None).build();
 //! # Ok(()) }
 //! ```
@@ -20,8 +20,8 @@ mod account;
 mod address_lookup_table_account;
 mod block;
 mod filter;
-//#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
-//mod integration_tests;
+#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
+mod integration_tests;
 mod notification;
 mod pkg;
 pub mod program;
@@ -179,7 +179,7 @@ impl Solana {
     pair: &mut Pair<HttpPkgsAux<API, DRSR>, T>,
     mut cb: impl for<'any> FnMutFut<
       (u8, &'any mut AUX, SolanaBlockhash, &'any mut Pair<HttpPkgsAux<API, DRSR>, T>),
-      Result<O, E>,
+      Result = Result<O, E>,
     >,
   ) -> Result<O, E>
   where
@@ -209,13 +209,13 @@ impl Solana {
           .blockhash
       };
     }
-    match cb((0, &mut aux, initial_blockhash, pair)).await {
+    match cb.call((0, &mut aux, initial_blockhash, pair)).await {
       Err(err) => {
         if let Some(n) = additional_tries.checked_sub(1) {
           let mut opt = None;
           for idx in 1..=n {
             let local_blockhash = local_blockhash!(pair);
-            if let Ok(elem) = cb((idx, &mut aux, local_blockhash, pair)).await {
+            if let Ok(elem) = cb.call((idx, &mut aux, local_blockhash, pair)).await {
               opt = Some(elem);
               break;
             }
@@ -224,7 +224,7 @@ impl Solana {
             Ok(elem)
           } else {
             let local_blockhash = local_blockhash!(pair);
-            let last = cb((additional_tries, &mut aux, local_blockhash, pair)).await?;
+            let last = cb.call((additional_tries, &mut aux, local_blockhash, pair)).await?;
             Ok(last)
           }
         } else {

@@ -15,16 +15,16 @@ use wtx::{
     network::{transport::Transport, HttpParams, WsParams},
   },
   data_transformation::dnsn::SerdeJson,
-  http::ClientFrameworkTokioRustls,
+  http::client_framework::ClientFrameworkTokioRustls,
   misc::Vector,
 };
 
-const HTTP_URI: &str = "https://api.testnet.solana.com:443";
+const HTTP_URI: &str = "https://api.testnet.solana.com";
 const TO_NORMAL_ACCOUNT: &str = "FiuQrMbFUYka1Goec4wdhoiNq3Ms99cxGrW8JWsWfPnJ";
 const TO_SOL_TOKEN_ACCOUNT: &str = "CDqKzghiixHryqny9r8RPJzYfg3hiiF7e8JecsF6fuJw";
 const TO_SOL_TOKEN_MINT: &str = "So11111111111111111111111111111111111111112";
 const TOKEN_PROGRAM: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-const WS_URI: &str = "wss://api.testnet.solana.com:443";
+const WS_URI: &str = "wss://api.testnet.solana.com";
 
 #[cfg(feature = "ed25519-dalek")]
 static ALICE_PK: LazyLock<SolanaAddressHash> = LazyLock::new(|| {
@@ -855,15 +855,14 @@ create_http_test!(
   http_reqs_with_array,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let mut buffer = Vector::new();
     trans
       .send_recv_decode_batch(
+        &mut Vector::new(),
         &mut [
           &mut pkgs_aux.get_balance().data(TO_NORMAL_ACCOUNT, None).build(),
           &mut pkgs_aux.get_balance().data(TO_NORMAL_ACCOUNT, None).build(),
         ][..],
         pkgs_aux,
-        &mut buffer,
       )
       .await
       .unwrap();
@@ -950,42 +949,36 @@ create_ws_test!(
   ws_reqs_with_array,
   (account_unsubscribe, account_unsubscribe),
   |pkgs_aux, trans| async {
+    let mut array = [
+      &mut pkgs_aux
+        .account_subscribe()
+        .data(
+          TO_NORMAL_ACCOUNT,
+          Some(AccountSubscribeConfig {
+            commitment: Some(Commitment::Confirmed),
+            encoding: Some(AccountEncoding::JsonParsed),
+          }),
+        )
+        .build(),
+      &mut pkgs_aux
+        .account_subscribe()
+        .data(
+          TO_NORMAL_ACCOUNT,
+          Some(AccountSubscribeConfig {
+            commitment: Some(Commitment::Confirmed),
+            encoding: Some(AccountEncoding::JsonParsed),
+          }),
+        )
+        .build(),
+    ];
     let mut buffer = Vector::new();
-    trans
-      .send_recv_decode_batch(
-        &mut [
-          &mut pkgs_aux
-            .account_subscribe()
-            .data(
-              TO_NORMAL_ACCOUNT,
-              Some(AccountSubscribeConfig {
-                commitment: Some(Commitment::Confirmed),
-                encoding: Some(AccountEncoding::JsonParsed),
-              }),
-            )
-            .build(),
-          &mut pkgs_aux
-            .account_subscribe()
-            .data(
-              TO_NORMAL_ACCOUNT,
-              Some(AccountSubscribeConfig {
-                commitment: Some(Commitment::Confirmed),
-                encoding: Some(AccountEncoding::JsonParsed),
-              }),
-            )
-            .build(),
-        ],
-        pkgs_aux,
-        &mut buffer,
-      )
-      .await
-      .unwrap();
+    trans.send_recv_decode_batch(&mut buffer, &mut array, pkgs_aux).await.unwrap();
     [*buffer[0].result.as_ref().unwrap(), *buffer[1].result.as_ref().unwrap()]
   }
 );
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri(HTTP_URI))
+  (SerdeJson, HttpParams::from_uri(HTTP_URI.into()))
 }
 
 #[cfg(feature = "ed25519-dalek")]

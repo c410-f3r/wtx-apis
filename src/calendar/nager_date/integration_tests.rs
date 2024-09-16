@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use wtx::{
   client_api_framework::network::{transport::Transport, HttpParams},
   data_transformation::dnsn::SerdeJson,
-  http::ClientFrameworkTokioRustls,
+  http::client_framework::ClientFrameworkTokioRustls,
 };
 
 static CLIENT: LazyLock<ClientFrameworkTokioRustls> =
@@ -70,5 +70,5 @@ create_http_test!(NagerDate, http(), v3_public_holidays, &*CLIENT, |pkgs_aux, tr
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://date.nager.at:443"))
+  (SerdeJson, HttpParams::from_uri("https://date.nager.at".into()))
 }

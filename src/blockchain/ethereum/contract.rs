@@ -7,7 +7,7 @@ mod tokenizable_item;
 mod tokenize;
 
 use crate::blockchain::ethereum::{
-  BlockId, CallRequest, EthCallPkg, EthCallReq, EthEstimateGasReq, EthGetLogsReq,
+  BlockId, Bytes, CallRequest, EthCallPkg, EthCallReq, EthEstimateGasReq, EthGetLogsReq,
   EthSendTransactionReq, EthSendTransactionRes, Ethereum, EthereumPkgsAux, FilterBuilder, Log,
   TransactionRequest,
 };
@@ -111,7 +111,7 @@ where
       gas_price,
       value,
       nonce,
-      data: Some(crate::blockchain::ethereum::Bytes(data)),
+      data: Some(Bytes(data)),
       condition,
       ty: transaction_type,
       access_list,
@@ -144,7 +144,7 @@ where
       gas: options.gas,
       gas_price: options.gas_price,
       value: options.value,
-      data: Some(crate::blockchain::ethereum::Bytes(data)),
+      data: Some(Bytes(data)),
       ty: options.ty,
       access_list: options.access_list,
       max_fee_per_gas: options.max_fee_per_gas,
@@ -222,7 +222,7 @@ where
       Ethereum,
       DRSR,
       T::Params,
-      ExternalResponseContent<'de> = JsonRpcResponse<Option<crate::blockchain::ethereum::Bytes>>,
+      ExternalResponseContent<'de> = JsonRpcResponse<Option<Bytes>>,
     >,
   {
     let function = self.abi.function(func)?;
@@ -233,7 +233,7 @@ where
       gas: options.gas,
       gas_price: options.gas_price,
       value: options.value,
-      data: Some(crate::blockchain::ethereum::Bytes(bytes)),
+      data: Some(Bytes(bytes)),
       ty: options.ty,
       access_list: options.access_list,
       max_fee_per_gas: options.max_fee_per_gas,
@@ -449,7 +449,11 @@ mod tests {
     trans: &mut Mock<str, HttpParams>,
   ) -> Contract<SerdeJson, &mut Mock<str, HttpParams>> {
     let pair = Pair::new(
-      EthereumPkgsAux::from_minimum(Ethereum::new(None), SerdeJson, HttpParams::from_uri("")),
+      EthereumPkgsAux::from_minimum(
+        Ethereum::new(None),
+        SerdeJson,
+        HttpParams::from_uri(String::new()),
+      ),
       trans,
     );
     Contract::from_json(Address::from_low_u64_be(1), pair, include_bytes!("./resources/token.json"))

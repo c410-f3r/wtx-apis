@@ -3,7 +3,7 @@ use std::sync::LazyLock;
 use wtx::{
   client_api_framework::network::{transport::Transport, HttpParams},
   data_transformation::dnsn::SerdeJson,
-  http::{ClientFrameworkTokioRustls, Method},
+  http::{client_framework::ClientFrameworkTokioRustls, Method},
 };
 
 const DEFAULT_GP: GenericParams<'_> = GenericParams::new(None, Method::Get, None, &[]);
@@ -53,5 +53,5 @@ create_http_test!(JsonPlaceholder, http(), users, &*CLIENT, |pkgs_aux, trans| as
 });
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://jsonplaceholder.typicode.com:443"))
+  (SerdeJson, HttpParams::from_uri("https://jsonplaceholder.typicode.com".into()))
 }

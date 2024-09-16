@@ -78,5 +78,5 @@ create_http_test!(
 );
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri("https://eth-mainnet.public.blastapi.io:443"))
+  (SerdeJson, HttpParams::from_uri("https://eth-mainnet.public.blastapi.io"))
 }

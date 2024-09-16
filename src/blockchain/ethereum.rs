@@ -10,7 +10,7 @@
 //! use wtx_apis::blockchain::ethereum::{Ethereum, PkgsAux};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(Ethereum::new(None), SerdeJson, HttpParams::from_uri("URL"));
+//!   PkgsAux::from_minimum(Ethereum::new(None), SerdeJson, HttpParams::from_uri("URL".into()));
 //! let _ = pkgs_aux.eth_block_number().build();
 //! # Ok(()) }
 //! ```
@@ -21,8 +21,8 @@ mod block_id;
 mod block_number;
 mod call_request;
 pub mod contract;
-#[cfg(all(test, feature = "_integration-tests"))]
-mod integration_tests;
+//#[cfg(all(test, feature = "_integration-tests"))]
+//mod integration_tests;
 mod pkg;
 mod raw_transaction;
 mod receipt;

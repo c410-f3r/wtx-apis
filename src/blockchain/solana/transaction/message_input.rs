@@ -16,15 +16,17 @@ pub struct CompiledInstructionInput {
 }
 
 /// Used when performing requests
+//
+// The order of the fields is important
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InstructionInput {
+  /// Base58 identifier
+  pub program_id: SolanaAddressHash,
   /// List of necessary accounts
   pub accounts: Vec<InstructionAccountInput>,
   /// Opaque data
   pub data: Vec<u8>,
-  /// Base58 identifier
-  pub program_id: SolanaAddressHash,
 }
 
 /// Account information.

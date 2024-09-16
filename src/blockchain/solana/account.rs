@@ -1,7 +1,8 @@
 use crate::blockchain::solana::{
   program::spl_token::GenericAccount, Epoch, SolanaAddressHashStr, SolanaProgramName,
 };
-use alloc::string::String;
+use alloc::{rc::Rc, string::String};
+use core::cell::RefCell;
 
 /// Generic account data representation.
 #[
@@ -69,4 +70,26 @@ pub enum AccountEncoding {
   /// Compressed base64 representation.
   #[serde(rename = "base64+zstd")]
   Base64Zstd,
+}
+
+/// Account in Solana programs
+#[derive(Clone, Debug)]
+#[repr(C)]
+pub struct ProgramAccount<'any> {
+  /// Public key of the account
+  pub key: &'any [u8; 32],
+  /// The lamports in the account.  Modifiable by programs.
+  pub lamports: Rc<RefCell<&'any mut u64>>,
+  /// The data held in this account.  Modifiable by programs.
+  pub data: Rc<RefCell<&'any mut [u8]>>,
+  /// Program that owns this account
+  pub owner: &'any [u8; 32],
+  /// The epoch at which this account will next owe rent
+  pub rent_epoch: Epoch,
+  /// Was the transaction signed by this account's public key?
+  pub is_signer: bool,
+  /// Is the account writable?
+  pub is_writable: bool,
+  /// This account's data contains a loaded program (and is now read-only)
+  pub executable: bool,
 }
