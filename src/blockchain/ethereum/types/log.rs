@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::Bytes;
-use alloc::{string::String, vec::Vec};
-use ethereum_types::{H160, H256, U256, U64};
+use ethereum_types::{H160, H256, U64, U256};
+use wtx::misc::{ArrayString, Vector};
 
 /// A log produced by a transaction.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -10,7 +10,7 @@ pub struct Log {
   /// H160
   pub address: H160,
   /// Topics
-  pub topics: Vec<H256>,
+  pub topics: Vector<H256>,
   /// Data
   pub data: Bytes,
   /// Block Hash
@@ -26,7 +26,7 @@ pub struct Log {
   /// Log Index in Transaction
   pub transaction_log_index: Option<U256>,
   /// Log Type
-  pub log_type: Option<String>,
+  pub log_type: Option<ArrayString<16>>,
   /// Removed
   pub removed: Option<bool>,
 }
@@ -50,15 +50,15 @@ impl Log {
 #[cfg(test)]
 mod tests {
   use crate::blockchain::ethereum::types::log::Log;
-  use alloc::vec;
   use ethabi::Address;
   use ethereum_types::{H160, H256};
+  use wtx::misc::Vector;
 
   #[test]
   fn is_removed_removed_true() {
     let log = Log {
       address: Address::from_low_u64_be(1),
-      topics: vec![],
+      topics: Vector::new(),
       data: <_>::default(),
       block_hash: Some(H256::from_low_u64_be(2)),
       block_number: Some(1.into()),
@@ -76,7 +76,7 @@ mod tests {
   fn is_removed_removed_false() {
     let log = Log {
       address: H160::from_low_u64_be(1),
-      topics: vec![],
+      topics: Vector::new(),
       data: <_>::default(),
       block_hash: Some(H256::from_low_u64_be(2)),
       block_number: Some(1.into()),
@@ -94,7 +94,7 @@ mod tests {
   fn is_removed_log_type_removed() {
     let log = Log {
       address: Address::from_low_u64_be(1),
-      topics: vec![],
+      topics: Vector::new(),
       data: <_>::default(),
       block_hash: Some(H256::from_low_u64_be(2)),
       block_number: Some(1.into()),
@@ -102,7 +102,7 @@ mod tests {
       transaction_index: Some(0.into()),
       log_index: Some(0.into()),
       transaction_log_index: Some(0.into()),
-      log_type: Some("removed".into()),
+      log_type: Some("removed".try_into().unwrap()),
       removed: None,
     };
     assert_eq!(true, log.is_removed());
@@ -112,7 +112,7 @@ mod tests {
   fn is_removed_log_type_mined() {
     let log = Log {
       address: Address::from_low_u64_be(1),
-      topics: vec![],
+      topics: Vector::new(),
       data: <_>::default(),
       block_hash: Some(H256::from_low_u64_be(2)),
       block_number: Some(1.into()),
@@ -120,7 +120,7 @@ mod tests {
       transaction_index: Some(0.into()),
       log_index: Some(0.into()),
       transaction_log_index: Some(0.into()),
-      log_type: Some("mined".into()),
+      log_type: Some("mined".try_into().unwrap()),
       removed: None,
     };
     assert_eq!(false, log.is_removed());
@@ -130,7 +130,7 @@ mod tests {
   fn is_removed_log_type_and_removed_none() {
     let log = Log {
       address: Address::from_low_u64_be(1),
-      topics: vec![],
+      topics: Vector::new(),
       data: <_>::default(),
       block_hash: Some(H256::from_low_u64_be(2)),
       block_number: Some(1.into()),

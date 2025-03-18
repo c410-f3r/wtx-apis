@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{AccessList, Bytes};
 use ethabi::Address;
-use ethereum_types::{H256, U256, U64};
+use ethereum_types::{H256, U64, U256};
 
 /// Description of a Transaction, pending or in the chain.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

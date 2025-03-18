@@ -1,24 +1,24 @@
 use crate::blockchain::ethereum::contract::Tokenizable;
-use alloc::{vec, vec::Vec};
 use ethabi::Token;
+use wtx::misc::Vector;
 
 /// Tokens conversion trait
 pub trait Tokenize {
   /// Convert to list of tokens
-  fn into_tokens(self) -> Vec<Token>;
+  fn into_tokens(self) -> Vector<Token>;
 }
 
 impl Tokenize for () {
   #[inline]
-  fn into_tokens(self) -> Vec<Token> {
-    Vec::new()
+  fn into_tokens(self) -> Vector<Token> {
+    Vector::new()
   }
 }
 
 impl Tokenize for &'_ [Token] {
   #[inline]
-  fn into_tokens(self) -> Vec<Token> {
-    self.to_vec()
+  fn into_tokens(self) -> Vector<Token> {
+    self.to_vec().into()
   }
 }
 
@@ -27,8 +27,8 @@ where
   T: Tokenizable,
 {
   #[inline]
-  fn into_tokens(self) -> Vec<Token> {
-    vec![self.into_token()]
+  fn into_tokens(self) -> Vector<Token> {
+    wtx::vector![self.into_token()]
   }
 }
 
@@ -42,8 +42,8 @@ macro_rules! impl_tuples {
         $( $ty: Tokenizable ),+
       {
         #[inline]
-        fn into_tokens(self) -> Vec<Token> {
-          vec![
+        fn into_tokens(self) -> Vector<Token> {
+          wtx::vector![
             $( self.$idx.into_token() ),+
           ]
         }

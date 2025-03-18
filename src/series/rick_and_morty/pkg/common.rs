@@ -1,4 +1,4 @@
-use alloc::{string::String, vec::Vec};
+use wtx::misc::Vector;
 
 pub(crate) const CHARACTER_FRAGMENT: &str = r#"
   fragment CharacterFrag on Character {
@@ -29,68 +29,68 @@ pub(crate) const CHARACTER_FRAGMENT: &str = r#"
 
 /// Character
 #[derive(Debug, serde::Deserialize)]
-pub struct Character {
+pub struct Character<T> {
   /// Time at which the character was created in the database.
-  pub created: String,
+  pub created: T,
   /// Episodes in which this character appeared.
-  pub episode: Option<Vec<Episode>>,
+  pub episode: Option<Vector<Episode<T>>>,
   /// The gender of the character ('Female', 'Male', 'Genderless' or 'unknown').
-  pub gender: String,
+  pub gender: T,
   /// The id of the character.
-  pub id: String,
+  pub id: T,
   /// Link to the character's image.
-  pub image: String,
+  pub image: T,
   /// The character's last known location
-  pub location: Location,
+  pub location: Location<T>,
   /// The name of the character.
-  pub name: String,
+  pub name: T,
   /// The character's origin location
-  pub origin: Location,
+  pub origin: Location<T>,
   /// The species of the character.
-  pub species: String,
+  pub species: T,
   /// The status of the character ('Alive', 'Dead' or 'unknown').
-  pub status: String,
+  pub status: T,
   /// The type or subspecies of the character.
-  pub r#type: String,
+  pub r#type: T,
 }
 
 /// Episode
 #[derive(Debug, serde::Deserialize)]
-pub struct Episode {
+pub struct Episode<T> {
   /// The air date of the episode.
-  pub air_date: String,
+  pub air_date: T,
   /// List of characters who have been seen in the episode.
-  pub characters: Vec<Character>,
+  pub characters: Vector<Character<T>>,
   /// Time at which the episode was created in the database.
-  pub created: String,
+  pub created: T,
   /// The code of the episode.
-  pub episode: String,
+  pub episode: T,
   /// The id of the episode.
-  pub id: String,
+  pub id: T,
   /// The name of the episode.
-  pub name: String,
+  pub name: T,
 }
 
 /// Location
 #[derive(Debug, serde::Deserialize)]
-pub struct Location {
+pub struct Location<T> {
   /// Time at which the location was created in the database.
-  pub created: Option<String>,
+  pub created: Option<T>,
   /// The dimension in which the location is located.
-  pub dimension: Option<String>,
+  pub dimension: Option<T>,
   /// The id of the location.
-  pub id: Option<String>,
+  pub id: Option<T>,
   /// The name of the location.
-  pub name: String,
+  pub name: T,
   /// List of characters who have been last seen in the location.
-  pub residents: Option<Vec<Character>>,
+  pub residents: Option<Vector<Character<T>>>,
   /// The type of the location.
-  pub r#type: Option<String>,
+  pub r#type: Option<T>,
 }
 
 /// Pagination
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct Pagination {
+pub struct Pagination<T> {
   /// Total number of entries
   pub count: u32,
   /// Next page
@@ -98,5 +98,5 @@ pub struct Pagination {
   /// Total number of pages
   pub pages: u32,
   /// Previous page
-  pub prev: Option<String>,
+  pub prev: Option<T>,
 }

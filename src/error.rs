@@ -1,5 +1,5 @@
 #[allow(unused_imports, reason = "optional features")]
-use alloc::string::String;
+use alloc::{boxed::Box, string::String};
 use core::fmt::{Debug, Display, Formatter};
 use wtx::http::StatusCode;
 
@@ -7,6 +7,7 @@ use wtx::http::StatusCode;
 #[derive(Debug)]
 pub enum Error {
   // External
+  //
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
@@ -25,11 +26,36 @@ pub enum Error {
   Wtx(wtx::Error),
 
   // Ethereum
+  //
   /// Bad data serialization
   #[cfg(feature = "ethereum")]
   TokensInvalidOutputType(String),
 
+  // Internal
+  //
+  /// An submitted transaction could not be confirmed by an external actor.
+  CouldNotConfirmTransaction,
+  /// Request was expecting a different HTTP status code.
+  IncompatibleStatusCode(StatusCode, StatusCode),
+
+  // Mercado Pago
+  //
+  /// It wasn't possible to fetch an access token
+  UnableToGetAccessToken,
+  /// Mercado Pago error
+  #[cfg(feature = "mercado-pago")]
+  MercadoPagoError(Box<crate::payment_gateway::mercado_pago::MercadoPagoError<String>>),
+
+  // Olist
+  //
+  /// Olist error
+  #[cfg(feature = "olist")]
+  OlistError(crate::erp::olist::OlistError<String>),
+  /// Unexpected token response
+  OlistUnexpectedTokenResponse,
+
   // Solana
+  //
   /// Returned data from counterpart is everything but a spl-token account
   #[cfg(feature = "solana")]
   SolanaAccountIsNotSplToken,
@@ -52,14 +78,16 @@ pub enum Error {
   #[cfg(feature = "solana")]
   SolanaUnsupportedMessageFormat,
 
-  // Internal
-  /// An submitted transaction could not be confirmed by an external actor.
-  CouldNotConfirmTransaction,
-  /// For third-party dependencies that throws strings errors
-  Generic(&'static str),
-  /// Request was expecting a different HTTP status code.
-  IncompatibleStatusCode(StatusCode, StatusCode),
+  // SuperFrete
+  //
+  /// SuperFrete error
+  #[cfg(feature = "super-frete")]
+  SuperFreteError(Box<crate::carrier::super_frete::SuperFreteError<String>>),
 }
+
+impl core::error::Error for Error {}
+
+// External
 
 #[cfg(feature = "solana")]
 impl From<bincode::Error> for Error {
@@ -104,6 +132,55 @@ impl From<wtx::Error> for Error {
   #[inline]
   fn from(from: wtx::Error) -> Self {
     Self::Wtx(from)
+  }
+}
+
+// Mercado Pago
+
+#[cfg(feature = "mercado-pago")]
+impl<S> From<crate::payment_gateway::mercado_pago::MercadoPagoError<S>> for Error
+where
+  S: wtx::misc::Lease<str>,
+{
+  #[inline]
+  fn from(from: crate::payment_gateway::mercado_pago::MercadoPagoError<S>) -> Self {
+    Self::MercadoPagoError(
+      crate::payment_gateway::mercado_pago::MercadoPagoError {
+        error: from.error.lease().into(),
+        message: from.message.lease().into(),
+        status: from.status,
+      }
+      .into(),
+    )
+  }
+}
+
+// Olist
+
+#[cfg(feature = "olist")]
+impl From<crate::erp::olist::OlistError<String>> for Error {
+  #[inline]
+  fn from(from: crate::erp::olist::OlistError<String>) -> Self {
+    Self::OlistError(from)
+  }
+}
+
+// SuperFrete
+
+#[cfg(feature = "super-frete")]
+impl<S> From<crate::carrier::super_frete::SuperFreteError<S>> for Error
+where
+  S: wtx::misc::Lease<str>,
+{
+  #[inline]
+  fn from(from: crate::carrier::super_frete::SuperFreteError<S>) -> Self {
+    Self::SuperFreteError(
+      crate::carrier::super_frete::SuperFreteError {
+        error: from.error.map(|el| el.lease().into()),
+        message: from.message.lease().into(),
+      }
+      .into(),
+    )
   }
 }
 

@@ -1,11 +1,12 @@
 use crate::blockchain::ethereum::contract::Tokenizable;
-use alloc::{format, vec::Vec};
+use alloc::format;
 use ethabi::Token;
+use wtx::misc::Vector;
 
 /// Output type possible to deserialize from Contract ABI
 pub trait Detokenize {
   /// Creates a new instance from parsed ABI tokens.
-  fn from_tokens(tokens: Vec<Token>) -> crate::Result<Self>
+  fn from_tokens(tokens: Vector<Token>) -> crate::Result<Self>
   where
     Self: Sized;
 }
@@ -15,7 +16,7 @@ where
   T: Tokenizable,
 {
   #[inline]
-  fn from_tokens(mut tokens: Vec<Token>) -> crate::Result<Self> {
+  fn from_tokens(mut tokens: Vector<Token>) -> crate::Result<Self> {
     let len = tokens.len();
     if let Some(first) = tokens.drain(..).next() {
       if len == 1 {
@@ -36,7 +37,7 @@ macro_rules! impl_tuples {
         $( $ty: Tokenizable, )+
       {
         #[inline]
-        fn from_tokens(mut tokens: Vec<Token>) -> crate::Result<Self> {
+        fn from_tokens(mut tokens: Vector<Token>) -> crate::Result<Self> {
           let len = tokens.len();
           let mut iter = tokens.drain(..);
           #[allow(non_snake_case)]

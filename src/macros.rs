@@ -2,6 +2,7 @@
 #[macro_export]
 macro_rules! create_generic_test {
   (
+    #[$($meta:meta)?],
     $api:expr,
     $drsr_exp:expr,
     $test:ident,
@@ -9,6 +10,7 @@ macro_rules! create_generic_test {
     |$rslt_cb_pkgs_aux:ident, $rslt_cb_trans:ident, $rslt_cb_parts:ident| $rslt_cb:expr,
     $trans:expr
   ) => {
+    $(#[$meta])?
     #[test]
     fn $test() {
       $crate::tests::_RUNTIME.block_on(async {
@@ -40,6 +42,7 @@ macro_rules! create_generic_test {
 #[macro_export]
 macro_rules! create_http_test {
   (
+    #[$($meta:meta)?],
     $api:expr,
     $drsr_exp:expr,
     $test:ident,
@@ -47,6 +50,7 @@ macro_rules! create_http_test {
     |$parts_cb_pkgs_aux:ident, $parts_cb_trans:ident| $parts_cb:expr
   ) => {
     $crate::create_generic_test! {
+      #[$($meta)?],
       $api,
       $drsr_exp,
       $test,
@@ -61,6 +65,7 @@ macro_rules! create_http_test {
 #[macro_export]
 macro_rules! create_ws_test {
   (
+    #[$($meta:meta)?],
     $uri:expr,
     $api:expr,
     $drsr_exp:expr,
@@ -69,24 +74,21 @@ macro_rules! create_ws_test {
     |$parts_cb_pkgs_aux:ident, $parts_cb_trans:ident| $parts_cb:expr
   ) => {
     $crate::create_generic_test! {
+      #[$($meta)?],
       $api,
       $drsr_exp,
       $test,
       |$parts_cb_pkgs_aux, $parts_cb_trans| $parts_cb,
       |pkgs_aux, trans, subs| async move {
+        use wtx::client_api_framework::network::transport::SendingTransport;
         let mut iter = subs.into_iter();
         let ids = &mut [$( pkgs_aux.$unsub().data(iter.next().unwrap()).build(), )+][..];
-        let _res = trans.send(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
+        let _res = trans.send_pkg(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
       },
       {
         let uri = wtx::misc::Uri::new($uri);
-        let mut fb = wtx::web_socket::FrameBufferVec::default();
-        let trans = wtx::web_socket::WebSocketClient::connect(
-          (),
-          &mut fb,
-          [],
-          &mut wtx::web_socket::HeadersBuffer::default(),
-          wtx::misc::NoStdRng::default(),
+        wtx::web_socket::WebSocketConnector::default()
+        .connect(
           wtx::misc::TokioRustlsConnector::from_auto()
             .unwrap()
             .connect_without_client_auth(
@@ -95,13 +97,10 @@ macro_rules! create_ws_test {
             )
             .await
             .unwrap(),
-          &uri,
-          wtx::web_socket::WebSocketBuffer::default(),
+          &uri
         )
         .await
         .unwrap()
-        .1;
-      (fb, trans)
       }
     }
   };

@@ -5,9 +5,9 @@ mod short_vec_visitor;
 use cl_aux::{Push, SingleTypeStorage, WithCapacity};
 use core::marker::PhantomData;
 use serde::{
+  Deserialize, Serialize,
   de::{self, Deserializer, SeqAccess},
   ser::{self, SerializeTuple, Serializer},
-  Deserialize, Serialize,
 };
 use short_u16::*;
 use short_u16_visitor::*;
@@ -104,9 +104,5 @@ fn visit_byte(elem: u8, val: u16, nth_byte: usize) -> Result<VisitStatus, VisitE
   let new_val = val_u32 | shifted_elem_val;
   let final_val = u16::try_from(new_val).map_err(|_err| VisitError::Overflow(new_val))?;
 
-  if elem_done {
-    Ok(VisitStatus::Done(final_val))
-  } else {
-    Ok(VisitStatus::More(final_val))
-  }
+  if elem_done { Ok(VisitStatus::Done(final_val)) } else { Ok(VisitStatus::More(final_val)) }
 }

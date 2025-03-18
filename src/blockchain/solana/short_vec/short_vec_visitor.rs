@@ -2,8 +2,8 @@ use crate::blockchain::solana::short_vec::ShortU16;
 use cl_aux::{Push, SingleTypeStorage, WithCapacity};
 use core::{fmt, marker::PhantomData};
 use serde::{
-  de::{self, SeqAccess, Visitor},
   Deserialize,
+  de::{self, SeqAccess, Visitor},
 };
 
 pub(crate) struct ShortVecVisitor<T>(pub(crate) PhantomData<T>);

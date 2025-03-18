@@ -1,12 +1,12 @@
 use crate::blockchain::solana::{
+  SolanaAddressHashStr, SolanaBlockhashStr, SolanaProgramName, SolanaSignatureHashStr,
   program::{
     spl_token::{self, TransferCheckedInstruction},
     system,
   },
-  SolanaAddressHashStr, SolanaBlockhashStr, SolanaProgramName, SolanaSignatureHashStr,
 };
-use alloc::{string::String, vec::Vec};
-use wtx::misc::ArrayString;
+use alloc::string::String;
+use wtx::misc::{ArrayString, Vector};
 
 /// A json instruction can be expressed in different formats.
 #[allow(
@@ -54,7 +54,7 @@ pub struct CompiledInstructionJson {
   /// Index in regards to the block array of programs.
   pub program_id_index: u8,
   /// Indexes in regards to the block array of accounts.
-  pub accounts: Vec<u8>,
+  pub accounts: Vector<u8>,
   /// Opaque data
   pub data: String,
 }
@@ -65,7 +65,7 @@ pub struct InnerInstructionJson {
   /// Index in regards to the block array of instructions.
   pub index: u8,
   /// Instructions
-  pub instructions: Vec<InstructionJsonGeneric>,
+  pub instructions: Vector<InstructionJsonGeneric>,
 }
 
 /// With decoded JSON data.
@@ -97,7 +97,7 @@ pub struct InstructionPartiallyDecoded {
   /// Program Base58 identifier.
   pub program_id: SolanaAddressHashStr,
   /// Instruction accounts
-  pub accounts: Vec<SolanaAddressHashStr>,
+  pub accounts: Vector<SolanaAddressHashStr>,
   /// Raw data
   pub data: String,
 }
@@ -107,9 +107,9 @@ pub struct InstructionPartiallyDecoded {
 #[serde(rename_all = "camelCase")]
 pub struct MessageJson<AK, I> {
   /// All block accounts.
-  pub account_keys: Vec<AK>,
+  pub account_keys: Vector<AK>,
   /// All block instructions.
-  pub instructions: Vec<I>,
+  pub instructions: Vector<I>,
   /// Recent blockhash.
   pub recent_blockhash: SolanaBlockhashStr,
 }
@@ -131,7 +131,7 @@ pub struct MessageJsonAccountKey {
 #[serde(rename_all = "camelCase")]
 pub struct TransactionJson<AK, I> {
   /// All block signatures.
-  pub signatures: Vec<SolanaSignatureHashStr>,
+  pub signatures: Vector<SolanaSignatureHashStr>,
   /// Message
   pub message: MessageJson<AK, I>,
 }

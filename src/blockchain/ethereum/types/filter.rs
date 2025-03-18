@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{BlockNumber, ValueOrArray};
-use alloc::vec::Vec;
 use ethereum_types::{H160, H256};
+use wtx::misc::Vector;
 
 /// Filter
 #[derive(Debug, Default, serde::Serialize)]
@@ -23,5 +23,5 @@ pub struct Filter {
   pub(crate) to_block: Option<BlockNumber>,
   /// Topics
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub(crate) topics: Option<Vec<Option<ValueOrArray<H256>>>>,
+  pub(crate) topics: Option<Vector<Option<ValueOrArray<H256>>>>,
 }

@@ -1,6 +1,6 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getTokenLargestAccounts")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
@@ -10,7 +10,7 @@ pub(crate) mod pkg {
     },
     misc::MaxNumberStr,
   };
-  use alloc::vec::Vec;
+  use wtx::misc::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -27,7 +27,7 @@ pub(crate) mod pkg {
 
   #[pkg::res_data]
   pub type GetTokenLargestAccountsRes =
-    JsonRpcResponseResultWithContext<Vec<GetTokenLargestAccounts>>;
+    JsonRpcResponseResultWithContext<Vector<GetTokenLargestAccounts>>;
 
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]

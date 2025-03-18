@@ -17,16 +17,11 @@
 mod integration_tests;
 mod pkg;
 
-wtx::create_packages_aux_wrapper!();
-
 pub use pkg::*;
-use wtx::client_api_framework::Api;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http))]
+#[wtx_macros::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
 pub struct NagerDate;
 
-impl Api for NagerDate {
-  type Error = crate::Error;
-}
+wtx::create_packages_aux_wrapper!();

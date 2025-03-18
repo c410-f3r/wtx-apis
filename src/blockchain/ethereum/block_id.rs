@@ -33,7 +33,7 @@ impl From<H256> for BlockId {
 
 mod serde {
   use crate::blockchain::ethereum::BlockId;
-  use serde::{ser::SerializeStruct, Serializer};
+  use serde::{Serializer, ser::SerializeStruct};
 
   impl serde::Serialize for BlockId {
     #[inline]

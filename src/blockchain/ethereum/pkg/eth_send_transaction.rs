@@ -1,6 +1,6 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::ethereum::Ethereum),
   data_format(json_rpc("eth_sendTransaction")),
+  id(crate::blockchain::ethereum::EthereumId),
   transport(http, stub)
 )]
 pub(crate) mod pkg {

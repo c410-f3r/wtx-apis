@@ -31,8 +31,6 @@ mod transaction_condition;
 mod transaction_request;
 mod types;
 
-wtx::create_packages_aux_wrapper!();
-
 pub use access_list::AccessList;
 pub use access_list_item::AccessListItem;
 pub use block_id::BlockId;
@@ -45,11 +43,11 @@ pub use transaction::Transaction;
 pub use transaction_condition::TransactionCondition;
 pub use transaction_request::TransactionRequest;
 pub use types::*;
-use wtx::client_api_framework::{misc::RequestThrottling, Api};
+use wtx::client_api_framework::{Api, misc::RequestThrottling};
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Ethereum {
   /// If some, tells that each request must respect calling intervals.
   pub rt: Option<RequestThrottling>,
@@ -64,6 +62,7 @@ impl Ethereum {
 
 impl Api for Ethereum {
   type Error = crate::Error;
+  type Id = EthereumId;
 
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     if let Some(ref mut rt) = self.rt {
@@ -72,3 +71,5 @@ impl Api for Ethereum {
     Ok(())
   }
 }
+
+wtx::create_packages_aux_wrapper!();

@@ -1,11 +1,11 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getVoteAccounts")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux, SolanaAddressHashStr};
-  use alloc::vec::Vec;
+  use wtx::misc::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -23,9 +23,9 @@ pub(crate) mod pkg {
   #[serde(rename_all = "camelCase")]
   pub struct GetVoteAccountsRes {
     /// Current
-    pub current: Vec<GetVoteAccounts>,
+    pub current: Vector<GetVoteAccounts>,
     /// Delinquent
-    pub delinquent: Vec<GetVoteAccounts>,
+    pub delinquent: Vector<GetVoteAccounts>,
   }
 
   #[derive(Debug, serde::Deserialize)]
@@ -45,7 +45,7 @@ pub(crate) mod pkg {
     /// Most recent slot voted on by this vote account
     pub last_vote: u64,
     /// History of how many credits earned by the end of each epoch
-    pub epoch_credits: Vec<[u64; 3]>,
+    pub epoch_credits: Vector<[u64; 3]>,
   }
 
   #[derive(Debug, serde::Serialize)]

@@ -1,8 +1,8 @@
-use alloc::vec::Vec;
+use wtx::misc::Vector;
 
 /// Value or Array
 #[derive(Debug)]
-pub struct ValueOrArray<T>(pub(crate) Vec<T>);
+pub struct ValueOrArray<T>(pub(crate) Vector<T>);
 
 mod serde {
   use crate::blockchain::ethereum::ValueOrArray;

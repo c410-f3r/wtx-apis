@@ -1,14 +1,13 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getProgramAccounts")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Account, AccountEncoding, Commitment, DataSlice, Filter, HttpPkgsAux,
   };
-  use alloc::vec::Vec;
-  use wtx::misc::ArrayString;
+  use wtx::misc::{ArrayString, Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -23,7 +22,7 @@ pub(crate) mod pkg {
   );
 
   #[pkg::res_data]
-  pub type GetProgramAccountsRes = Vec<GetProgramAccounts>;
+  pub type GetProgramAccountsRes = Vector<GetProgramAccounts>;
 
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]

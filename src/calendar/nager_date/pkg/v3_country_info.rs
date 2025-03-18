@@ -1,8 +1,11 @@
-#[wtx_macros::pkg(api(crate::calendar::nager_date::NagerDate), data_format(json), transport(http))]
+#[wtx_macros::pkg(data_format(json), id(crate::calendar::nager_date::NagerDateId), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::NagerDateHttpPkgsAux;
-  use alloc::{boxed::Box, vec::Vec};
-  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
+  use alloc::boxed::Box;
+  use wtx::{
+    client_api_framework::network::{HttpParams, transport::TransportParams},
+    misc::Vector,
+  };
 
   #[pkg::aux]
   impl<DRSR> NagerDateHttpPkgsAux<DRSR> {}
@@ -10,9 +13,12 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(
     params: &mut V3CountryInfoParams<'_>,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    req_params.uri.push_path(format_args!("/api/v3/CountryInfo/{}", params.country))?;
+    trans_params
+      .ext_req_params_mut()
+      .uri
+      .push_path(format_args!("/api/v3/CountryInfo/{}", params.country))?;
     Ok(())
   }
 
@@ -27,21 +33,21 @@ pub(crate) mod pkg {
   pub struct V3CountryInfoReq;
 
   #[pkg::res_data]
-  pub type V3CountryInfoRes = Box<V3CountryInfo>;
+  pub type V3CountryInfoRes<'any> = Box<V3CountryInfo<&'any str>>;
 
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
   #[doc = _generic_res_data_elem_doc!()]
-  pub struct V3CountryInfo {
+  pub struct V3CountryInfo<T> {
     /// For example, Spain.
-    pub common_name: ArrayString<12>,
+    pub common_name: T,
     /// For example, Kingdom of Spain.
-    pub official_name: ArrayString<26>,
+    pub official_name: T,
     /// ISO 3166-1 alpha-2.
-    pub country_code: ArrayString<12>,
+    pub country_code: T,
     /// Continent.
-    pub region: ArrayString<6>,
+    pub region: T,
     /// Adjacent countries.
-    pub borders: Option<Vec<V3CountryInfo>>,
+    pub borders: Option<Vector<V3CountryInfo<T>>>,
   }
 }

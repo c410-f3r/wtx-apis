@@ -1,6 +1,6 @@
-use alloc::vec::Vec;
 use ethabi::Address;
 use ethereum_types::H256;
+use wtx::misc::Vector;
 
 /// Access list item
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -9,5 +9,5 @@ pub struct AccessListItem {
   /// Accessed address
   pub address: Address,
   /// Accessed storage keys
-  pub storage_keys: Vec<H256>,
+  pub storage_keys: Vector<H256>,
 }

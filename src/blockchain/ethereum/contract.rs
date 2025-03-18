@@ -11,7 +11,6 @@ use crate::blockchain::ethereum::{
   EthSendTransactionReq, EthSendTransactionRes, Ethereum, EthereumPkgsAux, FilterBuilder, Log,
   TransactionRequest,
 };
-use alloc::vec::Vec;
 pub use detokenize::Detokenize;
 use ethabi::Address;
 use ethereum_types::{H256, U256};
@@ -22,20 +21,21 @@ pub use tokenize::Tokenize;
 use wtx::{
   client_api_framework::{
     misc::Pair,
-    network::{transport::Transport, HttpParams},
+    network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
   data_transformation::{
-    dnsn::{Deserialize, Serialize},
+    dnsn::De,
     format::{JsonRpcRequest, JsonRpcResponse},
   },
+  misc::{DecodeSeq, Encode, Vector, Wrapper},
 };
 
 /// Ethereum Contract Interface
 #[derive(Debug)]
 pub struct Contract<DRSR, T>
 where
-  T: Transport<DRSR, Params = HttpParams>,
+  T: SendingReceivingTransport<HttpParams>,
 {
   abi: ethabi::Contract,
   address: Address,
@@ -44,7 +44,7 @@ where
 
 impl<DRSR, T> Contract<DRSR, T>
 where
-  T: Transport<DRSR, Params = HttpParams>,
+  T: SendingReceivingTransport<HttpParams>,
 {
   /// Creates new Contract Interface given blockchain address and ABI
   #[inline]
@@ -89,8 +89,8 @@ where
   ) -> crate::Result<Option<H256>>
   where
     FP: Tokenize,
-    for<'tr> JsonRpcRequest<EthSendTransactionReq<'tr>>: Serialize<DRSR>,
-    JsonRpcResponse<EthSendTransactionRes>: for<'de> Deserialize<'de, DRSR>,
+    for<'tr> JsonRpcRequest<EthSendTransactionReq<'tr>>: Encode<De<DRSR>>,
+    JsonRpcResponse<EthSendTransactionRes>: for<'de> DecodeSeq<'de, De<DRSR>>,
   {
     let data = self.abi.function(func)?.encode_input(&func_params.into_tokens())?.into();
     let Options {
@@ -120,7 +120,7 @@ where
     };
     let (pkgs_aux, trans) = self.ethereum.parts_mut();
     let mut pkg = pkgs_aux.eth_send_transaction().data([&tr]).build();
-    Ok(trans.send_recv_decode_contained(&mut pkg, pkgs_aux).await?.result?)
+    Ok(trans.send_pkg_recv_decode_contained(&mut pkg, pkgs_aux).await?.result?)
   }
 
   /// Estimate gas required for this function call.
@@ -134,8 +134,8 @@ where
   ) -> crate::Result<U256>
   where
     FP: Tokenize,
-    for<'any> JsonRpcRequest<EthEstimateGasReq<'any>>: Serialize<DRSR>,
-    JsonRpcResponse<U256>: for<'de> Deserialize<'de, DRSR>,
+    for<'any> JsonRpcRequest<EthEstimateGasReq<'any>>: Encode<De<DRSR>>,
+    JsonRpcResponse<U256>: for<'de> DecodeSeq<'de, De<DRSR>>,
   {
     let data = self.abi.function(func)?.encode_input(&func_params.into_tokens())?.into();
     let call_request = CallRequest {
@@ -152,7 +152,7 @@ where
     };
     let (pkgs_aux, trans) = self.ethereum.parts_mut();
     let mut pkg = pkgs_aux.eth_estimate_gas().data(None, &call_request).build();
-    Ok(trans.send_recv_decode_contained(&mut pkg, pkgs_aux).await?.result?)
+    Ok(trans.send_pkg_recv_decode_contained(&mut pkg, pkgs_aux).await?.result?)
   }
 
   /// Find events matching the topics.
@@ -163,22 +163,18 @@ where
     topic0: AA,
     topic1: BB,
     topic2: CC,
-  ) -> crate::Result<Vec<R>>
+  ) -> crate::Result<Vector<R>>
   where
     AA: Tokenize,
     BB: Tokenize,
     CC: Tokenize,
     R: Detokenize,
-    for<'filter> JsonRpcRequest<EthGetLogsReq<'filter>>: Serialize<DRSR>,
-    JsonRpcResponse<Option<Vec<Log>>>: for<'de> Deserialize<'de, DRSR>,
+    for<'filter> JsonRpcRequest<EthGetLogsReq<'filter>>: Encode<De<DRSR>>,
+    JsonRpcResponse<Option<Vector<Log>>>: for<'de> DecodeSeq<'de, De<DRSR>>,
   {
     fn to_topic<A: Tokenize>(x: A) -> ethabi::Topic<ethabi::Token> {
       let tokens = x.into_tokens();
-      if tokens.is_empty() {
-        ethabi::Topic::Any
-      } else {
-        tokens.into()
-      }
+      if tokens.is_empty() { ethabi::Topic::Any } else { alloc::vec::Vec::from(tokens).into() }
     }
 
     let ev = self.abi.event(event)?;
@@ -189,20 +185,26 @@ where
       topic2: to_topic(topic2),
     })?;
 
-    let filter = FilterBuilder::default().topic_filter(topic_filer).build();
+    let filter = FilterBuilder::default().topic_filter(topic_filer)?.build();
     let (pkgs_aux, trans) = self.ethereum.parts_mut();
     let mut pkg = pkgs_aux.eth_get_logs().data(&filter).build();
-    let Some(logs) = trans.send_recv_decode_contained(&mut pkg, pkgs_aux).await?.result? else {
-      return Ok(Vec::new());
+    let Some(logs) = trans.send_pkg_recv_decode_contained(&mut pkg, pkgs_aux).await?.result? else {
+      return Ok(Vector::new());
     };
 
-    logs
-      .into_iter()
-      .map(move |l| {
-        let log = ev.parse_log(ethabi::RawLog { topics: l.topics, data: l.data.0.into() })?;
-        R::from_tokens(log.params.into_iter().map(|x| x.value).collect::<Vec<_>>())
-      })
-      .collect::<crate::Result<Vec<R>>>()
+    Ok(
+      logs
+        .into_iter()
+        .map(move |l| {
+          let log =
+            ev.parse_log(ethabi::RawLog { topics: l.topics.into(), data: l.data.0.into() })?;
+          let vector =
+            log.params.into_iter().map(|x| x.value).collect::<Wrapper<Result<Vector<_>, _>>>().0?;
+          R::from_tokens(vector)
+        })
+        .collect::<Result<Wrapper<Result<Vector<_>, _>>, _>>()?
+        .0?,
+    )
   }
 
   /// Call constant function
@@ -219,11 +221,12 @@ where
     FP: Tokenize,
     R: Detokenize,
     for<'any, 'de> EthCallPkg<JsonRpcRequest<EthCallReq<'any>>>: Package<
-      Ethereum,
-      DRSR,
-      T::Params,
-      ExternalResponseContent<'de> = JsonRpcResponse<Option<Bytes>>,
-    >,
+        Ethereum,
+        DRSR,
+        T::Inner,
+        HttpParams,
+        ExternalResponseContent<'de> = JsonRpcResponse<Option<Bytes>>,
+      >,
   {
     let function = self.abi.function(func)?;
     let bytes = function.encode_input(&func_params.into_tokens())?.into();
@@ -242,10 +245,10 @@ where
     let (pkgs_aux, trans) = self.ethereum.parts_mut();
     let mut pkg = pkgs_aux.eth_call().data(block_id, &call_request).build();
     trans
-      .send_recv_decode_contained(&mut pkg, pkgs_aux)
+      .send_pkg_recv_decode_contained(&mut pkg, pkgs_aux)
       .await?
       .result?
-      .map(|el| R::from_tokens(function.decode_output(&el.0)?))
+      .map(|el| R::from_tokens(function.decode_output(&el.0)?.into()))
       .transpose()
   }
 }
@@ -253,15 +256,13 @@ where
 #[cfg(test)]
 mod tests {
   use crate::blockchain::ethereum::{
-    contract::{Contract, Detokenize, Options},
     BlockId, BlockNumber, CallRequest, Ethereum, EthereumPkgsAux,
+    contract::{Contract, Detokenize, Options},
   };
   use alloc::{
     borrow::{Cow, ToOwned},
     format,
     string::String,
-    vec,
-    vec::Vec,
   };
   use ethabi::{Address, Token};
   use ethereum_types::{H256, U256};
@@ -269,31 +270,34 @@ mod tests {
   use wtx::{
     client_api_framework::{
       misc::Pair,
-      network::{transport::Mock, HttpParams},
+      network::{HttpParams, transport::Mock},
     },
     data_transformation::{
       dnsn::SerdeJson,
       format::{JsonRpcRequest, JsonRpcResponse},
     },
+    misc::Vector,
   };
 
-  const HELLO_WORLD: &str =
-    "0x00000000000000000000000000000000000000000000000000000000000000200000\
+  const HELLO_WORLD: &str = "0x00000000000000000000000000000000000000000000000000000000000000200000\
   00000000000000000000000000000000000000000000000000000000000c48656c6c6f20576f726c6421000000000000\
   0000000000000000000000000000";
 
   #[test]
   fn decoding_array_of_fixed_bytes() {
-    let tokens = vec![Token::FixedArray(vec![
-      Token::FixedBytes(hex::decode("01").unwrap().into()),
-      Token::FixedBytes(hex::decode("02").unwrap().into()),
-      Token::FixedBytes(hex::decode("03").unwrap().into()),
-      Token::FixedBytes(hex::decode("04").unwrap().into()),
-      Token::FixedBytes(hex::decode("05").unwrap().into()),
-      Token::FixedBytes(hex::decode("06").unwrap().into()),
-      Token::FixedBytes(hex::decode("07").unwrap().into()),
-      Token::FixedBytes(hex::decode("08").unwrap().into()),
-    ])];
+    let tokens = wtx::vector![Token::FixedArray(
+      wtx::vector![
+        Token::FixedBytes(hex::decode("01").unwrap().into()),
+        Token::FixedBytes(hex::decode("02").unwrap().into()),
+        Token::FixedBytes(hex::decode("03").unwrap().into()),
+        Token::FixedBytes(hex::decode("04").unwrap().into()),
+        Token::FixedBytes(hex::decode("05").unwrap().into()),
+        Token::FixedBytes(hex::decode("06").unwrap().into()),
+        Token::FixedBytes(hex::decode("07").unwrap().into()),
+        Token::FixedBytes(hex::decode("08").unwrap().into()),
+      ]
+      .into()
+    )];
     let data: [[u8; 1]; 8] = Detokenize::from_tokens(tokens).unwrap();
     assert_eq!(data[0][0], 1);
     assert_eq!(data[1][0], 2);
@@ -306,17 +310,17 @@ mod tests {
   fn decoding_compiles() {
     let _address: Address = output();
     let _bool: bool = output();
-    let _bytes: Vec<u8> = output();
+    let _bytes: Vector<u8> = output();
     let _string: String = output();
-    let _tokens: Vec<Token> = output();
+    let _tokens: Vector<Token> = output();
     let _uint: U256 = output();
 
     let _array: [U256; 4] = output();
-    let _bytes: Vec<[[u8; 1]; 64]> = output();
+    let _bytes: Vector<[[u8; 1]; 64]> = output();
     let _pair: (U256, bool) = output();
-    let _vec: Vec<U256> = output();
+    let _vec: Vector<U256> = output();
 
-    let _mixed: (Vec<Vec<u8>>, [U256; 4], Vec<U256>, U256) = output();
+    let _mixed: (Vector<Vector<u8>>, [U256; 4], Vector<U256>, U256) = output();
 
     let _uints: (u16, u32, u64, u128) = output();
   }

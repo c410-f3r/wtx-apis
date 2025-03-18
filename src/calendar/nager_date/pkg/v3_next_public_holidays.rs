@@ -1,8 +1,10 @@
-#[wtx_macros::pkg(api(crate::calendar::nager_date::NagerDate), data_format(json), transport(http))]
+#[wtx_macros::pkg(data_format(json), id(crate::calendar::nager_date::NagerDateId), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::{NagerDateHttpPkgsAux, V3PublicHoliday};
-  use alloc::vec::Vec;
-  use wtx::client_api_framework::network::HttpReqParams;
+  use wtx::{
+    client_api_framework::network::{HttpParams, transport::TransportParams},
+    misc::Vector,
+  };
 
   #[pkg::aux]
   impl<DRSR> NagerDateHttpPkgsAux<DRSR> {}
@@ -10,9 +12,12 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(
     params: &mut V3NextPublicHolidaysParams<'_>,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    req_params.uri.push_path(format_args!("/api/v3/NextPublicHolidays/{}", params.country_code))?;
+    trans_params
+      .ext_req_params_mut()
+      .uri
+      .push_path(format_args!("/api/v3/NextPublicHolidays/{}", params.country_code))?;
     Ok(())
   }
 
@@ -27,5 +32,5 @@ pub(crate) mod pkg {
   pub struct V3NextPublicHolidaysReq;
 
   #[pkg::res_data]
-  pub type V3NextPublicHolidaysRes = Vec<V3PublicHoliday>;
+  pub type V3NextPublicHolidaysRes = Vector<V3PublicHoliday>;
 }

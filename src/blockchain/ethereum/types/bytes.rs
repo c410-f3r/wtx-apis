@@ -19,8 +19,8 @@ mod serde {
   use alloc::string::String;
   use core::fmt::{Display, Formatter};
   use serde::{
-    de::{Unexpected, Visitor},
     Deserialize, Deserializer, Serialize, Serializer,
+    de::{Unexpected, Visitor},
   };
 
   impl<'de> Deserialize<'de> for Bytes {

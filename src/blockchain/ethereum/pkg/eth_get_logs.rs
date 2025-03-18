@@ -1,11 +1,11 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::ethereum::Ethereum),
   data_format(json_rpc("eth_getLogs")),
+  id(crate::blockchain::ethereum::EthereumId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::ethereum::{Filter, HttpPkgsAux, Log};
-  use alloc::vec::Vec;
+  use wtx::misc::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -15,5 +15,5 @@ pub(crate) mod pkg {
   pub struct EthGetLogsReq<'filter>(#[pkg::field(name = "filter")] &'filter Filter);
 
   #[pkg::res_data]
-  pub type EthGetLogsRes = Option<Vec<Log>>;
+  pub type EthGetLogsRes = Option<Vector<Log>>;
 }

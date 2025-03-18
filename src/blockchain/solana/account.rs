@@ -1,5 +1,5 @@
 use crate::blockchain::solana::{
-  program::spl_token::GenericAccount, Epoch, SolanaAddressHashStr, SolanaProgramName,
+  Epoch, SolanaAddressHashStr, SolanaProgramName, program::spl_token::GenericAccount,
 };
 use alloc::{rc::Rc, string::String};
 use core::cell::RefCell;

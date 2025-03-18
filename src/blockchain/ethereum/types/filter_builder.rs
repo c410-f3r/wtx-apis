@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{BlockNumber, Filter, ValueOrArray};
-use alloc::{vec, vec::Vec};
 use ethereum_types::{H160, H256};
+use wtx::misc::{Vector, Wrapper};
 
 /// Filter Builder
 #[derive(Debug, Default)]
@@ -41,7 +41,7 @@ impl FilterBuilder {
 
   /// Single address
   #[inline]
-  pub fn address(mut self, address: Vec<H160>) -> Self {
+  pub fn address(mut self, address: Vector<H160>) -> Self {
     self.filter.address = Some(ValueOrArray(address));
     self
   }
@@ -50,26 +50,27 @@ impl FilterBuilder {
   #[inline]
   pub fn topics(
     mut self,
-    topic1: Option<Vec<H256>>,
-    topic2: Option<Vec<H256>>,
-    topic3: Option<Vec<H256>>,
-    topic4: Option<Vec<H256>>,
-  ) -> Self {
-    let mut topics = vec![topic1, topic2, topic3, topic4]
+    topic1: Option<Vector<H256>>,
+    topic2: Option<Vector<H256>>,
+    topic3: Option<Vector<H256>>,
+    topic4: Option<Vector<H256>>,
+  ) -> crate::Result<Self> {
+    let mut topics = wtx::vector![topic1, topic2, topic3, topic4]
       .into_iter()
       .rev()
       .skip_while(Option::is_none)
       .map(|option| option.map(ValueOrArray))
-      .collect::<Vec<_>>();
+      .collect::<Wrapper<Result<Vector<_>, _>>>()
+      .0?;
     topics.reverse();
 
     self.filter.topics = Some(topics);
-    self
+    Ok(self)
   }
 
   /// Sets the topics according to the given `ethabi` topic filter
   #[inline]
-  pub fn topic_filter(self, topic_filter: ethabi::TopicFilter) -> Self {
+  pub fn topic_filter(self, topic_filter: ethabi::TopicFilter) -> crate::Result<Self> {
     self.topics(
       topic_to_option(topic_filter.topic0),
       topic_to_option(topic_filter.topic1),
@@ -92,11 +93,11 @@ impl FilterBuilder {
   }
 }
 
-/// Converts a `Topic` to an equivalent `Option<Vec<T>>`, suitable for `FilterBuilder::topics`
-fn topic_to_option<T>(topic: ethabi::Topic<T>) -> Option<Vec<T>> {
+/// Converts a `Topic` to an equivalent `Option<Vector<T>>`, suitable for `FilterBuilder::topics`
+fn topic_to_option<T>(topic: ethabi::Topic<T>) -> Option<Vector<T>> {
   match topic {
     ethabi::Topic::Any => None,
-    ethabi::Topic::OneOf(v) => Some(v),
-    ethabi::Topic::This(t) => Some(vec![t]),
+    ethabi::Topic::OneOf(v) => Some(v.into()),
+    ethabi::Topic::This(t) => Some(wtx::vector![t]),
   }
 }

@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{AccessList, Bytes, TransactionCondition};
 use ethabi::Address;
-use ethereum_types::{U256, U64};
+use ethereum_types::{U64, U256};
 
 /// Request parameters when sending.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

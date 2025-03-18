@@ -1,5 +1,5 @@
 use crate::blockchain::ethereum::{AccessList, TransactionCondition};
-use ethereum_types::{U256, U64};
+use ethereum_types::{U64, U256};
 
 /// Contract Call/Query Options
 #[derive(Debug, Default)]
