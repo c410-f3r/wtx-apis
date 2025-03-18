@@ -62,19 +62,7 @@ impl OauthRefreshToken {
 }
 
 /// Differently from client credentials, it is your responsibility to spin up a task that
-/// manages the lifecycle of the access token. For example, the following snippet keeps checking
-/// for new tokens every 60 seconds.
-///
-/// ```rust
-/// let _jh = tokio::spawn(async move {
-///   loop {
-///     if oauth_refresh_token_sync.needs_refresh() {
-///       oauth_refresh_token_sync.refresh_token().await
-///     }
-///     tokio::timer::sleep(Duration::from_secs(60)).await
-///   }
-/// });
-/// ```
+/// manages the lifecycle of the access token.
 pub struct OauthRefreshTokenSync {
   pub(crate) access_token: AtomicCell<TokenArray>,
   pub(crate) client_id: String,

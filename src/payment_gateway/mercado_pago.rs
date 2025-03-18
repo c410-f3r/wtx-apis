@@ -8,7 +8,7 @@
 //! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
 //! use wtx_apis::payment_gateway::mercado_pago::{MercadoPago, PkgsAux};
 //!
-//! let mercado_pago = MercadoPago::new("CLIENT_ID".into(), "CLIENT_SECRET".into(), true);
+//! let mercado_pago = MercadoPago::new("CLIENT_ID".into(), "CLIENT_SECRET".into(), 60, true);
 //! let mut pkgs_aux =
 //!   PkgsAux::from_minimum(mercado_pago, SerdeJson, HttpParams::from_uri("URL".into()));
 //! let _ = pkgs_aux.get_payment().params(1).build();
