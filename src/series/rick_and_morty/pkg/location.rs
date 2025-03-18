@@ -1,10 +1,10 @@
 #[wtx_macros::pkg(
-  api(crate::series::rick_and_morty::RickAndMorty),
   data_format(json),
+  id(crate::series::rick_and_morty::RickAndMortyId),
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::series::rick_and_morty::{Location, RickAndMortyHttpPkgsAux, CHARACTER_FRAGMENT};
+  use crate::series::rick_and_morty::{CHARACTER_FRAGMENT, Location, RickAndMortyHttpPkgsAux};
   use alloc::string::String;
   use core::fmt::Write;
   use wtx::{
@@ -50,12 +50,12 @@ pub(crate) mod pkg {
   pub type LocationReq<'any> = GraphQlRequest<(), &'any str, ()>;
 
   #[pkg::res_data]
-  pub type LocationRes = GraphQlResponse<LocationData, serde::de::IgnoredAny>;
+  pub type LocationRes<'any> = GraphQlResponse<LocationData<&'any str>, serde::de::IgnoredAny>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = generic_data_doc!()]
-  pub struct LocationData {
+  pub struct LocationData<T> {
     /// Location
-    pub location: Location,
+    pub location: Location<T>,
   }
 }

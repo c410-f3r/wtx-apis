@@ -1,11 +1,11 @@
 #[wtx_macros::pkg(
-  api(crate::test_data::json_placeholder::JsonPlaceholder),
   data_format(json),
+  id(crate::test_data::json_placeholder::JsonPlaceholderId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::test_data::json_placeholder::{GenericParams, GenericRes, JsonPlaceholderHttpPkgsAux};
-  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
+  use wtx::client_api_framework::network::HttpParams;
 
   #[pkg::aux]
   impl<DRSR> JsonPlaceholderHttpPkgsAux<DRSR> {}
@@ -13,9 +13,9 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(
     params: &mut GenericParams<'_>,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    params.manage("photos", req_params)?;
+    params.manage("photos", trans_params)?;
     Ok(())
   }
 
@@ -27,21 +27,21 @@ pub(crate) mod pkg {
   pub struct PhotosReq;
 
   #[pkg::res_data]
-  pub type PhotosRes = GenericRes;
+  pub type PhotosRes<'any> = GenericRes<&'any str>;
 
   /// Photo
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct Photo {
+  pub struct Photo<T> {
     /// Album id.
     pub album_id: u32,
     /// Id.
     pub id: u32,
     /// Title
-    pub title: ArrayString<86>,
+    pub title: T,
     /// URL
-    pub url: ArrayString<38>,
+    pub url: T,
     /// Thumbnail URL
-    pub thumbnail_url: ArrayString<38>,
+    pub thumbnail_url: T,
   }
 }

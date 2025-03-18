@@ -13,9 +13,7 @@ pub use v3_long_weekend::pkg::*;
 pub use v3_next_public_holidays::pkg::*;
 pub use v3_next_public_holidays_worldwide::pkg::*;
 pub use v3_public_holidays::pkg::*;
-
-use alloc::vec::Vec;
-use wtx::misc::ArrayString;
+use wtx::misc::{ArrayString, Vector};
 
 /// The type of a public holiday
 #[derive(Debug, serde::Deserialize)]
@@ -51,9 +49,9 @@ pub struct V3PublicHoliday {
   /// Is this public holiday in every county (federal state).
   pub global: bool,
   /// ISO-3166-2 - Federal states.
-  pub counties: Option<Vec<ArrayString<8>>>,
+  pub counties: Option<Vector<ArrayString<8>>>,
   /// The launch year of the public holiday
   pub launch_year: Option<i32>,
   /// A list of types the public holiday it is valid
-  pub types: Option<Vec<V3HolidayTy>>,
+  pub types: Option<Vector<V3HolidayTy>>,
 }

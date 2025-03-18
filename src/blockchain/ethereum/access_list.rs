@@ -1,5 +1,5 @@
 use crate::blockchain::ethereum::AccessListItem;
-use alloc::vec::Vec;
+use wtx::misc::Vector;
 
 /// Access list
-pub type AccessList = Vec<AccessListItem>;
+pub type AccessList = Vector<AccessListItem>;

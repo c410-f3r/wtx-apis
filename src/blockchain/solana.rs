@@ -30,8 +30,6 @@ mod short_vec;
 mod slot_update;
 mod transaction;
 
-wtx::create_packages_aux_wrapper!();
-
 use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
@@ -44,10 +42,10 @@ pub use slot_update::*;
 pub use transaction::*;
 use wtx::{
   client_api_framework::{
-    misc::{Pair, PairMut, RequestThrottling},
-    network::{transport::Transport, HttpParams},
-    pkg::Package,
     Api,
+    misc::{Pair, PairMut, RequestThrottling},
+    network::{HttpParams, transport::SendingReceivingTransport},
+    pkg::Package,
   },
   data_transformation::format::{JsonRpcRequest, JsonRpcResponse},
   misc::{ArrayString, FnMutFut},
@@ -69,7 +67,7 @@ _create_blockchain_constants!(
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Solana {
   /// If some, tells that each request must respect calling intervals.
   pub rt: Option<RequestThrottling>,
@@ -90,14 +88,15 @@ impl Solana {
   ) -> Result<(), A::Error>
   where
     A: Api<Error = crate::Error>,
-    T: Transport<DRSR, Params = HttpParams>,
+    T: SendingReceivingTransport<HttpParams>,
     GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>:
       for<'de> Package<
-        A,
-        DRSR,
-        T::Params,
-        ExternalResponseContent<'de> = JsonRpcResponse<GetSignatureStatusesRes>,
-      >,
+          A,
+          DRSR,
+          T::Inner,
+          HttpParams,
+          ExternalResponseContent<'de> = JsonRpcResponse<GetSignatureStatusesRes>,
+        >,
   {
     macro_rules! call {
       () => {{
@@ -106,7 +105,7 @@ impl Solana {
           confirmation_status: Commitment::Finalized, ..
         })) = pair
           .trans
-          .send_recv_decode_contained(
+          .send_pkg_recv_decode_contained(
             &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
             &mut pair.pkgs_aux,
           )
@@ -148,7 +147,7 @@ impl Solana {
   pub fn spl_token_mint_account(
     account_data: &AccountData,
   ) -> crate::Result<&program::spl_token::MintAccount> {
-    if let Some(program::spl_token::GenericAccount::Mint(ref elem)) =
+    if let Some(program::spl_token::GenericAccount::Mint(elem)) =
       Self::spl_token_account(account_data)
     {
       Ok(elem)
@@ -161,7 +160,7 @@ impl Solana {
   pub fn spl_token_normal_account(
     account_data: &AccountData,
   ) -> crate::Result<&program::spl_token::TokenAccount> {
-    if let Some(program::spl_token::GenericAccount::Account(ref elem)) =
+    if let Some(program::spl_token::GenericAccount::Account(elem)) =
       Self::spl_token_account(account_data)
     {
       Ok(elem)
@@ -185,19 +184,20 @@ impl Solana {
   where
     API: Api<Error = crate::Error>,
     E: From<crate::Error>,
-    T: Transport<DRSR, Params = HttpParams>,
+    T: SendingReceivingTransport<HttpParams>,
     GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: for<'de> Package<
-      API,
-      DRSR,
-      HttpParams,
-      ExternalResponseContent<'de> = JsonRpcResponse<GetLatestBlockhashRes>,
-    >,
+        API,
+        DRSR,
+        T::Inner,
+        HttpParams,
+        ExternalResponseContent<'de> = JsonRpcResponse<GetLatestBlockhashRes>,
+      >,
   {
     macro_rules! local_blockhash {
       ($local_pair:expr) => {
         $local_pair
           .trans
-          .send_recv_decode_contained(
+          .send_pkg_recv_decode_contained(
             &mut $local_pair.pkgs_aux.get_latest_blockhash().data(None).build(),
             &mut $local_pair.pkgs_aux,
           )
@@ -250,6 +250,7 @@ impl Solana {
 
 impl Api for Solana {
   type Error = crate::Error;
+  type Id = SolanaId;
 
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     if let Some(ref mut rt) = self.rt {
@@ -258,3 +259,5 @@ impl Api for Solana {
     Ok(())
   }
 }
+
+wtx::create_packages_aux_wrapper!();

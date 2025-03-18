@@ -1,13 +1,13 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getSupply")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, SolanaAddressHashStr,
   };
-  use alloc::vec::Vec;
+  use wtx::misc::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -34,7 +34,7 @@ pub(crate) mod pkg {
     /// Non-circulating supply in lamports
     pub non_circulating: u64,
     /// An array of account addresses of non-circulating accounts, as strings.
-    pub non_circulating_accounts: Vec<SolanaAddressHashStr>,
+    pub non_circulating_accounts: Vector<SolanaAddressHashStr>,
   }
 
   #[derive(Debug, serde::Serialize)]

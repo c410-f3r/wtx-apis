@@ -1,12 +1,11 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getClusterNodes")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{HttpPkgsAux, SolanaAddressHashStr};
-  use alloc::vec::Vec;
-  use wtx::misc::ArrayString;
+  use wtx::misc::{ArrayString, Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -16,7 +15,7 @@ pub(crate) mod pkg {
   pub struct GetClusterNodesReq;
 
   #[pkg::res_data]
-  pub type GetClusterNodesRes = Vec<GetClusterNodes>;
+  pub type GetClusterNodesRes = Vector<GetClusterNodes>;
 
   #[derive(Debug, PartialEq, serde::Deserialize)]
   #[doc = _generic_res_data_elem_doc!()]

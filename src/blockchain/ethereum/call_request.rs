@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{AccessList, Bytes};
 use ethabi::Address;
-use ethereum_types::{U256, U64};
+use ethereum_types::{U64, U256};
 
 /// Call contract request (eth_call / eth_estimateGas)
 ///

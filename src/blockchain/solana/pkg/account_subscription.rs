@@ -1,6 +1,6 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("accountSubscribe")),
+  id(crate::blockchain::solana::SolanaId),
   transport(ws)
 )]
 pub(crate) mod sub {
@@ -34,8 +34,8 @@ pub(crate) mod sub {
 }
 
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("accountUnsubscribe")),
+  id(crate::blockchain::solana::SolanaId),
   transport(ws)
 )]
 pub(crate) mod unsub {

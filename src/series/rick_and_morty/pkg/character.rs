@@ -1,10 +1,10 @@
 #[wtx_macros::pkg(
-  api(crate::series::rick_and_morty::RickAndMorty),
   data_format(json),
+  id(crate::series::rick_and_morty::RickAndMortyId),
   transport(http)
 )]
 pub(crate) mod pkg {
-  use crate::series::rick_and_morty::{Character, RickAndMortyHttpPkgsAux, CHARACTER_FRAGMENT};
+  use crate::series::rick_and_morty::{CHARACTER_FRAGMENT, Character, RickAndMortyHttpPkgsAux};
   use alloc::string::String;
   use core::fmt::Write;
   use wtx::{
@@ -43,12 +43,12 @@ pub(crate) mod pkg {
   pub type CharacterReq<'any> = GraphQlRequest<(), &'any str, ()>;
 
   #[pkg::res_data]
-  pub type CharacterRes = GraphQlResponse<CharacterData, serde::de::IgnoredAny>;
+  pub type CharacterRes<'any> = GraphQlResponse<CharacterData<&'any str>, serde::de::IgnoredAny>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = generic_data_doc!()]
-  pub struct CharacterData {
+  pub struct CharacterData<T> {
     /// Character
-    pub character: Character,
+    pub character: Character<T>,
   }
 }

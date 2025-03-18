@@ -1,8 +1,8 @@
-use crate::blockchain::ethereum::{contract::TokenizableItem, Bytes};
-use alloc::{format, string::String, vec::Vec};
+use crate::blockchain::ethereum::{Bytes, contract::TokenizableItem};
+use alloc::{format, string::String};
 use ethabi::{Address, Token};
 use ethereum_types::{H256, U128, U256};
-use wtx::misc::ArrayVector;
+use wtx::misc::{ArrayVector, Vector, Wrapper};
 
 /// Simplified output type for single value.
 pub trait Tokenizable {
@@ -165,14 +165,20 @@ impl Tokenizable for Token {
   }
 }
 
-impl<T> Tokenizable for Vec<T>
+impl<T> Tokenizable for Vector<T>
 where
   T: TokenizableItem,
 {
   #[inline]
   fn from_token(token: Token) -> crate::Result<Self> {
     if let Token::Array(tokens) | Token::FixedArray(tokens) = token {
-      tokens.into_iter().map(Tokenizable::from_token).collect()
+      Ok(
+        tokens
+          .into_iter()
+          .map(Tokenizable::from_token)
+          .collect::<Result<Wrapper<Result<Vector<_>, _>>, _>>()?
+          .0?,
+      )
     } else {
       Err(crate::Error::TokensInvalidOutputType(format!("Expected `bytes`, got {:?}", token)))
     }
@@ -184,11 +190,11 @@ where
   }
 }
 
-impl Tokenizable for Vec<u8> {
+impl Tokenizable for Vector<u8> {
   #[inline]
   fn from_token(token: Token) -> crate::Result<Self> {
     if let Token::Bytes(data) | Token::FixedBytes(data) = token {
-      Ok(data)
+      Ok(data.into())
     } else {
       Err(crate::Error::TokensInvalidOutputType(format!("Expected `bytes`, got {:?}", token)))
     }
@@ -196,7 +202,7 @@ impl Tokenizable for Vec<u8> {
 
   #[inline]
   fn into_token(self) -> Token {
-    Token::Bytes(self)
+    Token::Bytes(self.into())
   }
 }
 
@@ -235,7 +241,7 @@ macro_rules! impl_unsigned_native {
       fn from_token(token: Token) -> crate::Result<Self> {
         match token {
           Token::Uint(data) => {
-            data.try_into().map_err(|err: &'static str| crate::Error::Generic(err.into()))
+            data.try_into().map_err(|err: &'static str| wtx::Error::Generic(err).into())
           }
           other => Err(crate::Error::TokensInvalidOutputType(format!(
             "Expected `{}`, got {:?}",

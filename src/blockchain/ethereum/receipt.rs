@@ -1,7 +1,7 @@
 use crate::blockchain::ethereum::Log;
-use alloc::vec::Vec;
 use ethabi::Address;
-use ethereum_types::{Bloom, H256, U256, U64};
+use ethereum_types::{Bloom, H256, U64, U256};
+use wtx::misc::Vector;
 
 /// "Receipt" of an executed transaction: details of its execution.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -34,7 +34,7 @@ pub struct Receipt {
   /// Contract address created, or `None` if not a deployment.
   pub contract_address: Option<Address>,
   /// Logs generated within this transaction.
-  pub logs: Vec<Log>,
+  pub logs: Vector<Log>,
   /// Status: either 1 (success) or 0 (failure).
   pub status: Option<U64>,
   /// State root.

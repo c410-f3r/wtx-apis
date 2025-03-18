@@ -1,5 +1,5 @@
 use crate::blockchain::solana::short_vec::ShortU16Visitor;
-use serde::{de::Deserializer, ser::SerializeTuple, Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer, de::Deserializer, ser::SerializeTuple};
 
 pub(crate) struct ShortU16(pub(crate) u16);
 

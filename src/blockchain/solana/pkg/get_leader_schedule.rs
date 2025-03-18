@@ -1,11 +1,12 @@
 #[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
   data_format(json_rpc("getLeaderSchedule")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux, SolanaBlockhash};
-  use alloc::{collections::BTreeMap, string::String, vec::Vec};
+  use alloc::collections::BTreeMap;
+  use wtx::misc::Vector;
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
@@ -22,7 +23,7 @@ pub(crate) mod pkg {
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[pkg::res_data]
-  pub type GetLeaderScheduleRes = Option<BTreeMap<String, Vec<usize>>>;
+  pub type GetLeaderScheduleRes<'any> = Option<BTreeMap<&'any str, Vector<usize>>>;
 
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]

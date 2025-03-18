@@ -88,3 +88,38 @@ impl From<ProgramError> for u64 {
     }
   }
 }
+
+impl From<u64> for ProgramError {
+  #[inline]
+  fn from(error: u64) -> Self {
+    match error {
+      0 => Self::Custom(0),
+      1 => Self::InvalidArgument,
+      2 => Self::InvalidInstructionData,
+      3 => Self::InvalidAccountData,
+      4 => Self::AccountDataTooSmall,
+      5 => Self::InsufficientFunds,
+      6 => Self::IncorrectProgramId,
+      7 => Self::MissingRequiredSignature,
+      8 => Self::AccountAlreadyInitialized,
+      9 => Self::UninitializedAccount,
+      10 => Self::NotEnoughAccountKeys,
+      11 => Self::AccountBorrowFailed,
+      12 => Self::MaxSeedLengthExceeded,
+      13 => Self::InvalidSeeds,
+      14 => Self::BorshIoError,
+      15 => Self::AccountNotRentExempt,
+      16 => Self::UnsupportedSysvar,
+      17 => Self::IllegalOwner,
+      18 => Self::MaxAccountsDataAllocationsExceeded,
+      19 => Self::InvalidRealloc,
+      20 => Self::MaxInstructionTraceLengthExceeded,
+      21 => Self::BuiltinProgramsMustConsumeComputeUnits,
+      22 => Self::InvalidAccountOwner,
+      23 => Self::ArithmeticOverflow,
+      24 => Self::Immutable,
+      25 => Self::IncorrectAuthority,
+      _ => Self::Custom(error.try_into().unwrap_or(u32::MAX)),
+    }
+  }
+}

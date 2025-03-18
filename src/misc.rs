@@ -1,13 +1,23 @@
 //! Utility functions and structures
 
 mod concat_array_str;
+mod oauth;
 mod slice_by_commas;
+#[cfg(feature = "chrono")]
+pub(crate) mod yyyy_mm_dd;
+#[cfg(feature = "chrono")]
+pub(crate) mod yyyy_mm_dd_opt;
 
 pub use concat_array_str::ConcatArrayStr;
 use core::{fmt::Display, str::FromStr};
-use serde::{de::IntoDeserializer, Deserialize, Deserializer, Serialize, Serializer};
+pub use oauth::*;
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::IntoDeserializer as _};
 pub use slice_by_commas::SliceByCommas;
-use wtx::misc::ArrayString;
+use wtx::{
+  client_api_framework::network::{HttpParams, transport::TransportParams as _},
+  http::{Header, KnownHeaderName},
+  misc::ArrayString,
+};
 
 const MAX_ASSET_ABBR_LEN: usize = 10;
 const MAX_NUMBER_LEN: usize = 31;
@@ -31,6 +41,14 @@ _create_blockchain_constants!(
   pub transaction_hash: MaxTransactionHash = 64,
   pub transaction_hash_str: MaxTransactionHashStr = 90
 );
+
+#[inline]
+pub(crate) fn _apply_auth_header(trans_params: &mut HttpParams, value: &str) -> crate::Result<()> {
+  Ok(trans_params.ext_req_params_mut().headers.push_from_iter(Header::from_name_and_value(
+    KnownHeaderName::Authorization.into(),
+    [value.as_bytes()],
+  ))?)
+}
 
 /// Deserializes an Base58 string as an array of bytes.
 #[cfg(feature = "bs58")]
@@ -109,9 +127,9 @@ where
 #[cfg(test)]
 pub(crate) fn init_test_cfg() {
   use tracing_subscriber::{
-    fmt::{format::FmtSpan, Subscriber},
-    util::SubscriberInitExt,
     EnvFilter,
+    fmt::{Subscriber, format::FmtSpan},
+    util::SubscriberInitExt,
   };
   let _rslt = Subscriber::builder()
     .with_env_filter(EnvFilter::from_default_env())
