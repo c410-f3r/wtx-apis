@@ -880,9 +880,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.21.2"
+version = "1.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2806eaa3524762875e21c3dcd057bc4b7bfa01ce4da8d46be1cd43649e1cc6b"
+checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 
 [[package]]
 name = "opaque-debug"
@@ -1833,7 +1833,7 @@ dependencies = [
 [[package]]
 name = "wtx"
 version = "0.30.0"
-source = "git+https://github.com/c410-f3r/wtx?branch=misc#369c9c4a43dad3d3934d34e8172108dd05bd68ab"
+source = "git+https://github.com/c410-f3r/wtx?branch=misc#565705b7a7eb5988e08d9dc9191d1fb7cb345202"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -1902,7 +1902,7 @@ dependencies = [
 [[package]]
 name = "wtx-macros"
 version = "0.4.0"
-source = "git+https://github.com/c410-f3r/wtx?branch=misc#369c9c4a43dad3d3934d34e8172108dd05bd68ab"
+source = "git+https://github.com/c410-f3r/wtx?branch=misc#565705b7a7eb5988e08d9dc9191d1fb7cb345202"
 dependencies = [
  "proc-macro2",
  "quote",
