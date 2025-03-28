@@ -44,10 +44,12 @@ _create_blockchain_constants!(
 
 #[inline]
 pub(crate) fn _apply_auth_header(trans_params: &mut HttpParams, value: &str) -> crate::Result<()> {
-  Ok(trans_params.ext_req_params_mut().headers.push_from_iter(Header::from_name_and_value(
-    KnownHeaderName::Authorization.into(),
-    [value.as_bytes()],
-  ))?)
+  Ok(
+    trans_params.ext_req_params_mut().headers.push_from_iter(Header::from_name_and_value(
+      KnownHeaderName::Authorization.into(),
+      [value],
+    ))?,
+  )
 }
 
 /// Deserializes an Base58 string as an array of bytes.
