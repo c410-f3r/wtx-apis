@@ -50,15 +50,19 @@ impl OauthRefreshToken {
   }
 
   pub(crate) async fn manage_access_token(&mut self) {
+    let mut needs_update = false;
     poll_fn(|cx| {
       if self.sync.needs_access_token_update.load(Ordering::Relaxed) {
+        needs_update = true;
         self.sync.waker.register(cx.waker());
         return Poll::Pending;
       }
       Poll::Ready(())
     })
     .await;
-    self.access_token.push_str(self.sync.access_token.load().as_str());
+    if needs_update {
+      self.access_token.push_str(self.sync.access_token.load().as_str());
+    }
   }
 }
 
