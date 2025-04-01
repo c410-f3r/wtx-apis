@@ -21,7 +21,7 @@ use wtx::{
   misc::{ArrayString, Decode, Vector},
 };
 
-pub(crate) type TokenArray = ArrayString<{ 1024 + 512 }>;
+pub(crate) type TokenArray = ArrayString<{ 2048 + 256 }>;
 
 /// How the Oauth token should be created.
 #[derive(Clone, Copy, Debug, serde::Serialize)]
@@ -122,6 +122,7 @@ where
   trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   trans_params.ext_req_params_mut().method = Method::Post;
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
+  pkgs_aux.log_body(true);
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);
   let rslt = trans.send_bytes_recv(SendBytesSource::PkgsAux, &mut pkgs_aux).await;
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);

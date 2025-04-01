@@ -38,8 +38,7 @@ pub struct SuperFrete {
 
 impl SuperFrete {
   /// Creates a new instance with the given token.
-  pub fn new(mut token: String) -> Self {
-    token.insert_str(0, "Bearer ");
+  pub fn new(token: String) -> Self {
     SuperFrete { token }
   }
 }

@@ -12,8 +12,10 @@ primitive-types = { default-features = false, features = ["serde"], optional = t
 rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
-wtx = { default-features = false, features = ["cl-aux", "client-api-framework", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
-wtx-macros = { default-features = false, git = "https://github.com/c410-f3r/wtx" }
+#wtx = { default-features = false, features = ["cl-aux", "client-api-framework", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
+wtx = { default-features = false, features = ["cl-aux", "client-api-framework", "serde", "web-socket"], path = "../wtx/wtx" }
+#wtx-macros = { default-features = false, git = "https://github.com/c410-f3r/wtx" }
+wtx-macros = { default-features = false, path = "../wtx/wtx-macros" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
@@ -21,7 +23,8 @@ rust_decimal_macros = { default-features = false, version = "1.0" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
-wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
+#wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
+wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], path = "../wtx/wtx" }
 
 [features]
 default = []

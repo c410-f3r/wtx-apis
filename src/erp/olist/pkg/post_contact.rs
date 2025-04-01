@@ -16,6 +16,7 @@ pub(crate) mod pkg {
   async fn before_sending(api: &mut Olist, trans_params: &mut HttpParams) -> crate::Result<()> {
     trans_params.ext_req_params_mut().method = Method::Post;
     manage_before_sending(api, trans_params, |el| el.push_path(format_args!("/contatos"))).await?;
+    std::dbg!(&trans_params.ext_params().0.headers);
     Ok(())
   }
 
