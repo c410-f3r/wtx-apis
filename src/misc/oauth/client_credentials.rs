@@ -1,7 +1,7 @@
 #![allow(dead_code, reason = "Condition feature activation")]
 
 use alloc::string::String;
-use core::fmt::{Debug, Formatter, Write as _};
+use core::fmt::{Debug, Formatter};
 use wtx::{
   client_api_framework::{
     Api,
@@ -69,9 +69,7 @@ where
   let res = send_req((api, drsr, trans, trans_params), bytes).await?;
   let OauthClientCredentials { access_token, token_ttl, token_ttl_slack, .. } = api.lease_mut();
   access_token.clear();
-  access_token
-    .write_fmt(format_args!("Bearer {}", &res.data.access_token))
-    .map_err(wtx::Error::from)?;
+  access_token.push_str(res.data.access_token);
   *token_ttl = if let Some(elem) = res.data.expires_in.checked_sub((*token_ttl_slack).into()) {
     elem
   } else {

@@ -158,7 +158,7 @@ fn update_access_token(
   access_token: &AtomicCell<TokenArray>,
   access_token_new: &str,
 ) -> crate::Result<()> {
-  access_token.store(TokenArray::try_from(format_args!("Bearer {access_token_new}"))?);
+  access_token.store(TokenArray::try_from(access_token_new)?);
   Ok(())
 }
 
