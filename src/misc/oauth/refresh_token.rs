@@ -61,6 +61,7 @@ impl OauthRefreshToken {
     })
     .await;
     if needs_update {
+      self.access_token.clear();
       self.access_token.push_str(self.sync.access_token.load().as_str());
     }
   }
@@ -81,6 +82,12 @@ pub struct OauthRefreshTokenSync {
 }
 
 impl OauthRefreshTokenSync {
+  /// The contents of the access token.
+  #[inline]
+  pub fn access_token(&self) -> &AtomicCell<TokenArray> {
+    &self.access_token
+  }
+
   /// Returns `true` if the TTL of a token was expired.
   ///
   /// The actual TTL is calculated as the returned API's TTL minus the user-provided TTL slack.

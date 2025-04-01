@@ -72,6 +72,10 @@ where
   access_token
     .write_fmt(format_args!("Bearer {}", &res.data.access_token))
     .map_err(wtx::Error::from)?;
-  *token_ttl = res.data.expires_in.saturating_sub((*token_ttl_slack).into());
+  *token_ttl = if let Some(elem) = res.data.expires_in.checked_sub((*token_ttl_slack).into()) {
+    elem
+  } else {
+    res.data.expires_in
+  };
   Ok(())
 }

@@ -880,9 +880,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.21.2"
+version = "1.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2806eaa3524762875e21c3dcd057bc4b7bfa01ce4da8d46be1cd43649e1cc6b"
+checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 
 [[package]]
 name = "opaque-debug"
@@ -1424,9 +1424,9 @@ checksum = "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e"
 
 [[package]]
 name = "socket2"
-version = "0.5.8"
+version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c970269d99b64e60ec3bd6ad27270092a5394c4e309314b18ae3fe575695fbe8"
+checksum = "4f5fd57c80058a56cf5c777ab8a126398ece8e442983605d280a44ce79d0edef"
 dependencies = [
  "libc",
  "windows-sys",
@@ -1832,8 +1832,8 @@ dependencies = [
 
 [[package]]
 name = "wtx"
-version = "0.30.0"
-source = "git+https://github.com/c410-f3r/wtx#16d3490cdfbd96d213be898cb5b6be67b4039e75"
+version = "0.31.0"
+source = "git+https://github.com/c410-f3r/wtx#a4ad459ca35c2387b0733f31e363c1d788e76231"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -1902,7 +1902,7 @@ dependencies = [
 [[package]]
 name = "wtx-macros"
 version = "0.4.0"
-source = "git+https://github.com/c410-f3r/wtx#16d3490cdfbd96d213be898cb5b6be67b4039e75"
+source = "git+https://github.com/c410-f3r/wtx#a4ad459ca35c2387b0733f31e363c1d788e76231"
 dependencies = [
  "proc-macro2",
  "quote",
