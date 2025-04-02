@@ -1,6 +1,6 @@
 [dependencies]
 base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
-bincode = { default-features = false, optional = true, version = "1.0" }
+bincode = { default-features = false, optional = true, version = "2.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
 chrono = { default-features = false, optional = true, version = "0.4" }
 cl-aux = { default-features = false, features = ["alloc", "serde"], version = "5.0" }
