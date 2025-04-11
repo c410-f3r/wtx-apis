@@ -21,7 +21,7 @@ use wtx::{
   misc::{ArrayString, Decode, Vector},
 };
 
-pub(crate) type TokenArray = ArrayString<{ 1024 + 512 }>;
+pub(crate) type TokenArray = ArrayString<{ 2048 + 256 }>;
 
 /// How the Oauth token should be created.
 #[derive(Clone, Copy, Debug, serde::Serialize)]

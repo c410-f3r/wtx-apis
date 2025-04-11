@@ -83,7 +83,10 @@ macro_rules! create_ws_test {
         use wtx::client_api_framework::network::transport::SendingTransport;
         let mut iter = subs.into_iter();
         let ids = &mut [$( pkgs_aux.$unsub().data(iter.next().unwrap()).build(), )+][..];
-        let _res = trans.send_pkg(&mut wtx::client_api_framework::pkg::BatchPkg::new(ids), pkgs_aux).await.unwrap();
+        let _res = trans.send_pkg(
+          &mut wtx::client_api_framework::pkg::BatchPkg::new(ids, pkgs_aux),
+          pkgs_aux
+        ).await.unwrap();
       },
       {
         let uri = wtx::misc::Uri::new($uri);

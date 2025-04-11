@@ -1,21 +1,21 @@
 #![allow(dead_code, reason = "Condition feature activation")]
 
+use crate::misc::{
+  OauthGrantType, OauthResponse, TokenArray,
+  oauth::{encode_req, send_req},
+};
 use alloc::string::String;
 use core::{
   fmt::{Debug, Formatter},
   future::poll_fn,
   sync::atomic::{AtomicBool, AtomicU32, Ordering},
   task::Poll,
+  time::Duration,
 };
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   data_transformation::{dnsn::De, format::VerbatimResponse},
   misc::{Arc, AtomicCell, AtomicWaker, Decode, GenericTime, Vector, into_rslt},
-};
-
-use crate::misc::{
-  OauthGrantType, OauthResponse, TokenArray,
-  oauth::{encode_req, send_req},
 };
 
 /// Common attributes used by APIs that integrate Oauth workflows.
@@ -49,15 +49,20 @@ impl OauthRefreshToken {
   }
 
   pub(crate) async fn manage_access_token(&mut self) {
+    let mut needs_local_access_token_update = false;
     poll_fn(|cx| {
       if self.sync.needs_access_token_update.load(Ordering::Relaxed) {
+        needs_local_access_token_update = true;
         self.sync.waker.register(cx.waker());
         return Poll::Pending;
       }
       Poll::Ready(())
     })
     .await;
-    self.access_token.push_str(self.sync.access_token.load().as_str());
+    if needs_local_access_token_update || self.access_token.is_empty() {
+      self.access_token.clear();
+      self.access_token.push_str(self.sync.access_token.load().as_str());
+    }
   }
 }
 
@@ -76,6 +81,12 @@ pub struct OauthRefreshTokenSync {
 }
 
 impl OauthRefreshTokenSync {
+  /// The contents of the access token.
+  #[inline]
+  pub fn access_token(&self) -> &AtomicCell<TokenArray> {
+    &self.access_token
+  }
+
   /// Returns `true` if the TTL of a token was expired.
   ///
   /// The actual TTL is calculated as the returned API's TTL minus the user-provided TTL slack.
@@ -87,6 +98,12 @@ impl OauthRefreshTokenSync {
       self.needs_access_token_update.store(true, Ordering::Relaxed);
     }
     Ok(needs_refresh)
+  }
+
+  /// The contents of the refresh token.
+  #[inline]
+  pub fn refresh_token(&self) -> &AtomicCell<TokenArray> {
+    &self.refresh_token
   }
 
   /// Makes a request that asks for a new access token using the inner refresh token.
@@ -116,22 +133,15 @@ impl OauthRefreshTokenSync {
     Ok(())
   }
 
-  /// If tokens are somehow managed by external parties then they can be directly updated using
-  /// this method.
+  /// The time where the token will expire.
   #[inline]
-  pub fn update_tokens(
-    &self,
-    access_token: &str,
-    refresh_token: TokenArray,
-    token_ttl: u32,
-  ) -> crate::Result<()> {
-    update_access_token(&self.access_token, access_token)?;
-    update_token_ttl(&self.token_ttl, token_ttl, self.token_ttl_slack);
-    self.needs_access_token_update.store(false, Ordering::Relaxed);
-    self.refresh_token.store(refresh_token);
-    self.timer.store(GenericTime::now());
-    self.waker.wake();
-    Ok(())
+  pub fn token_expiration(&self) -> crate::Result<GenericTime> {
+    Ok(
+      self
+        .timer
+        .load()
+        .checked_add(Duration::from_secs(self.token_ttl.load(Ordering::Relaxed).into()))?,
+    )
   }
 }
 
@@ -147,7 +157,7 @@ fn update_access_token(
   access_token: &AtomicCell<TokenArray>,
   access_token_new: &str,
 ) -> crate::Result<()> {
-  access_token.store(TokenArray::try_from(format_args!("Bearer {access_token_new}"))?);
+  access_token.store(TokenArray::try_from(access_token_new)?);
   Ok(())
 }
 
