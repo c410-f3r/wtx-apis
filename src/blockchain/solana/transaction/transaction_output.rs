@@ -4,7 +4,7 @@ use crate::blockchain::solana::{
   TransactionVersion, program::spl_token::AccountBalance,
 };
 use alloc::string::String;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// A transaction can be represented in various formats.
 #[allow(clippy::large_enum_variant)]
@@ -164,16 +164,6 @@ pub enum InstructionError {
 
   /// Incorrect authority provided
   IncorrectAuthority,
-
-  /// Failed to serialize or deserialize account data
-  ///
-  /// Warning: This error should never be emitted by the runtime.
-  ///
-  /// This error includes strings from the underlying 3rd party Borsh crate
-  /// which can be dangerous because the error strings could change across
-  /// Borsh versions. Only programs can use this error because they are
-  /// consistent across Solana software versions.
-  BorshIoError(String),
 
   /// An account does not have enough lamports to be rent-exempt
   AccountNotRentExempt,

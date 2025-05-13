@@ -6,7 +6,7 @@
 pub(crate) mod pkg {
   use crate::blockchain::solana::HttpPkgsAux;
   use serde::Serialize;
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

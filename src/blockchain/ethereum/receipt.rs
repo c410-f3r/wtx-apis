@@ -1,7 +1,7 @@
 use crate::blockchain::ethereum::Log;
 use ethabi::Address;
 use ethereum_types::{Bloom, H256, U64, U256};
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// "Receipt" of an executed transaction: details of its execution.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

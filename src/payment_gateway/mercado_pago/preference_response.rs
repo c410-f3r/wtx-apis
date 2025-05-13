@@ -1,6 +1,6 @@
 use crate::payment_gateway::mercado_pago::{BackUrls, Item, Payer, PaymentMethods, Shipments};
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Struct representing a preference for MercadoPago.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

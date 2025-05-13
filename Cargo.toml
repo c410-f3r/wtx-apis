@@ -2,7 +2,6 @@
 base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
-chrono = { default-features = false, optional = true, version = "0.4" }
 cl-aux = { default-features = false, features = ["alloc", "serde"], version = "5.0" }
 ed25519-dalek = { default-features = false, optional = true, version = "2.0" }
 ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
@@ -28,9 +27,9 @@ default = []
 ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
 json-placeholder = []
 melhor-envio = []
-mercado-pago = ["chrono/serde", "rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
+mercado-pago = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
 nager-date = []
-olist = ["chrono/serde", "rust_decimal/serde-with-str", "wtx/serde_urlencoded"]
+olist = ["rust_decimal/serde-with-str", "wtx/serde_urlencoded"]
 pagar-me = ["base64", "wtx/serde"]
 rick-and-morty = []
 solana = ["base64", "bincode", "bs58", "wtx/std"]

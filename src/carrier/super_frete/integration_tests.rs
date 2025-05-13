@@ -9,9 +9,10 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
+  collection::Vector,
   data_transformation::dnsn::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::{Vector, Wrapper},
+  misc::Wrapper,
 };
 
 const DEST_ZIPCODE: &str = "04571000";
@@ -33,7 +34,7 @@ static PRODUCTS: [QuoteFreightReqProduct; 2] = [
   },
 ];
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static SUPER_FRETE: LazyLock<Mutex<SuperFrete>> = LazyLock::new(|| {
   let token = std::env::var("SUPER_FRETE_TOKEN").unwrap();

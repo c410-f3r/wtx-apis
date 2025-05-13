@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{BlockNumber, ValueOrArray};
 use ethereum_types::{H160, H256};
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Filter
 #[derive(Debug, Default, serde::Serialize)]

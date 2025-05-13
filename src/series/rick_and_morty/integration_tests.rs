@@ -7,7 +7,7 @@ use wtx::{
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 
 create_http_test!(#[], RickAndMorty, http(), character, &*CLIENT, |pkgs_aux, trans| async {

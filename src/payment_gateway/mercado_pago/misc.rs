@@ -7,12 +7,13 @@ use wtx::{
     HttpParams,
     transport::{SendingReceivingTransport, TransportParams},
   },
+  collection::Vector,
   data_transformation::{
     dnsn::De,
     format::{VerbatimRequest, VerbatimResponse},
   },
   http::ReqBuilder,
-  misc::{DecodeSeq, Encode, Vector},
+  misc::{DecodeSeq, Encode},
 };
 
 pub(crate) async fn manage_before_sending<DRSR, T>(

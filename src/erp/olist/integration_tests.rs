@@ -7,14 +7,16 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
+  collection::Vector,
   data_transformation::dnsn::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::{Uri, Vector},
+  misc::Uri,
+  time::DateTime,
 };
 
-static CLIENT_ACC: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT_ACC: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
-static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static OLIST: LazyLock<Mutex<Olist>> = LazyLock::new(|| {
   let client_id = std::env::var("OLIST_CLIENT_ID").unwrap();
@@ -119,12 +121,12 @@ create_http_test!(
         &mut pkgs_aux
           .post_order()
           .data(OrderPost::<&str> {
-            data_prevista: Some(chrono::NaiveDate::from_ymd_opt(2025, 1, 25).unwrap()),
+            data_prevista: Some(DateTime::EPOCH),
             data_envio: None,
             observacoes: None,
             observacoes_internas: None,
             situacao: None,
-            data: Some(chrono::NaiveDate::from_ymd_opt(2025, 1, 25).unwrap()),
+            data: Some(DateTime::EPOCH),
             data_entrega: None,
             numero_ordem_compra: None,
             valor_desconto: None,

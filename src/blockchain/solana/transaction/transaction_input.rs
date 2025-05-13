@@ -1,5 +1,5 @@
 use crate::blockchain::solana::{SolanaSignatureHash, VersionedMessageInput};
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 #[cfg(feature = "ed25519-dalek")]
 use {
   crate::blockchain::solana::SolanaBlockhash,

@@ -13,7 +13,7 @@ pub use v3_long_weekend::pkg::*;
 pub use v3_next_public_holidays::pkg::*;
 pub use v3_next_public_holidays_worldwide::pkg::*;
 pub use v3_public_holidays::pkg::*;
-use wtx::misc::{ArrayString, Vector};
+use wtx::collection::{ArrayString, Vector};
 
 /// The type of a public holiday
 #[derive(Debug, serde::Deserialize)]

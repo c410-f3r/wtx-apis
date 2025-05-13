@@ -19,7 +19,10 @@ pub use insert_cart_request::*;
 pub use insert_cart_response::*;
 pub use melhor_envio_result::*;
 pub use pkg::*;
-use wtx::misc::{Arc, Lease, LeaseMut};
+use wtx::{
+  misc::{Lease, LeaseMut},
+  sync::Arc,
+};
 
 /// Development URI
 pub static DEV_URI: &str = "https://sandbox.melhorenvio.com.br";

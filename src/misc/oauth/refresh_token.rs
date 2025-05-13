@@ -14,8 +14,11 @@ use core::{
 };
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
+  collection::Vector,
   data_transformation::{dnsn::De, format::VerbatimResponse},
-  misc::{Arc, AtomicCell, AtomicWaker, Decode, GenericTime, Vector, into_rslt},
+  misc::{Decode, into_rslt},
+  sync::{Arc, AtomicCell, AtomicWaker},
+  time::Instant,
 };
 
 /// Common attributes used by APIs that integrate Oauth workflows.
@@ -40,7 +43,7 @@ impl OauthRefreshToken {
         client_secret,
         needs_access_token_update: AtomicBool::new(true),
         refresh_token: AtomicCell::new(refresh_token.try_into()?),
-        timer: AtomicCell::new(GenericTime::now()),
+        timer: AtomicCell::new(Instant::now()),
         token_ttl: AtomicU32::new(0),
         token_ttl_slack,
         waker: AtomicWaker::new(),
@@ -74,7 +77,7 @@ pub struct OauthRefreshTokenSync {
   pub(crate) client_secret: String,
   pub(crate) needs_access_token_update: AtomicBool,
   pub(crate) refresh_token: AtomicCell<TokenArray>,
-  pub(crate) timer: AtomicCell<GenericTime>,
+  pub(crate) timer: AtomicCell<Instant>,
   pub(crate) token_ttl: AtomicU32,
   pub(crate) token_ttl_slack: u16,
   pub(crate) waker: AtomicWaker,
@@ -128,14 +131,14 @@ impl OauthRefreshTokenSync {
     update_token_ttl(&self.token_ttl, res.data.expires_in, self.token_ttl_slack);
     self.needs_access_token_update.store(false, Ordering::Relaxed);
     self.refresh_token.store(into_rslt(res.data.refresh_token)?.try_into()?);
-    self.timer.store(GenericTime::now());
+    self.timer.store(Instant::now());
     self.waker.wake();
     Ok(())
   }
 
   /// The time where the token will expire.
   #[inline]
-  pub fn token_expiration(&self) -> crate::Result<GenericTime> {
+  pub fn token_expiration(&self) -> crate::Result<Instant> {
     Ok(
       self
         .timer

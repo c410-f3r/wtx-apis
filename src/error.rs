@@ -77,6 +77,9 @@ pub enum Error {
   /// The system only supports v0 messages
   #[cfg(feature = "solana")]
   SolanaUnsupportedMessageFormat,
+  #[cfg(feature = "solana")]
+  /// Transaction error
+  SolanaTxError(crate::blockchain::solana::TransactionError),
 
   // SuperFrete
   //

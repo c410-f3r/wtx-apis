@@ -24,11 +24,12 @@ use wtx::{
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
+  collection::Vector,
   data_transformation::{
     dnsn::De,
     format::{JsonRpcRequest, JsonRpcResponse},
   },
-  misc::{DecodeSeq, Encode, Vector, Wrapper},
+  misc::{DecodeSeq, Encode, Wrapper},
 };
 
 /// Ethereum Contract Interface
@@ -272,11 +273,11 @@ mod tests {
       misc::Pair,
       network::{HttpParams, transport::Mock},
     },
+    collection::Vector,
     data_transformation::{
       dnsn::SerdeJson,
       format::{JsonRpcRequest, JsonRpcResponse},
     },
-    misc::Vector,
   };
 
   const HELLO_WORLD: &str = "0x00000000000000000000000000000000000000000000000000000000000000200000\

@@ -2,7 +2,10 @@ use crate::blockchain::ethereum::{Bytes, contract::TokenizableItem};
 use alloc::{format, string::String};
 use ethabi::{Address, Token};
 use ethereum_types::{H256, U128, U256};
-use wtx::misc::{ArrayVector, Vector, Wrapper};
+use wtx::{
+  collection::{ArrayVector, Vector},
+  misc::Wrapper,
+};
 
 /// Simplified output type for single value.
 pub trait Tokenizable {

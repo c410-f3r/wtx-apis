@@ -3,7 +3,7 @@ pub(crate) mod pkg {
   use crate::calendar::nager_date::{NagerDateHttpPkgsAux, V3PublicHoliday};
   use wtx::{
     client_api_framework::network::{HttpParams, transport::TransportParams},
-    misc::Vector,
+    collection::Vector,
   };
 
   #[pkg::aux]

@@ -3,7 +3,7 @@ use serde::{
   Deserialize,
   de::{Deserializer, Error, MapAccess, Visitor},
 };
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// A vector where each element is a key and a value.
 #[derive(Debug)]

@@ -7,7 +7,7 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, TransactionError,
   };
-  use wtx::misc::Vector;
+  use wtx::collection::ArrayVector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -23,7 +23,7 @@ pub(crate) mod pkg {
 
   #[pkg::res_data]
   pub type GetSignatureStatusesRes =
-    JsonRpcResponseResultWithContext<Vector<Option<GetSignatureStatuses>>>;
+    JsonRpcResponseResultWithContext<ArrayVector<Option<GetSignatureStatuses>, 8>>;
 
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]

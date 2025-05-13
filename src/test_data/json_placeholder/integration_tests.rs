@@ -10,7 +10,7 @@ use wtx::{
 };
 
 const DEFAULT_GP: GenericParams<'_> = GenericParams::new(None, Method::Get, None, &[]);
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 
 create_http_test!(#[], JsonPlaceholder, http(), albums, &*CLIENT, |pkgs_aux, trans| async {

@@ -1,4 +1,4 @@
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Status of a chargeback
 #[derive(Debug, serde::Deserialize)]

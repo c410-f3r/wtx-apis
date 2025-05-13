@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use wtx::time::DateTime;
 
 /// WebHook notification
 #[derive(Debug, Eq, PartialEq, serde::Deserialize)]
@@ -10,7 +10,7 @@ pub struct Notification {
   /// See [NotificationData].
   pub data: NotificationData,
   /// Date created
-  pub date_created: DateTime<Utc>,
+  pub date_created: DateTime,
   /// Id
   pub id: u64,
   /// Live mode
@@ -66,7 +66,7 @@ mod tests {
   use crate::payment_gateway::mercado_pago::{
     ApiVersion, Notification, NotificationAction, NotificationTy,
   };
-  use chrono::DateTime;
+  use wtx::time::{Date, DateTime, Time};
 
   #[test]
   fn json() {
@@ -80,7 +80,11 @@ mod tests {
       assert_eq!(notification.data.id, 7547658345);
       assert_eq!(
         notification.date_created,
-        DateTime::parse_from_rfc3339("2025-01-14T19:19:25Z").unwrap()
+        DateTime::new(
+          Date::from_ymd(2025.try_into().unwrap(), 01.try_into().unwrap(), 14.try_into().unwrap())
+            .unwrap(),
+          Time::from_hms(19.try_into().unwrap(), 19.try_into().unwrap(), 25.try_into().unwrap())
+        )
       );
       assert_eq!(notification.id, 636490643061);
       assert_eq!(notification.live_mode, false);
@@ -98,7 +102,11 @@ mod tests {
       assert_eq!(notification.data.id, 123456);
       assert_eq!(
         notification.date_created,
-        DateTime::parse_from_rfc3339("2021-11-01T02:02:02Z").unwrap()
+        DateTime::new(
+          Date::from_ymd(2021.try_into().unwrap(), 11.try_into().unwrap(), 1.try_into().unwrap())
+            .unwrap(),
+          Time::from_hms(2.try_into().unwrap(), 2.try_into().unwrap(), 2.try_into().unwrap())
+        )
       );
       assert_eq!(notification.id, 123456);
       assert_eq!(notification.live_mode, false);

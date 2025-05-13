@@ -13,12 +13,13 @@ use wtx::{
     },
     pkg::PkgsAux,
   },
+  collection::{ArrayString, Vector},
   data_transformation::{
     dnsn::{De, DecodeWrapper},
     format::VerbatimResponse,
   },
   http::{Method, Mime},
-  misc::{ArrayString, Decode, Vector},
+  misc::Decode,
 };
 
 pub(crate) type TokenArray = ArrayString<{ 2048 + 256 }>;

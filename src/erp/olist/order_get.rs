@@ -1,9 +1,8 @@
 use crate::erp::olist::{
   FreightResponsibility, OrderStatus, PersonTy, associated_entity::AssociatedEntityIdName,
 };
-use chrono::NaiveDate;
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::{collection::Vector, time::DateTime};
 
 /// Represents an order with various optional fields.
 #[derive(Debug, serde::Deserialize)]
@@ -11,10 +10,10 @@ use wtx::misc::Vector;
 pub struct OrderGet<S> {
   /// The expected date.
   #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_prevista: Option<NaiveDate>,
+  pub data_prevista: Option<DateTime>,
   /// The sending date.
   #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_envio: Option<NaiveDate>,
+  pub data_envio: Option<DateTime>,
   /// Observations.
   pub observacoes: Option<S>,
   /// Internal observations.
@@ -23,10 +22,10 @@ pub struct OrderGet<S> {
   pub situacao: Option<OrderStatus>,
   /// Date.
   #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data: Option<NaiveDate>,
+  pub data: Option<DateTime>,
   /// Delivery date.
   #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_entrega: Option<NaiveDate>,
+  pub data_entrega: Option<DateTime>,
   /// Purchase order number.
   pub numero_ordem_compra: Option<S>,
   /// Discount value.
@@ -43,7 +42,7 @@ pub struct OrderGet<S> {
   pub id_nota_fiscal: Option<u32>,
   /// Billing date.
   #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_faturamento: Option<NaiveDate>,
+  pub data_faturamento: Option<DateTime>,
   /// Total product value.
   pub valor_total_produtos: Option<Decimal>,
   /// Total order value.
@@ -225,7 +224,7 @@ pub struct OrderGetPaymentInstallment<S> {
   pub dias: Option<u16>,
   /// Date
   #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data: Option<NaiveDate>,
+  pub data: Option<DateTime>,
   /// Value
   pub valor: Option<Decimal>,
   /// Observations

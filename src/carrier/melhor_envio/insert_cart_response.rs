@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents a shipment with all relevant details and associated data
 #[derive(Debug, Serialize, Deserialize, Clone)]

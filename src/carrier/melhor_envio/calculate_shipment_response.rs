@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents a shipment with detailed information about pricing, delivery, and contents
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

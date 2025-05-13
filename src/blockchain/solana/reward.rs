@@ -1,5 +1,5 @@
 use crate::blockchain::solana::SolanaAddressHashStr;
-use wtx::misc::ArrayString;
+use wtx::collection::ArrayString;
 
 /// Transaction-level reward that is populated if requested.
 #[derive(Debug, serde::Deserialize)]

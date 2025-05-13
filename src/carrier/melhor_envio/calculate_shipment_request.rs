@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents a shipping quote request containing origin, destination,
 /// products, delivery options, and volume information.

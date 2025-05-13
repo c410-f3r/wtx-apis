@@ -57,7 +57,8 @@ use wtx::{
     Api,
     misc::{RequestLimit, RequestThrottling},
   },
-  misc::{Arc, Lease, LeaseMut},
+  misc::{Lease, LeaseMut},
+  sync::Arc,
 };
 
 /// Base URI

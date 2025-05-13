@@ -1,4 +1,4 @@
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Raw bytes wrapper
 #[derive(Debug, Default, Eq, PartialEq)]

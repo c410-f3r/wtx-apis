@@ -1,21 +1,19 @@
 //! Utility functions and structures
 
 mod concat_array_str;
-#[cfg(feature = "olist")]
+#[cfg(any(feature = "mercado-pago", feature = "olist"))]
 mod oauth;
 mod slice_by_commas;
-#[cfg(feature = "chrono")]
 pub(crate) mod yyyy_mm_dd;
-#[cfg(feature = "chrono")]
 pub(crate) mod yyyy_mm_dd_opt;
 
 pub use concat_array_str::ConcatArrayStr;
 use core::{fmt::Display, str::FromStr};
-#[cfg(feature = "olist")]
+#[cfg(any(feature = "mercado-pago", feature = "olist"))]
 pub use oauth::*;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::IntoDeserializer as _};
 pub use slice_by_commas::SliceByCommas;
-use wtx::misc::ArrayString;
+use wtx::collection::ArrayString;
 
 const MAX_ASSET_ABBR_LEN: usize = 10;
 const MAX_NUMBER_LEN: usize = 31;

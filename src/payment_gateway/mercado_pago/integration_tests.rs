@@ -7,12 +7,12 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
+  collection::ArrayVector,
   data_transformation::dnsn::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::ArrayVector,
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static MERCADO_PAGO: LazyLock<Mutex<MercadoPago>> = LazyLock::new(|| {
   let client_id = std::env::var("MERCADO_PAGO_CLIENT_ID").unwrap();

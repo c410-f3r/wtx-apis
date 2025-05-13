@@ -1,5 +1,9 @@
 #![allow(dead_code, reason = "Condition feature activation")]
 
+use crate::misc::{
+  OauthGrantType, OauthResponse,
+  oauth::{encode_req, send_req},
+};
 use alloc::string::String;
 use core::fmt::{Debug, Formatter};
 use wtx::{
@@ -7,13 +11,10 @@ use wtx::{
     Api,
     network::{HttpParams, transport::SendingReceivingTransport},
   },
+  collection::Vector,
   data_transformation::{dnsn::De, format::VerbatimResponse},
-  misc::{Decode, GenericTime, LeaseMut, Vector},
-};
-
-use crate::misc::{
-  OauthGrantType, OauthResponse,
-  oauth::{encode_req, send_req},
+  misc::{Decode, LeaseMut},
+  time::Instant,
 };
 
 /// Common attributes used by APIs that integrate Oauth workflows.
@@ -21,7 +22,7 @@ pub struct OauthClientCredentials {
   pub(crate) access_token: String,
   pub(crate) client_id: String,
   pub(crate) client_secret: String,
-  pub(crate) timer: GenericTime,
+  pub(crate) timer: Instant,
   pub(crate) token_ttl_slack: u16,
   pub(crate) token_ttl: u32,
 }
@@ -32,7 +33,7 @@ impl OauthClientCredentials {
       access_token: String::new(),
       client_id,
       client_secret,
-      timer: GenericTime::now(),
+      timer: Instant::now(),
       token_ttl_slack,
       token_ttl: 0,
     }
