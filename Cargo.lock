@@ -1835,7 +1835,7 @@ dependencies = [
 [[package]]
 name = "wtx"
 version = "0.32.0"
-source = "git+https://github.com/c410-f3r/wtx#3c4443a5c5fa811a528395a5bf1c10b6aae12de2"
+source = "git+https://github.com/c410-f3r/wtx#8e5a65540fd60ac9f2f23875b9c2c7358e92e5c1"
 dependencies = [
  "aes-gcm",
  "argon2",
@@ -1903,7 +1903,7 @@ dependencies = [
 [[package]]
 name = "wtx-macros"
 version = "0.4.0"
-source = "git+https://github.com/c410-f3r/wtx#3c4443a5c5fa811a528395a5bf1c10b6aae12de2"
+source = "git+https://github.com/c410-f3r/wtx#8e5a65540fd60ac9f2f23875b9c2c7358e92e5c1"
 dependencies = [
  "proc-macro2",
  "quote",
