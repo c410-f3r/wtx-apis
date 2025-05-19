@@ -258,15 +258,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
-name = "chrono"
-version = "0.4.41"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c469d952047f47f91b68d1cba3f10d63c11d73e4636f24f08daf0278abf01c4d"
-dependencies = [
- "num-traits",
-]
-
-[[package]]
 name = "cipher"
 version = "0.5.0-pre.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1834,14 +1825,13 @@ dependencies = [
 
 [[package]]
 name = "wtx"
-version = "0.32.0"
-source = "git+https://github.com/c410-f3r/wtx#3c4443a5c5fa811a528395a5bf1c10b6aae12de2"
+version = "0.33.0"
+source = "git+https://github.com/c410-f3r/wtx#177ca40b9a512c865a3d269a4c4b2f95687d310d"
 dependencies = [
  "aes-gcm",
  "argon2",
  "base64",
  "borsh",
- "chrono",
  "cl-aux",
  "crypto-common 0.1.6",
  "digest",
@@ -1903,7 +1893,7 @@ dependencies = [
 [[package]]
 name = "wtx-macros"
 version = "0.4.0"
-source = "git+https://github.com/c410-f3r/wtx#3c4443a5c5fa811a528395a5bf1c10b6aae12de2"
+source = "git+https://github.com/c410-f3r/wtx#177ca40b9a512c865a3d269a4c4b2f95687d310d"
 dependencies = [
  "proc-macro2",
  "quote",
