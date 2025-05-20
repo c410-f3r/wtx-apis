@@ -23,5 +23,5 @@ pub(crate) mod pkg {
   pub struct V3NextPublicHolidaysWorldwideReq;
 
   #[pkg::res_data]
-  pub type V3NextPublicHolidaysWorldwideRes = Vector<V3PublicHoliday>;
+  pub type V3NextPublicHolidaysWorldwideRes<'de> = Vector<V3PublicHoliday<&'de str>>;
 }

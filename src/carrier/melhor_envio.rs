@@ -39,16 +39,9 @@ pub struct MelhorEnvio {
 impl MelhorEnvio {
   /// New instance
   #[inline]
-  pub fn new(
-    client_id: String,
-    client_secret: String,
-    token_ttl_slack: u16,
-    refresh_token: &str,
-  ) -> crate::Result<Self> {
+  pub fn new(client_id: String, client_secret: String, token_ttl_slack: u16) -> Self {
     const _1_MIN: Duration = Duration::from_secs(30);
-    Ok(Self {
-      common: OauthRefreshToken::new(client_id, client_secret, token_ttl_slack, refresh_token)?,
-    })
+    Self { common: OauthRefreshToken::new(client_id, client_secret, token_ttl_slack) }
   }
 
   /// Manages tokens in concurrent scenarios.

@@ -1,6 +1,6 @@
 use crate::payment_gateway::mercado_pago::{BackUrls, Item, Payer, PaymentMethods, Shipments};
 use rust_decimal::Decimal;
-use wtx::{collection::Vector, time::DateTime};
+use wtx::{calendar::DateTime, collection::Vector};
 
 /// Differential pricing configuration.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

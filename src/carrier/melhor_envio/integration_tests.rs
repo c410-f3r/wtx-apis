@@ -8,6 +8,7 @@ use rust_decimal_macros::dec;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
+  calendar::{Duration, Instant},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   collection::Vector,
   data_transformation::dnsn::SerdeJson,
@@ -40,13 +41,19 @@ const PRODUCTS: [CalculateShipmentRequestProduct<&'static str>; 2] = [
 static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static SUPER_FRETE: LazyLock<Mutex<MelhorEnvio>> = LazyLock::new(|| {
+  let access_token = std::env::var("MELHOR_ENVIO_ACCESS_TOKEN").unwrap();
   let client_id = std::env::var("MELHOR_ENVIO_CLIENT_ID").unwrap();
   let client_secret = std::env::var("MELHOR_ENVIO_CLIENT_SECRET").unwrap();
-  let refresh_token = std::env::var("MELHOR_ENVIO_REFRESH_TOKEN").unwrap();
-  Mutex::new(
-    MelhorEnvio::new(client_id, client_secret, 60, refresh_token.as_str().try_into().unwrap())
-      .unwrap(),
-  )
+  let this = MelhorEnvio::new(client_id, client_secret, 0);
+  this
+    .sync()
+    .update_params(
+      &access_token,
+      "",
+      Instant::now_date_time(0).unwrap().add(Duration::from_seconds(120).unwrap()).unwrap(),
+    )
+    .unwrap();
+  Mutex::new(this)
 });
 
 create_http_test!(

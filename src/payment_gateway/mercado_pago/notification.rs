@@ -1,4 +1,4 @@
-use wtx::time::DateTime;
+use wtx::calendar::DateTime;
 
 /// WebHook notification
 #[derive(Debug, Eq, PartialEq, serde::Deserialize)]
@@ -66,7 +66,7 @@ mod tests {
   use crate::payment_gateway::mercado_pago::{
     ApiVersion, Notification, NotificationAction, NotificationTy,
   };
-  use wtx::time::{Date, DateTime, Time};
+  use wtx::calendar::DateTime;
 
   #[test]
   fn json() {
@@ -80,11 +80,7 @@ mod tests {
       assert_eq!(notification.data.id, 7547658345);
       assert_eq!(
         notification.date_created,
-        DateTime::new(
-          Date::from_ymd(2025.try_into().unwrap(), 01.try_into().unwrap(), 14.try_into().unwrap())
-            .unwrap(),
-          Time::from_hms(19.try_into().unwrap(), 19.try_into().unwrap(), 25.try_into().unwrap())
-        )
+        DateTime::from_iso_8601(b"2015-01-14T19:19:25").unwrap(),
       );
       assert_eq!(notification.id, 636490643061);
       assert_eq!(notification.live_mode, false);
@@ -102,11 +98,7 @@ mod tests {
       assert_eq!(notification.data.id, 123456);
       assert_eq!(
         notification.date_created,
-        DateTime::new(
-          Date::from_ymd(2021.try_into().unwrap(), 11.try_into().unwrap(), 1.try_into().unwrap())
-            .unwrap(),
-          Time::from_hms(2.try_into().unwrap(), 2.try_into().unwrap(), 2.try_into().unwrap())
-        )
+        DateTime::from_iso_8601(b"2011-11-01T02:02:02").unwrap()
       );
       assert_eq!(notification.id, 123456);
       assert_eq!(notification.live_mode, false);

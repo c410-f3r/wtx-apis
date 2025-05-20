@@ -4,7 +4,9 @@ mod concat_array_str;
 #[cfg(any(feature = "mercado-pago", feature = "olist"))]
 mod oauth;
 mod slice_by_commas;
+#[cfg(feature = "olist")]
 pub(crate) mod yyyy_mm_dd;
+#[cfg(feature = "olist")]
 pub(crate) mod yyyy_mm_dd_opt;
 
 pub use concat_array_str::ConcatArrayStr;

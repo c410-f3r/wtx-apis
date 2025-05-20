@@ -1,12 +1,13 @@
 #![allow(dead_code, reason = "Condition feature activation")]
 
 use crate::misc::{
-  OauthGrantType, OauthResponse,
-  oauth::{encode_req, send_req},
+  OauthGrantType, OauthRequest, OauthResponse,
+  oauth::{encode_oauth_req, send_oauth_req},
 };
 use alloc::string::String;
 use core::fmt::{Debug, Formatter};
 use wtx::{
+  calendar::Instant,
   client_api_framework::{
     Api,
     network::{HttpParams, transport::SendingReceivingTransport},
@@ -14,7 +15,6 @@ use wtx::{
   collection::Vector,
   data_transformation::{dnsn::De, format::VerbatimResponse},
   misc::{Decode, LeaseMut},
-  time::Instant,
 };
 
 /// Common attributes used by APIs that integrate Oauth workflows.
@@ -61,20 +61,27 @@ where
   if api.lease_mut().timer.elapsed()?.as_secs() < api.lease_mut().token_ttl.into() {
     return Ok(());
   }
-  encode_req(
+  encode_oauth_req(
     bytes,
-    (&api.lease().client_id, &api.lease().client_secret, ""),
-    OauthGrantType::ClientCredentials,
+    &OauthRequest {
+      client_id: &api.lease().client_id,
+      client_secret: &api.lease().client_secret,
+      code: None,
+      code_verifier: None,
+      grant_type: OauthGrantType::ClientCredentials,
+      redirect_uri: None,
+      refresh_token: None,
+    },
     enc_cb,
   )?;
-  let res = send_req((api, drsr, trans, trans_params), bytes).await?;
+  let res = send_oauth_req((api, drsr, trans, trans_params), bytes).await?;
   let OauthClientCredentials { access_token, token_ttl, token_ttl_slack, .. } = api.lease_mut();
   access_token.clear();
-  access_token.push_str(res.data.access_token);
-  *token_ttl = if let Some(elem) = res.data.expires_in.checked_sub((*token_ttl_slack).into()) {
+  access_token.push_str(res.access_token);
+  *token_ttl = if let Some(elem) = res.expires_in.checked_sub((*token_ttl_slack).into()) {
     elem
   } else {
-    res.data.expires_in
+    res.expires_in
   };
   Ok(())
 }
