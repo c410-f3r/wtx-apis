@@ -1,5 +1,5 @@
 use crate::{
-  misc::{_apply_auth_header, _manage_client_credentials, OauthResponse},
+  misc::{_manage_client_credentials, OauthResponse},
   payment_gateway::mercado_pago::{MercadoPago, OauthReq},
 };
 use wtx::{
@@ -7,11 +7,13 @@ use wtx::{
     HttpParams,
     transport::{SendingReceivingTransport, TransportParams},
   },
+  collection::Vector,
   data_transformation::{
     dnsn::De,
     format::{VerbatimRequest, VerbatimResponse},
   },
-  misc::{DecodeSeq, Encode, Vector},
+  http::ReqBuilder,
+  misc::{DecodeSeq, Encode},
 };
 
 pub(crate) async fn manage_before_sending<DRSR, T>(
@@ -34,6 +36,7 @@ where
   })
   .await?;
   trans_params.ext_req_params_mut().uri.truncate_with_initial_len();
-  _apply_auth_header(trans_params, &api.common.access_token)?;
+  let headers = &mut trans_params.ext_req_params_mut().headers;
+  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.common.access_token))?;
   Ok(())
 }

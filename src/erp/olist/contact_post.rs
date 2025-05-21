@@ -1,6 +1,6 @@
 use crate::erp::olist::{AssociatedEntityId, CivilStatus, Gender, PersonTy, TributaryRegime};
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents the current situation/status of a contact
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]

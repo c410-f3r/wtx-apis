@@ -1,4 +1,4 @@
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 pub(crate) const CHARACTER_FRAGMENT: &str = r#"
   fragment CharacterFrag on Character {

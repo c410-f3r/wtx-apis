@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents a shipment request with all necessary information for transportation
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

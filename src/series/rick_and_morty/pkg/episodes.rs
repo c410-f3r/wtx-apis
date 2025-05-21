@@ -11,9 +11,9 @@ pub(crate) mod pkg {
   use core::fmt::Write;
   use wtx::{
     client_api_framework::network::transport::TransportParams,
+    collection::Vector,
     data_transformation::format::{GraphQlRequest, GraphQlResponse},
     http::Method,
-    misc::Vector,
   };
 
   #[pkg::aux]

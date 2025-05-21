@@ -25,7 +25,7 @@ mod serde {
   use crate::blockchain::ethereum::BlockNumber;
   use core::fmt::Write;
   use serde::{Serialize, Serializer, ser::Error};
-  use wtx::misc::ArrayString;
+  use wtx::collection::ArrayString;
 
   impl Serialize for BlockNumber {
     #[inline]

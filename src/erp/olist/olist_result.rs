@@ -1,4 +1,4 @@
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Wrapper structure for contact response
 #[derive(Debug, ::serde::Deserialize)]

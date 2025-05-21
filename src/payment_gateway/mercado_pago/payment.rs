@@ -1,6 +1,6 @@
 use crate::payment_gateway::mercado_pago::{Item, Payer, Shipments};
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents additional information about the payment.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

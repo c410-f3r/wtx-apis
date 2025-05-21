@@ -57,7 +57,8 @@ use wtx::{
     Api,
     misc::{RequestLimit, RequestThrottling},
   },
-  misc::{Arc, Lease, LeaseMut},
+  misc::{Lease, LeaseMut},
+  sync::Arc,
 };
 
 /// Base URI
@@ -81,11 +82,10 @@ impl Olist {
     client_secret: String,
     token_ttl_slack: u16,
     plan: Plan,
-    refresh_token: &str,
   ) -> crate::Result<Self> {
     const _1_MIN: Duration = Duration::from_secs(30);
     Ok(Self {
-      common: OauthRefreshToken::new(client_id, client_secret, token_ttl_slack, refresh_token)?,
+      common: OauthRefreshToken::new(client_id, client_secret, token_ttl_slack),
       rt: RequestThrottling::from_rl(match plan {
         Plan::Crescer => RequestLimit::new(30, _1_MIN),
         Plan::Evoluir => RequestLimit::new(60, _1_MIN),

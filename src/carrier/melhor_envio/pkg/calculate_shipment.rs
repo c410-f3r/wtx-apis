@@ -9,7 +9,7 @@ pub(crate) mod pkg {
     calculate_shipment_request::CalculateShipmentRequest,
     calculate_shipment_response::CalculateShipmentResponse, misc::manage_before_sending,
   };
-  use wtx::{client_api_framework::network::HttpParams, misc::Vector};
+  use wtx::{client_api_framework::network::HttpParams, collection::Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

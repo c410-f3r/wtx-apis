@@ -13,9 +13,10 @@ pub(crate) mod pkg {
       HttpParams,
       transport::{SendingReceivingTransport, TransportParams},
     },
+    collection::Vector,
     data_transformation::dnsn::SerdeJson,
     http::Header,
-    misc::{LeaseMut, Vector},
+    misc::LeaseMut,
   };
 
   #[pkg::aux]
@@ -37,7 +38,7 @@ pub(crate) mod pkg {
     manage_before_sending((api, drsr.lease_mut(), trans, trans_params), bytes).await?;
     trans_params.ext_req_params_mut().headers.push_from_iter(Header::from_name_and_value(
       "x-idempotency-key",
-      [params.idempotency_key.as_bytes()].into_iter(),
+      [params.idempotency_key].into_iter(),
     ))?;
     trans_params
       .ext_req_params_mut()

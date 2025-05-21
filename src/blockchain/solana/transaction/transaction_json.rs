@@ -6,7 +6,7 @@ use crate::blockchain::solana::{
   },
 };
 use alloc::string::String;
-use wtx::misc::{ArrayString, Vector};
+use wtx::collection::{ArrayString, Vector};
 
 /// A json instruction can be expressed in different formats.
 #[allow(

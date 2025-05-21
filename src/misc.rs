@@ -1,23 +1,21 @@
 //! Utility functions and structures
 
 mod concat_array_str;
+#[cfg(any(feature = "mercado-pago", feature = "olist"))]
 mod oauth;
 mod slice_by_commas;
-#[cfg(feature = "chrono")]
+#[cfg(feature = "olist")]
 pub(crate) mod yyyy_mm_dd;
-#[cfg(feature = "chrono")]
+#[cfg(feature = "olist")]
 pub(crate) mod yyyy_mm_dd_opt;
 
 pub use concat_array_str::ConcatArrayStr;
 use core::{fmt::Display, str::FromStr};
+#[cfg(any(feature = "mercado-pago", feature = "olist"))]
 pub use oauth::*;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::IntoDeserializer as _};
 pub use slice_by_commas::SliceByCommas;
-use wtx::{
-  client_api_framework::network::{HttpParams, transport::TransportParams as _},
-  http::{Header, KnownHeaderName},
-  misc::ArrayString,
-};
+use wtx::collection::ArrayString;
 
 const MAX_ASSET_ABBR_LEN: usize = 10;
 const MAX_NUMBER_LEN: usize = 31;
@@ -41,14 +39,6 @@ _create_blockchain_constants!(
   pub transaction_hash: MaxTransactionHash = 64,
   pub transaction_hash_str: MaxTransactionHashStr = 90
 );
-
-#[inline]
-pub(crate) fn _apply_auth_header(trans_params: &mut HttpParams, value: &str) -> crate::Result<()> {
-  Ok(trans_params.ext_req_params_mut().headers.push_from_iter(Header::from_name_and_value(
-    KnownHeaderName::Authorization.into(),
-    [value.as_bytes()],
-  ))?)
-}
 
 /// Deserializes an Base58 string as an array of bytes.
 #[cfg(feature = "bs58")]

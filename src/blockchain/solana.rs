@@ -30,7 +30,6 @@ mod short_vec;
 mod slot_update;
 mod transaction;
 
-use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
 pub use block::*;
@@ -47,8 +46,9 @@ use wtx::{
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
+  collection::ArrayString,
   data_transformation::format::{JsonRpcRequest, JsonRpcResponse},
-  misc::{ArrayString, FnMutFut},
+  misc::FnMutFut,
 };
 
 pub(crate) type Epoch = u64;
@@ -65,7 +65,7 @@ _create_blockchain_constants!(
   pub transaction_hash_str: SolanaTransactionHashStr = 90
 );
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[doc = _generic_api_doc!()]
 #[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Solana {
@@ -79,13 +79,11 @@ impl Solana {
     Self { rt }
   }
 
-  /// Make successive HTTP requests over a period defined in `cto` until the transaction is
-  /// successful or expired.
-  pub async fn confirm_transaction<'th, A, DRSR, T>(
-    cto: ConfirmTransactionOptions,
+  #[doc(hidden)]
+  pub async fn check_confirmation<'th, A, DRSR, T>(
     pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
     tx_hash: &'th str,
-  ) -> Result<(), A::Error>
+  ) -> crate::Result<bool>
   where
     A: Api<Error = crate::Error>,
     T: SendingReceivingTransport<HttpParams>,
@@ -98,48 +96,27 @@ impl Solana {
           ExternalResponseContent<'de> = JsonRpcResponse<GetSignatureStatusesRes>,
         >,
   {
-    macro_rules! call {
-      () => {{
-        let signatures = [tx_hash];
-        if let Some(Some(GetSignatureStatuses {
-          confirmation_status: Commitment::Finalized, ..
-        })) = pair
-          .trans
-          .send_pkg_recv_decode_contained(
-            &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
-            &mut pair.pkgs_aux,
-          )
-          .await?
-          .result?
-          .value
-          .get(0)
-        {
-          true
-        } else {
-          false
-        }
-      }};
+    let signatures = [tx_hash];
+    if let Some(Some(GetSignatureStatuses {
+      confirmation_status: Commitment::Finalized,
+      err,
+      ..
+    })) = pair
+      .trans
+      .send_pkg_recv_decode_contained(
+        &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
+        &mut pair.pkgs_aux,
+      )
+      .await?
+      .result?
+      .value
+      .into_iter()
+      .next()
+    {
+      if let Some(elem) = err { Err(crate::Error::SolanaTxError(elem)) } else { Ok(true) }
+    } else {
+      Ok(false)
     }
-
-    match cto {
-      ConfirmTransactionOptions::Tries { number } => {
-        for _ in 0u16..number {
-          if call!() {
-            return Ok(());
-          }
-        }
-      }
-      ConfirmTransactionOptions::TriesWithInterval { interval, number } => {
-        for _ in 0u16..number {
-          if call!() {
-            return Ok(());
-          }
-          wtx::misc::sleep(interval).await?;
-        }
-      }
-    }
-
-    Err(crate::Error::CouldNotConfirmTransaction)
   }
 
   /// If existing, extracts the parsed spl token account ([program::spl_token::MintAccount]) out of

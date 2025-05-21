@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::contract::Tokenizable;
 use ethabi::Token;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Tokens conversion trait
 pub trait Tokenize {

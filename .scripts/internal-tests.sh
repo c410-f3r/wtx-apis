@@ -24,6 +24,7 @@ $rt check-with-features . ethereum
 $rt check-with-features . ethereum-types
 $rt check-with-features . hex
 $rt check-with-features . json-placeholder
+$rt check-with-features . mercado-pago
 $rt check-with-features . nager-date
 $rt check-with-features . primitive-types
 $rt check-with-features . rick-and-morty

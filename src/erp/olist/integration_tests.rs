@@ -1,35 +1,30 @@
-use crate::erp::olist::{
-  ACC_PROD_URI, API_PROD_URI, ContactPost, Olist, OrderPost, PersonTy, PkgsAux, Plan,
-};
+use crate::erp::olist::{API_PROD_URI, ContactPost, Olist, OrderPost, PersonTy, PkgsAux, Plan};
 use alloc::string::ToString;
-use core::time::Duration;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
+  calendar::{Date, Duration, Instant},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   data_transformation::dnsn::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::{Uri, Vector},
 };
 
-static CLIENT_ACC: LazyLock<ClientPoolTokioRustls<fn()>> =
-  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
-static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static OLIST: LazyLock<Mutex<Olist>> = LazyLock::new(|| {
+  let access_token = std::env::var("OLIST_ACCESS_TOKEN").unwrap();
   let client_id = std::env::var("OLIST_CLIENT_ID").unwrap();
   let client_secret = std::env::var("OLIST_CLIENT_SECRET").unwrap();
-  let refresh_token = std::env::var("OLIST_REFRESH_TOKEN").unwrap();
-  Mutex::new(
-    Olist::new(
-      client_id,
-      client_secret,
-      60,
-      Plan::Crescer,
-      refresh_token.as_str().try_into().unwrap(),
+  let this = Olist::new(client_id, client_secret, 0, Plan::Crescer).unwrap();
+  this
+    .sync()
+    .update_params(
+      &access_token,
+      "",
+      Instant::now_date_time(0).unwrap().add(Duration::from_seconds(120).unwrap()).unwrap(),
     )
-    .unwrap(),
-  )
+    .unwrap();
+  Mutex::new(this)
 });
 
 create_http_test!(
@@ -39,7 +34,6 @@ create_http_test!(
   get_info,
   &*CLIENT_API,
   |pkgs_aux, trans| async {
-    refresh_token(&mut pkgs_aux.api).await;
     let _res = trans
       .send_pkg_recv_decode_contained(&mut pkgs_aux.get_info().build(), pkgs_aux)
       .await
@@ -55,8 +49,6 @@ create_http_test!(
   post_contact,
   &*CLIENT_API,
   |pkgs_aux, trans| async {
-    refresh_token(&mut pkgs_aux.api).await;
-
     let _res = trans
       .send_pkg_recv_decode_contained(
         &mut pkgs_aux
@@ -113,18 +105,17 @@ create_http_test!(
   post_and_get_order,
   &*CLIENT_API,
   |pkgs_aux, trans| async {
-    refresh_token(&mut pkgs_aux.api).await;
     let numero_pedido = trans
       .send_pkg_recv_decode_contained(
         &mut pkgs_aux
           .post_order()
           .data(OrderPost::<&str> {
-            data_prevista: Some(chrono::NaiveDate::from_ymd_opt(2025, 1, 25).unwrap()),
+            data_prevista: Some(Date::EPOCH),
             data_envio: None,
             observacoes: None,
             observacoes_internas: None,
             situacao: None,
-            data: Some(chrono::NaiveDate::from_ymd_opt(2025, 1, 25).unwrap()),
+            data: Some(Date::EPOCH),
             data_entrega: None,
             numero_ordem_compra: None,
             valor_desconto: None,
@@ -152,7 +143,7 @@ create_http_test!(
       .unwrap()
       .id
       .to_string();
-    tokio::time::sleep(Duration::from_secs(5)).await;
+    tokio::time::sleep(core::time::Duration::from_secs(5)).await;
     let _res = trans
       .send_pkg_recv_decode_contained(
         &mut pkgs_aux.get_order().params(&numero_pedido).build(),
@@ -168,19 +159,4 @@ create_http_test!(
 
 fn http() -> (SerdeJson, HttpParams) {
   (SerdeJson, HttpParams::from_uri(API_PROD_URI.into()))
-}
-
-async fn refresh_token(olist: &mut Olist) {
-  olist
-    .sync()
-    .request_tokens(
-      (
-        &mut SerdeJson,
-        &mut CLIENT_ACC.lock(&Uri::new(ACC_PROD_URI)).await.unwrap().client,
-        &mut HttpParams::from_uri(ACC_PROD_URI.into()),
-      ),
-      &mut Vector::new(),
-    )
-    .await
-    .unwrap();
 }

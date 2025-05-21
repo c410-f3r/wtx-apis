@@ -19,7 +19,7 @@ pub(crate) mod pkg {
     trans_params
       .ext_req_params_mut()
       .headers
-      .push_from_iter(Header::from_name_and_value("x-vault-token", [api.token.as_bytes()]))?;
+      .push_from_iter(Header::from_name_and_value("x-vault-token", [api.token.as_str()]))?;
     trans_params
       .ext_req_params_mut()
       .uri

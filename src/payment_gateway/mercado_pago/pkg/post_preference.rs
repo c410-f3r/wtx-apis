@@ -13,9 +13,10 @@ pub(crate) mod pkg {
       HttpParams,
       transport::{SendingReceivingTransport, TransportParams},
     },
+    collection::Vector,
     data_transformation::dnsn::SerdeJson,
     http::Method,
-    misc::{LeaseMut, Vector},
+    misc::LeaseMut,
   };
 
   #[pkg::aux]

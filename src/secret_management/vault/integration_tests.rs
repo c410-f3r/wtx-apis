@@ -8,7 +8,7 @@ use wtx::{
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static URI: LazyLock<String> = LazyLock::new(|| std::env::var("VAULT_URI").unwrap());
 static VAULT: LazyLock<Mutex<Vault>> = LazyLock::new(|| {

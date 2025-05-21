@@ -1,7 +1,6 @@
 use crate::erp::olist::{AssociatedEntityId, FreightResponsibility, OrderStatus, PersonTy};
-use chrono::NaiveDate;
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::{calendar::Date, collection::Vector};
 
 /// Derive common traits for serialization, deserialization, and debugging
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -9,10 +8,10 @@ use wtx::misc::Vector;
 pub struct OrderPost<S> {
   /// Expected date
   #[serde(skip_serializing_if = "Option::is_none", with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_prevista: Option<NaiveDate>,
+  pub data_prevista: Option<Date>,
   /// Shipment date
   #[serde(skip_serializing_if = "Option::is_none", with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_envio: Option<NaiveDate>,
+  pub data_envio: Option<Date>,
   /// General observations/comments
   #[serde(skip_serializing_if = "Option::is_none")]
   pub observacoes: Option<S>,
@@ -24,10 +23,10 @@ pub struct OrderPost<S> {
   pub situacao: Option<OrderStatus>,
   /// Order date
   #[serde(skip_serializing_if = "Option::is_none", with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data: Option<NaiveDate>,
+  pub data: Option<Date>,
   /// Delivery date
   #[serde(skip_serializing_if = "Option::is_none", with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data_entrega: Option<NaiveDate>,
+  pub data_entrega: Option<Date>,
   /// Purchase order number
   #[serde(skip_serializing_if = "Option::is_none")]
   pub numero_ordem_compra: Option<S>,
@@ -161,7 +160,7 @@ pub struct OrderPostInstallment<S> {
   pub dias: Option<u32>,
   /// Payment date
   #[serde(skip_serializing_if = "Option::is_none", with = "crate::misc::yyyy_mm_dd_opt")]
-  pub data: Option<NaiveDate>,
+  pub data: Option<Date>,
   /// Installment amount (decimal)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub valor: Option<Decimal>,

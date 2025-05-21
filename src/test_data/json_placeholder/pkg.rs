@@ -15,8 +15,8 @@ pub use users::pkg::*;
 use alloc::boxed::Box;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::TransportParams},
+  collection::Vector,
   http::Method,
-  misc::Vector,
 };
 
 /// Generic response used by all packages.
