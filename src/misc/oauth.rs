@@ -89,7 +89,7 @@ pub struct OauthResponse<T> {
 #[inline]
 pub fn encode_oauth_req(
   bytes: &mut Vector<u8>,
-  req: &OauthRequest,
+  req: &OauthRequest<'_>,
   enc_cb: impl FnOnce(&mut Vector<u8>) -> crate::Result<()>,
 ) -> crate::Result<()> {
   bytes.clear();

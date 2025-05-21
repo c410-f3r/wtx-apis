@@ -5,7 +5,6 @@ use tokio::sync::Mutex;
 use wtx::{
   calendar::{Date, Duration, Instant},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  collection::Vector,
   data_transformation::dnsn::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };

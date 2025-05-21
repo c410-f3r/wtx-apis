@@ -391,9 +391,10 @@ mod tests {
     let from = Address::from_low_u64_be(5);
     let mut trans = Mock::default();
     trans.push_response(response(format!("{:#x}", H256::from_low_u64_be(5)).into()));
-    let result =
-      contract(&mut trans).call("name", (), from, Options::default()).await.unwrap().unwrap();
-    assert_eq!(result, H256::from_low_u64_be(5));
+    assert_eq!(
+      contract(&mut trans).call("name", (), from, Options::default()).await.unwrap().unwrap(),
+      H256::from_low_u64_be(5)
+    );
     let mut cr = call_request();
     cr.data = Some(hex::decode("06fdde03").unwrap().into());
     cr.from = Some(from);
@@ -406,9 +407,10 @@ mod tests {
     let from = Address::from_low_u64_be(5);
     let mut trans = Mock::default();
     trans.push_response(response(format!("{:#x}", U256::from(5)).into()));
-    let result =
-      contract(&mut trans).estimate_gas("name", (), from, Options::default()).await.unwrap();
-    assert_eq!(result, 5.into());
+    assert_eq!(
+      contract(&mut trans).estimate_gas("name", (), from, Options::default()).await.unwrap(),
+      5.into()
+    );
     let mut cr = call_request();
     cr.data = Some(hex::decode("06fdde03").unwrap().into());
     cr.from = Some(from);

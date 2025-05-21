@@ -1,14 +1,14 @@
 #![allow(dead_code, reason = "Conditional features")]
 
 use serde::{Deserialize as _, de::Error};
-use wtx::calendar::{Date, TimeToken};
+use wtx::calendar::{CalendarToken, Date};
 
-static TOKENS: &[TimeToken] = &[
-  TimeToken::FourDigitYear,
-  TimeToken::Dash,
-  TimeToken::TwoDigitMonth,
-  TimeToken::Dash,
-  TimeToken::TwoDigitDay,
+static TOKENS: &[CalendarToken] = &[
+  CalendarToken::FourDigitYear,
+  CalendarToken::Dash,
+  CalendarToken::TwoDigitMonth,
+  CalendarToken::Dash,
+  CalendarToken::TwoDigitDay,
 ];
 
 pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Date>, D::Error>
