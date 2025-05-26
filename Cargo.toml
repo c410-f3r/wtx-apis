@@ -18,7 +18,7 @@ wtx-macros = { default-features = false, git = "https://github.com/c410-f3r/wtx"
 dotenv = { default-features = false, version = "0.15" }
 rust_decimal_macros = { default-features = false, version = "1.0" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
-tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
+tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.45" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
 wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
 
