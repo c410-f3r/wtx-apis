@@ -1287,7 +1287,7 @@ dependencies = [
 [[package]]
 name = "wtx"
 version = "0.35.0"
-source = "git+https://github.com/c410-f3r/wtx#79a66277a8d40ccf2d170f6f66153f2e9a8a6f3a"
+source = "git+https://github.com/c410-f3r/wtx#930af369e396320586907171afd77fd7c4cc5c22"
 dependencies = [
  "base64",
  "foldhash",
@@ -1333,7 +1333,7 @@ dependencies = [
 [[package]]
 name = "wtx-macros"
 version = "0.4.0"
-source = "git+https://github.com/c410-f3r/wtx#79a66277a8d40ccf2d170f6f66153f2e9a8a6f3a"
+source = "git+https://github.com/c410-f3r/wtx#930af369e396320586907171afd77fd7c4cc5c22"
 dependencies = [
  "proc-macro2",
  "quote",
