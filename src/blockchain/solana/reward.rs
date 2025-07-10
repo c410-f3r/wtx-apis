@@ -1,5 +1,5 @@
 use crate::blockchain::solana::SolanaAddressHashStr;
-use wtx::collection::ArrayString;
+use wtx::collection::ArrayStringU8;
 
 /// Transaction-level reward that is populated if requested.
 #[derive(Debug, serde::Deserialize)]
@@ -12,7 +12,7 @@ pub struct Reward {
   /// Account balance in lamports after the reward was applied.
   pub post_balance: u64,
   /// Type of reward that currently is only "rent".
-  pub reward_type: ArrayString<8>,
+  pub reward_type: ArrayStringU8<8>,
   /// Vote account commission when the reward was credited, only present for voting and staking
   /// rewards.
   pub commission: Option<u8>,

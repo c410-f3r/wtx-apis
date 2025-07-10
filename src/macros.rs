@@ -159,22 +159,22 @@ macro_rules! _create_blockchain_constants {
     /// Address hash as bytes
     $address_hash_vis type $address_hash = [u8; $_1];
     /// Address hash as an encoded string
-    $address_hash_str_vis type $address_hash_str = ::wtx::collection::ArrayString<$_2>;
+    $address_hash_str_vis type $address_hash_str = ::wtx::collection::ArrayStringU8<$_2>;
 
     /// Block hash as bytes
     $block_hash_vis type $block_hash = [u8; $_3];
     /// Block hash as an encoded string
-    $block_hash_str_vis type $block_hash_str = ::wtx::collection::ArrayString<$_4>;
+    $block_hash_str_vis type $block_hash_str = ::wtx::collection::ArrayStringU8<$_4>;
 
     /// Signature hash as bytes
-    $signature_hash_vis type $signature_hash = ::cl_aux::ArrayWrapper<u8, $_5>;
+    $signature_hash_vis type $signature_hash = ::wtx::collection::ArrayVectorU8<u8, $_5>;
     /// Signature hash as an encoded string
-    $signature_hash_str_vis type $signature_hash_str = ::wtx::collection::ArrayString<$_6>;
+    $signature_hash_str_vis type $signature_hash_str = ::wtx::collection::ArrayStringU8<$_6>;
 
     /// Transaction hash as bytes
-    $transaction_hash_vis type $transaction_hash = ::cl_aux::ArrayWrapper<u8, $_7>;
+    $transaction_hash_vis type $transaction_hash = ::wtx::collection::ArrayVectorU8<u8, $_7>;
     /// Transaction hash as an encoded string
-    $transaction_hash_str_vis type $transaction_hash_str = ::wtx::collection::ArrayString<$_8>;
+    $transaction_hash_str_vis type $transaction_hash_str = ::wtx::collection::ArrayStringU8<$_8>;
   };
 }
 

@@ -4,7 +4,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::dnsn::SerdeJson};
 //! use wtx_apis::calendar::nager_date::{NagerDate, PkgsAux};
 //!
 //! let mut pkgs_aux =
@@ -21,7 +21,7 @@ pub use pkg::*;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
 pub struct NagerDate;
 
 wtx::create_packages_aux_wrapper!();

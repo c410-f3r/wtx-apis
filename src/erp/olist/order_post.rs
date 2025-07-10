@@ -40,7 +40,7 @@ pub struct OrderPost<S> {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub valor_outras_despesas: Option<Decimal>,
   /// Contact ID
-  pub id_contato: u32,
+  pub id_contato: u64,
   /// Price list details
   #[serde(skip_serializing_if = "Option::is_none")]
   pub lista_preco: Option<AssociatedEntityId>,

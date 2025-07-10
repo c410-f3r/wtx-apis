@@ -6,7 +6,7 @@ use crate::blockchain::solana::{
   },
 };
 use alloc::string::String;
-use wtx::collection::{ArrayString, Vector};
+use wtx::collection::{ArrayStringU8, Vector};
 
 /// A json instruction can be expressed in different formats.
 #[allow(
@@ -87,7 +87,7 @@ pub struct InstructionJsonParsedDecoded {
   /// Information
   pub info: InstructionJsonParsedInfo,
   /// Type
-  pub r#type: ArrayString<32>,
+  pub r#type: ArrayStringU8<32>,
 }
 
 /// With decoded JSON data.

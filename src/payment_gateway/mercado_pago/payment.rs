@@ -1,6 +1,9 @@
 use crate::payment_gateway::mercado_pago::{Item, Payer, Shipments};
 use rust_decimal::Decimal;
-use wtx::collection::Vector;
+use wtx::{
+  calendar::{DateTime, DynTz},
+  collection::Vector,
+};
 
 /// Represents additional information about the payment.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -19,7 +22,7 @@ pub struct AdditionalInfo<T> {
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Card<T> {
   /// Creation date of card.
-  pub date_created: Option<T>,
+  pub date_created: Option<DateTime<DynTz>>,
   /// Card expiration month.
   pub expiration_month: Option<u32>,
   /// Card expiration year.
@@ -61,13 +64,13 @@ pub struct Payment<T> {
   /// Identifier of the currency used in the payment.
   pub currency_id: Option<T>,
   /// Date of payment approval. A payment can be created in an intermediate state and later approved.
-  pub date_approved: Option<T>,
+  pub date_approved: Option<DateTime<DynTz>>,
   /// Date the payment was created.
-  pub date_created: Option<T>,
+  pub date_created: Option<DateTime<DynTz>>,
   /// Date when the last payment event was registered.
-  pub date_last_updated: Option<T>,
+  pub date_last_updated: Option<DateTime<DynTz>>,
   /// Expiration date of the payment. The format is "yyyy-MM-dd'T'HH:mm:ssz".
-  pub date_of_expiration: Option<T>,
+  pub date_of_expiration: Option<DateTime<DynTz>>,
   /// Pricing scheme applied by Mercado Pago. Represents information of a type of financing (installment plan).
   pub deduction_schema: Option<T>,
   /// Description of the purchased product, the reason for payment.
@@ -89,7 +92,7 @@ pub struct Payment<T> {
   /// Merchant establishment number (applies to the gateway model).
   pub merchant_number: Option<T>,
   /// Date when payment is settled and money is available in Collector's Mercado Pago account.
-  pub money_release_date: Option<T>,
+  pub money_release_date: Option<DateTime<DynTz>>,
   /// Identifies if payment is PNF (payment in flow). Determines how installments are released over months.
   pub money_release_schema: Option<T>,
   /// URL to receive payment event notifications. Max 248 characters.
@@ -109,7 +112,7 @@ pub struct Payment<T> {
   /// Description shown on card statement (e.g., MERCADOPAGO).
   pub statement_descriptor: Option<T>,
   /// Current status of the payment.
-  pub status: Option<T>,
+  pub status: Option<PaymentStatus>,
   /// Details about the resulting collection.
   pub status_detail: Option<T>,
   /// Cost of the product.
@@ -119,12 +122,36 @@ pub struct Payment<T> {
   #[serde(with = "rust_decimal::serde::float_option")]
   pub transaction_amount_refunded: Option<Decimal>,
   /// Details of the transaction.
-  pub transaction_details: Option<TransactionDetails<T>>,
+  pub transaction_details: Option<PaymentTransactionDetails<T>>,
+}
+
+/// Represents the current status of a payment.
+#[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PaymentStatus {
+  /// The user hasn't completed the payment process yet.
+  Pending,
+  /// The payment was successfully approved and credited.
+  Approved,
+  /// The payment was authorized but hasn't been captured yet.
+  Authorized,
+  /// The payment is under review.
+  InProcess,
+  /// The user has initiated a dispute.
+  InMediation,
+  /// The payment was rejected.
+  Rejected,
+  /// The payment was canceled by one of the parties or it expired.
+  Cancelled,
+  /// The payment was refunded to the user.
+  Refunded,
+  /// A chargeback has been applied to the buyer's credit card.
+  ChargedBack,
 }
 
 /// Represents transaction details.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub struct TransactionDetails<T> {
+pub struct PaymentTransactionDetails<T> {
   /// Details of the transaction.
   pub details: Option<T>,
 }

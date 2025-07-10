@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("slotSubscribe")),
   id(crate::blockchain::solana::SolanaId),
   transport(ws)
@@ -17,7 +17,7 @@ pub(crate) mod sub {
   pub type SlotSubscribeRes = u64;
 }
 
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("slotUnsubscribe")),
   id(crate::blockchain::solana::SolanaId),
   transport(ws)

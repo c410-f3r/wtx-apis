@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getSignatureStatuses")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)
@@ -7,7 +7,7 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, TransactionError,
   };
-  use wtx::collection::ArrayVector;
+  use wtx::collection::ArrayVectorU8;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -23,7 +23,7 @@ pub(crate) mod pkg {
 
   #[pkg::res_data]
   pub type GetSignatureStatusesRes =
-    JsonRpcResponseResultWithContext<ArrayVector<Option<GetSignatureStatuses>, 8>>;
+    JsonRpcResponseResultWithContext<ArrayVectorU8<Option<GetSignatureStatuses>, 8>>;
 
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]

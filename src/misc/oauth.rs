@@ -13,16 +13,16 @@ use wtx::{
     },
     pkg::PkgsAux,
   },
-  collection::{ArrayString, Vector},
-  data_transformation::{
-    dnsn::{De, DecodeWrapper},
-    format::VerbatimResponse,
+  collection::{ArrayStringU16, IndexedStorageMut, Vector},
+  de::{
+    Decode,
+    format::{De, DecodeWrapper},
+    protocol::VerbatimDecoder,
   },
   http::{Method, Mime},
-  misc::Decode,
 };
 
-pub(crate) type TokenArray = ArrayString<{ 2048 + 256 }>;
+pub(crate) type TokenArray = ArrayStringU16<{ 2048 + 256 }>;
 
 /// How the Oauth token should be created.
 #[derive(Clone, Copy, Debug, serde::Serialize)]
@@ -126,11 +126,11 @@ pub async fn send_oauth_req<'de, A, DRSR, T>(
 where
   A: Api,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimResponse<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
 {
-  trans_params.reset();
-  trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
+  trans_params.ext_req_params_mut().headers.clear();
   trans_params.ext_req_params_mut().method = Method::Post;
+  trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);
   pkgs_aux.log_body();
@@ -138,6 +138,6 @@ where
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);
   rslt?;
   let dw = &mut DecodeWrapper::new(bytes);
-  let res = VerbatimResponse::<OauthResponse<&str>>::decode(pkgs_aux.drsr, dw)?;
+  let res = VerbatimDecoder::<OauthResponse<&str>>::decode(pkgs_aux.drsr, dw)?;
   Ok(res.data)
 }

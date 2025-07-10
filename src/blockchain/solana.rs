@@ -4,7 +4,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::dnsn::SerdeJson};
 //! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
@@ -46,13 +46,13 @@ use wtx::{
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
-  collection::ArrayString,
-  data_transformation::format::{JsonRpcRequest, JsonRpcResponse},
+  collection::ArrayStringU8,
+  de::protocol::{JsonRpcDecoder, JsonRpcEncoder},
   misc::FnMutFut,
 };
 
 pub(crate) type Epoch = u64;
-pub(crate) type SolanaProgramName = ArrayString<32>;
+pub(crate) type SolanaProgramName = ArrayStringU8<32>;
 
 _create_blockchain_constants!(
   pub address_hash: SolanaAddressHash = 32,
@@ -67,7 +67,7 @@ _create_blockchain_constants!(
 
 #[derive(Clone, Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Solana {
   /// If some, tells that each request must respect calling intervals.
   pub rt: Option<RequestThrottling>,
@@ -87,13 +87,13 @@ impl Solana {
   where
     A: Api<Error = crate::Error>,
     T: SendingReceivingTransport<HttpParams>,
-    GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>:
+    GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<[&'th str; 1]>>>:
       for<'de> Package<
           A,
           DRSR,
           T::Inner,
           HttpParams,
-          ExternalResponseContent<'de> = JsonRpcResponse<GetSignatureStatusesRes>,
+          ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
         >,
   {
     let signatures = [tx_hash];
@@ -162,12 +162,12 @@ impl Solana {
     API: Api<Error = crate::Error>,
     E: From<crate::Error>,
     T: SendingReceivingTransport<HttpParams>,
-    GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: for<'de> Package<
+    GetLatestBlockhashPkg<JsonRpcEncoder<GetLatestBlockhashReq>>: for<'de> Package<
         API,
         DRSR,
         T::Inner,
         HttpParams,
-        ExternalResponseContent<'de> = JsonRpcResponse<GetLatestBlockhashRes>,
+        ExternalResponseContent<'de> = JsonRpcDecoder<GetLatestBlockhashRes>,
       >,
   {
     macro_rules! local_blockhash {

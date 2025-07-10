@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json),
   id(crate::payment_gateway::mercado_pago::MercadoPagoId),
   transport(http)
@@ -14,7 +14,7 @@ pub(crate) mod pkg {
       transport::{SendingReceivingTransport, TransportParams},
     },
     collection::Vector,
-    data_transformation::dnsn::SerdeJson,
+    de::format::SerdeJson,
     http::Header,
     misc::LeaseMut,
   };

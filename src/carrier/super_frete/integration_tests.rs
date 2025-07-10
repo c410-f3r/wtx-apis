@@ -10,7 +10,7 @@ use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   collection::Vector,
-  data_transformation::dnsn::SerdeJson,
+  de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
   misc::Wrapper,
 };

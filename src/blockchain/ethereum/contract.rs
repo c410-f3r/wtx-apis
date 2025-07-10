@@ -25,11 +25,12 @@ use wtx::{
     pkg::Package,
   },
   collection::Vector,
-  data_transformation::{
-    dnsn::De,
-    format::{JsonRpcRequest, JsonRpcResponse},
+  de::{
+    DecodeSeq, Encode,
+    format::De,
+    protocol::{JsonRpcDecoder, JsonRpcEncoder},
   },
-  misc::{DecodeSeq, Encode, Wrapper},
+  misc::Wrapper,
 };
 
 /// Ethereum Contract Interface
@@ -90,8 +91,8 @@ where
   ) -> crate::Result<Option<H256>>
   where
     FP: Tokenize,
-    for<'tr> JsonRpcRequest<EthSendTransactionReq<'tr>>: Encode<De<DRSR>>,
-    JsonRpcResponse<EthSendTransactionRes>: for<'de> DecodeSeq<'de, De<DRSR>>,
+    for<'tr> JsonRpcEncoder<EthSendTransactionReq<'tr>>: Encode<De<DRSR>>,
+    JsonRpcDecoder<EthSendTransactionRes>: for<'de> DecodeSeq<'de, De<DRSR>>,
   {
     let data = self.abi.function(func)?.encode_input(&func_params.into_tokens())?.into();
     let Options {
@@ -135,8 +136,8 @@ where
   ) -> crate::Result<U256>
   where
     FP: Tokenize,
-    for<'any> JsonRpcRequest<EthEstimateGasReq<'any>>: Encode<De<DRSR>>,
-    JsonRpcResponse<U256>: for<'de> DecodeSeq<'de, De<DRSR>>,
+    for<'any> JsonRpcEncoder<EthEstimateGasReq<'any>>: Encode<De<DRSR>>,
+    JsonRpcDecoder<U256>: for<'de> DecodeSeq<'de, De<DRSR>>,
   {
     let data = self.abi.function(func)?.encode_input(&func_params.into_tokens())?.into();
     let call_request = CallRequest {
@@ -170,8 +171,8 @@ where
     BB: Tokenize,
     CC: Tokenize,
     R: Detokenize,
-    for<'filter> JsonRpcRequest<EthGetLogsReq<'filter>>: Encode<De<DRSR>>,
-    JsonRpcResponse<Option<Vector<Log>>>: for<'de> DecodeSeq<'de, De<DRSR>>,
+    for<'filter> JsonRpcEncoder<EthGetLogsReq<'filter>>: Encode<De<DRSR>>,
+    JsonRpcDecoder<Option<Vector<Log>>>: for<'de> DecodeSeq<'de, De<DRSR>>,
   {
     fn to_topic<A: Tokenize>(x: A) -> ethabi::Topic<ethabi::Token> {
       let tokens = x.into_tokens();
@@ -221,12 +222,12 @@ where
   where
     FP: Tokenize,
     R: Detokenize,
-    for<'any, 'de> EthCallPkg<JsonRpcRequest<EthCallReq<'any>>>: Package<
+    for<'any, 'de> EthCallPkg<JsonRpcEncoder<EthCallReq<'any>>>: Package<
         Ethereum,
         DRSR,
         T::Inner,
         HttpParams,
-        ExternalResponseContent<'de> = JsonRpcResponse<Option<Bytes>>,
+        ExternalResponseContent<'de> = JsonRpcDecoder<Option<Bytes>>,
       >,
   {
     let function = self.abi.function(func)?;
@@ -274,9 +275,10 @@ mod tests {
       network::{HttpParams, transport::Mock},
     },
     collection::Vector,
-    data_transformation::{
-      dnsn::SerdeJson,
-      format::{JsonRpcRequest, JsonRpcResponse},
+    de::{
+      decode_hex_to_slice,
+      format::SerdeJson,
+      protocol::{JsonRpcDecoder, JsonRpcEncoder},
     },
   };
 
@@ -288,14 +290,30 @@ mod tests {
   fn decoding_array_of_fixed_bytes() {
     let tokens = wtx::vector![Token::FixedArray(
       wtx::vector![
-        Token::FixedBytes(hex::decode("01").unwrap().into()),
-        Token::FixedBytes(hex::decode("02").unwrap().into()),
-        Token::FixedBytes(hex::decode("03").unwrap().into()),
-        Token::FixedBytes(hex::decode("04").unwrap().into()),
-        Token::FixedBytes(hex::decode("05").unwrap().into()),
-        Token::FixedBytes(hex::decode("06").unwrap().into()),
-        Token::FixedBytes(hex::decode("07").unwrap().into()),
-        Token::FixedBytes(hex::decode("08").unwrap().into()),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"01", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"02", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"03", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"04", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"05", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"06", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"07", &mut [0; 8]).unwrap().to_vec().into()
+        ),
+        Token::FixedBytes(
+          decode_hex_to_slice::<false>(b"08", &mut [0; 8]).unwrap().to_vec().into()
+        ),
       ]
       .into()
     )];
@@ -338,7 +356,7 @@ mod tests {
       .unwrap();
     assert_eq!(result, "Hello World!");
     let mut cr = call_request();
-    cr.data = Some(hex::decode("06fdde03").unwrap().into());
+    cr.data = Some(decode_hex_to_slice::<false>(b"06fdde03", &mut [0; 8]).unwrap().to_vec().into());
     trans.assert_request(&req("eth_call", (block_id, cr)));
     trans.assert_does_not_have_non_asserted_requests();
   }
@@ -355,7 +373,7 @@ mod tests {
       .unwrap();
     assert_eq!(result, "Hello World!".to_owned());
     let mut cr = call_request();
-    cr.data = Some(hex::decode("06fdde03").unwrap().into());
+    cr.data = Some(decode_hex_to_slice::<false>(b"06fdde03", &mut [0; 8]).unwrap().to_vec().into());
     trans.assert_request(&req("eth_call", (block_id, cr)));
     trans.assert_does_not_have_non_asserted_requests();
   }
@@ -379,7 +397,7 @@ mod tests {
       .unwrap();
     assert_eq!(result, "Hello World!".to_owned());
     let mut cr = call_request();
-    cr.data = Some(hex::decode("06fdde03").unwrap().into());
+    cr.data = Some(decode_hex_to_slice::<false>(b"06fdde03", &mut [0; 8]).unwrap().to_vec().into());
     cr.from = Some(from);
     cr.gas_price = Some(10_000_000.into());
     trans.assert_request(&req("eth_call", (block_id, cr)));
@@ -396,7 +414,7 @@ mod tests {
       H256::from_low_u64_be(5)
     );
     let mut cr = call_request();
-    cr.data = Some(hex::decode("06fdde03").unwrap().into());
+    cr.data = Some(decode_hex_to_slice::<false>(b"06fdde03", &mut [0; 8]).unwrap().to_vec().into());
     cr.from = Some(from);
     trans.assert_request(&req("eth_sendTransaction", [cr]));
     trans.assert_does_not_have_non_asserted_requests();
@@ -412,7 +430,7 @@ mod tests {
       5.into()
     );
     let mut cr = call_request();
-    cr.data = Some(hex::decode("06fdde03").unwrap().into());
+    cr.data = Some(decode_hex_to_slice::<false>(b"06fdde03", &mut [0; 8]).unwrap().to_vec().into());
     cr.from = Some(from);
     trans.assert_request(&req("eth_estimateGas", [cr]));
     trans.assert_does_not_have_non_asserted_requests();
@@ -438,9 +456,13 @@ mod tests {
     assert_eq!(result, 0x20.into());
     let mut cr = call_request();
     cr.data = Some(
-      hex::decode("70a082310000000000000000000000000000000000000000000000000000000000000005")
-        .unwrap()
-        .into(),
+      decode_hex_to_slice::<false>(
+        b"70a082310000000000000000000000000000000000000000000000000000000000000005",
+        &mut [0; 64],
+      )
+      .unwrap()
+      .to_vec()
+      .into(),
     );
     trans.assert_request(&req("eth_call", (BlockId::Number(BlockNumber::Latest), cr)));
     trans.assert_does_not_have_non_asserted_requests();
@@ -478,11 +500,11 @@ mod tests {
   where
     P: Serialize,
   {
-    serde_json::to_string(&JsonRpcRequest { id: 1, method, params }).unwrap()
+    serde_json::to_string(&JsonRpcEncoder { id: 1, method, params }).unwrap()
   }
 
   fn response(result: Cow<'static, str>) -> Cow<'static, str> {
-    let elem = JsonRpcResponse { id: 1, method: None, result: Ok(result) };
+    let elem = JsonRpcDecoder { id: 1, method: None, result: Ok(result) };
     serde_json::to_string(&elem).unwrap().into()
   }
 }

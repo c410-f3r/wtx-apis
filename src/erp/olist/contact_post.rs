@@ -1,6 +1,6 @@
 use crate::erp::olist::{AssociatedEntityId, CivilStatus, Gender, PersonTy, TributaryRegime};
 use rust_decimal::Decimal;
-use wtx::collection::Vector;
+use wtx::{calendar::Date, collection::Vector};
 
 /// Represents the current situation/status of a contact
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -83,7 +83,8 @@ pub struct ContactPost<S> {
   pub sexo: Option<Gender>,
   /// Date of birth
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub data_nascimento: Option<S>,
+  #[serde(with = "crate::misc::yyyy_mm_dd_opt")]
+  pub data_nascimento: Option<Date>,
   /// Place of birth
   #[serde(skip_serializing_if = "Option::is_none")]
   pub naturalidade: Option<S>,

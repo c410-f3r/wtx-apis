@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json),
   id(crate::test_data::json_placeholder::JsonPlaceholderId),
   transport(http)

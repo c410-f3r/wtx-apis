@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getProgramAccounts")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)
@@ -7,7 +7,7 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Account, AccountEncoding, Commitment, DataSlice, Filter, HttpPkgsAux,
   };
-  use wtx::collection::{ArrayString, Vector};
+  use wtx::collection::{ArrayStringU8, Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -51,6 +51,6 @@ pub(crate) mod pkg {
     /// Account
     pub account: Account,
     /// Base58 identifier
-    pub pubkey: ArrayString<44>,
+    pub pubkey: ArrayStringU8<44>,
   }
 }

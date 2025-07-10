@@ -1,8 +1,4 @@
-#[wtx_macros::pkg(
-  data_format(json),
-  id(crate::series::rick_and_morty::RickAndMortyId),
-  transport(http)
-)]
+#[wtx::pkg(data_format(json), id(crate::series::rick_and_morty::RickAndMortyId), transport(http))]
 pub(crate) mod pkg {
   use crate::{
     misc::SliceByCommas,
@@ -13,7 +9,7 @@ pub(crate) mod pkg {
   use wtx::{
     client_api_framework::network::transport::TransportParams,
     collection::Vector,
-    data_transformation::format::{GraphQlRequest, GraphQlResponse},
+    de::protocol::{GraphQlDecoder, GraphQlEncoder},
     http::Method,
   };
 
@@ -52,11 +48,11 @@ pub(crate) mod pkg {
   }
 
   #[pkg::req_data]
-  pub type LocationsByIdsReq<'any> = GraphQlRequest<(), &'any str, ()>;
+  pub type LocationsByIdsReq<'any> = GraphQlEncoder<(), &'any str, ()>;
 
   #[pkg::res_data]
   pub type LocationsByIdsRes<'any> =
-    GraphQlResponse<LocationsByIdsData<&'any str>, serde::de::IgnoredAny>;
+    GraphQlDecoder<LocationsByIdsData<&'any str>, serde::de::IgnoredAny>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = generic_data_doc!()]

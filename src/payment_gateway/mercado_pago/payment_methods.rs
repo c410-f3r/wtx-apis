@@ -1,4 +1,4 @@
-use wtx::collection::ArrayVector;
+use wtx::collection::ArrayVectorU8;
 
 wtx::create_enum! {
   /// Invidial payment method
@@ -65,9 +65,9 @@ pub struct PaymentMethods {
   pub default_payment_method_id: Option<PaymentMethodId>,
   /// Excluded payment methods.
   pub excluded_payment_methods:
-    Option<ArrayVector<ExcludedPaymentMethod, { PaymentMethodId::len() }>>,
+    Option<ArrayVectorU8<ExcludedPaymentMethod, { PaymentMethodId::len() }>>,
   /// Excluded payment types.
-  pub excluded_payment_types: Option<ArrayVector<ExcludedPaymentType, { PaymentTypeId::len() }>>,
+  pub excluded_payment_types: Option<ArrayVectorU8<ExcludedPaymentType, { PaymentTypeId::len() }>>,
   /// Maximum number of installments.
   pub installments: Option<u8>,
 }

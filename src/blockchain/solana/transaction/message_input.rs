@@ -1,6 +1,9 @@
 use crate::blockchain::solana::{AddressLookupTableAccount, SolanaAddressHash, SolanaBlockhash};
 use alloc::collections::BTreeMap;
-use wtx::{collection::Vector, misc::Wrapper};
+use wtx::{
+  collection::{IndexedStorageMut, Vector},
+  misc::Wrapper,
+};
 
 /// Compiled [InstructionInput]
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]

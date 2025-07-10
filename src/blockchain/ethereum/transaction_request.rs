@@ -47,6 +47,7 @@ pub struct TransactionRequest {
 mod tests {
   use crate::blockchain::ethereum::{TransactionCondition, TransactionRequest};
   use ethereum_types::Address;
+  use wtx::de::decode_hex_to_slice;
 
   #[test]
   fn should_serialize_transaction_request() {
@@ -56,7 +57,7 @@ mod tests {
       gas: Some(21_000.into()),
       gas_price: None,
       value: Some(5_000_000.into()),
-      data: Some(hex::decode("010203").unwrap().into()),
+      data: Some(decode_hex_to_slice::<false>(b"010203", &mut [0; 8]).unwrap().to_vec().into()),
       nonce: None,
       condition: Some(TransactionCondition::Block(5)),
       ty: None,
@@ -97,7 +98,10 @@ mod tests {
     assert_eq!(deserialized.gas, Some(21_000.into()));
     assert_eq!(deserialized.gas_price, None);
     assert_eq!(deserialized.value, Some(5_000_000.into()));
-    assert_eq!(deserialized.data, Some(hex::decode("010203").unwrap().into()));
+    assert_eq!(
+      deserialized.data,
+      Some(decode_hex_to_slice::<false>(b"010203", &mut [0; 8]).unwrap().to_vec().into())
+    );
     assert_eq!(deserialized.nonce, None);
     assert_eq!(deserialized.condition, Some(TransactionCondition::Block(5)));
   }

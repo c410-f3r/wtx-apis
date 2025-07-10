@@ -12,11 +12,11 @@ use core::{
   task::Poll,
 };
 use wtx::{
-  calendar::{DateTime, Duration, Instant},
+  calendar::{DateTime, Duration, Instant, Utc},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   collection::{ArrayString, Vector},
-  data_transformation::{dnsn::De, format::VerbatimResponse},
-  misc::{Decode, into_rslt},
+  de::{Decode, format::De, protocol::VerbatimDecoder},
+  misc::into_rslt,
   sync::{Arc, AtomicCell, AtomicWaker},
 };
 
@@ -71,7 +71,7 @@ pub struct OauthRefreshTokenSync {
   pub(crate) client_secret: String,
   pub(crate) needs_access_token_update: AtomicBool,
   pub(crate) refresh_token: AtomicCell<TokenArray>,
-  pub(crate) token_ttl: AtomicCell<DateTime>,
+  pub(crate) token_ttl: AtomicCell<DateTime<Utc>>,
   pub(crate) token_ttl_slack: u16,
   pub(crate) waker: AtomicWaker,
 }
@@ -108,7 +108,7 @@ impl OauthRefreshTokenSync {
   ) -> crate::Result<()>
   where
     for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-    for<'any> VerbatimResponse<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+    for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
   {
     encode_oauth_req(
       bytes,
@@ -136,7 +136,7 @@ impl OauthRefreshTokenSync {
 
   /// The time where the token will expire with the slack value already applied.
   #[inline]
-  pub fn token_ttl(&self) -> DateTime {
+  pub fn token_ttl(&self) -> DateTime<Utc> {
     self.token_ttl.load()
   }
 
@@ -147,7 +147,7 @@ impl OauthRefreshTokenSync {
     &self,
     access_token: &str,
     refresh_token: &str,
-    token_ttl: DateTime,
+    token_ttl: DateTime<Utc>,
   ) -> crate::Result<()> {
     self.do_update_params(access_token, refresh_token, token_ttl)
   }
@@ -156,7 +156,7 @@ impl OauthRefreshTokenSync {
     &self,
     access_token: &str,
     refresh_token: &str,
-    token_ttl: DateTime,
+    token_ttl: DateTime<Utc>,
   ) -> crate::Result<()> {
     self.token_ttl.store(
       token_ttl

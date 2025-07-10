@@ -63,7 +63,7 @@ pub struct QuoteFreightResGeneric<P, S> {
   /// Indicates if there is an error with the freight.
   pub has_error: bool,
   /// Unique identifier for the freight.
-  pub id: u8,
+  pub id: u16,
   /// Name of the freight.
   pub name: S,
   /// Packages associated with the freight.

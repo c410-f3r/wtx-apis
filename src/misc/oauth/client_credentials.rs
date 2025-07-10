@@ -10,11 +10,14 @@ use wtx::{
   calendar::Instant,
   client_api_framework::{
     Api,
-    network::{HttpParams, transport::SendingReceivingTransport},
+    network::{
+      HttpParams,
+      transport::{SendingReceivingTransport, TransportParams},
+    },
   },
-  collection::Vector,
-  data_transformation::{dnsn::De, format::VerbatimResponse},
-  misc::{Decode, LeaseMut},
+  collection::{IndexedStorageMut, Vector},
+  de::{Decode, format::De, protocol::VerbatimDecoder},
+  misc::LeaseMut,
 };
 
 /// Common attributes used by APIs that integrate Oauth workflows.
@@ -56,7 +59,7 @@ pub(crate) async fn _manage_client_credentials<A, DRSR, T>(
 where
   A: Api<Error = crate::Error> + LeaseMut<OauthClientCredentials>,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimResponse<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
 {
   if api.lease_mut().timer.elapsed()?.as_secs() < api.lease_mut().token_ttl.into() {
     return Ok(());
@@ -83,5 +86,7 @@ where
   } else {
     res.expires_in
   };
+  bytes.clear();
+  trans_params.reset();
   Ok(())
 }

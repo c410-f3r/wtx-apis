@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(data_format(json), id(crate::erp::olist::OlistId), transport(http))]
+#[wtx::pkg(data_format(json), id(crate::erp::olist::OlistId), transport(http))]
 pub(crate) mod pkg {
   use crate::erp::olist::{HttpPkgsAux, Olist, OlistResult, OrderGet, misc::manage_before_sending};
   use alloc::string::String;

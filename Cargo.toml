@@ -2,17 +2,14 @@
 base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
-cl-aux = { default-features = false, features = ["alloc", "serde"], version = "5.0" }
 ed25519-dalek = { default-features = false, optional = true, version = "2.0" }
 ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
 ethereum-types = { default-features = false, features = ["serialize"], optional = true, version = "0.14" }
-hex = { default-features = false, optional = true, version = "0.4" }
 primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
 rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
-wtx = { default-features = false, features = ["cl-aux", "client-api-framework", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
-wtx-macros = { default-features = false, git = "https://github.com/c410-f3r/wtx" }
+wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
@@ -24,12 +21,11 @@ wtx = { default-features = false, features = ["client-api-framework", "http-clie
 
 [features]
 default = []
-ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
+ethereum = ["ethabi", "ethereum-types", "primitive-types"]
 json-placeholder = []
-melhor-envio = []
-mercado-pago = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/calendar", "wtx/serde_json"]
+mercado-pago = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
 nager-date = []
-olist = ["rust_decimal/serde-with-str", "wtx/calendar", "wtx/serde_urlencoded"]
+olist = ["rust_decimal/serde-with-str", "wtx/serde_urlencoded"]
 pagar-me = ["base64", "wtx/serde"]
 rick-and-morty = []
 solana = ["base64", "bincode", "bs58", "wtx/std"]

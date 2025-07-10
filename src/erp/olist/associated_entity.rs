@@ -3,7 +3,7 @@
 pub struct AssociatedEntityId {
   /// Id
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub id: Option<u32>,
+  pub id: Option<u64>,
 }
 
 /// Generic entity that is associated by an ID and name

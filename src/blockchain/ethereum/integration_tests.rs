@@ -7,7 +7,7 @@ use wtx::{
     misc::{RequestLimit, RequestThrottling},
     network::{HttpParams, transport::SendingReceivingTransport},
   },
-  data_transformation::dnsn::SerdeJson,
+  de::dnsn::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 

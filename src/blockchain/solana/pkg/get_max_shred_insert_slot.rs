@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getMaxShredInsertSlot")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)

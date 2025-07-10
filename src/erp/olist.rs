@@ -68,7 +68,7 @@ pub const ACC_PROD_URI: &str =
   "https://accounts.tiny.com.br/realms/tiny/protocol/openid-connect/token";
 
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http))]
 pub struct Olist {
   common: OauthRefreshToken,
   rt: RequestThrottling,

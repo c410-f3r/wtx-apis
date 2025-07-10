@@ -23,9 +23,8 @@ where
 
 mod serde {
   use crate::blockchain::ethereum::BlockNumber;
-  use core::fmt::Write;
-  use serde::{Serialize, Serializer, ser::Error};
-  use wtx::collection::ArrayString;
+  use serde::{Serialize, Serializer};
+  use wtx::de::{HexDisplay, u64_string};
 
   impl Serialize for BlockNumber {
     #[inline]
@@ -35,10 +34,8 @@ mod serde {
     {
       match *self {
         BlockNumber::Number(ref x) => {
-          let mut s = ArrayString::<10>::new();
-          s.write_fmt(format_args!("0x{:x}", x))
-            .map_err(|_err| S::Error::custom("Buffer is not large enough to fill block number"))?;
-          serializer.serialize_str(s.as_str())
+          let s = u64_string(*x);
+          serializer.collect_str(&format_args!("{}", HexDisplay::<true>(s.as_bytes())))
         }
         BlockNumber::Latest => serializer.serialize_str("latest"),
         BlockNumber::Earliest => serializer.serialize_str("earliest"),

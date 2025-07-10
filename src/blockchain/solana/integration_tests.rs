@@ -15,7 +15,7 @@ use wtx::{
     network::{HttpParams, WsParams, transport::SendingReceivingTransport},
   },
   collection::Vector,
-  data_transformation::dnsn::SerdeJson,
+  de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 

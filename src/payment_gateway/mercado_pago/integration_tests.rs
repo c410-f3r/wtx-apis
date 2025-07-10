@@ -7,8 +7,8 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  collection::ArrayVector,
-  data_transformation::dnsn::SerdeJson,
+  collection::{ArrayVectorU8, IndexedStorageMut},
+  de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
@@ -59,7 +59,7 @@ create_http_test!(
               default_payment_method_id: None,
               excluded_payment_methods: None,
               excluded_payment_types: Some(
-                ArrayVector::from_iter([ExcludedPaymentType { id: PaymentTypeId::Ticket }])
+                ArrayVectorU8::from_iter([ExcludedPaymentType { id: PaymentTypeId::Ticket }])
                   .unwrap(),
               ),
               installments: Some(12),
@@ -85,7 +85,7 @@ create_http_test!(
   |pkgs_aux, trans| async {
     let _rslt = trans
       .send_pkg_recv_decode_contained(
-        &mut pkgs_aux.get_payment().params(1330392301).build(),
+        &mut pkgs_aux.get_payment().params("1330392301").build(),
         pkgs_aux,
       )
       .await

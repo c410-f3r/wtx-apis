@@ -3,7 +3,7 @@ use serde::{
   Deserialize,
   de::{Deserializer, Error, MapAccess, Visitor},
 };
-use wtx::collection::Vector;
+use wtx::collection::{IndexedStorageMut, Vector};
 
 /// A vector where each element is a key and a value.
 #[derive(Debug)]

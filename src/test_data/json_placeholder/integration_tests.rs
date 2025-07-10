@@ -2,7 +2,7 @@ use crate::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux
 use std::sync::LazyLock;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  data_transformation::dnsn::SerdeJson,
+  de::format::SerdeJson,
   http::{
     Method,
     client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
