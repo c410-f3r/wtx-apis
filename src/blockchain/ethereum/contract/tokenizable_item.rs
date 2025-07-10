@@ -2,7 +2,7 @@ use crate::blockchain::ethereum::contract::Tokenizable;
 use alloc::string::String;
 use ethabi::{Address, Token};
 use ethereum_types::{H256, U128, U256};
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Marker trait for `Tokenizable` types that are can tokenized to and from a
 /// `Token::Array` and `Token:FixedArray`.

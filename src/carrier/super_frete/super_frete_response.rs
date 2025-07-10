@@ -11,8 +11,6 @@ pub enum SuperFreteResponse<S, T> {
 /// SuperFrete error
 #[derive(Debug, serde::Deserialize)]
 pub struct SuperFreteError<S> {
-  /// Error
-  pub error: Option<S>,
   /// Message
   pub message: S,
 }

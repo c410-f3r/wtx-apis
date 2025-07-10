@@ -46,12 +46,13 @@ pub struct CallRequest {
 mod tests {
   use crate::blockchain::ethereum::CallRequest;
   use ethereum_types::Address;
+  use wtx::de::decode_hex_to_slice;
 
   #[test]
   fn should_serialize_call_request() {
     let call_request = CallRequest {
       access_list: None,
-      data: Some(hex::decode("010203").unwrap().into()),
+      data: Some(decode_hex_to_slice::<false>(b"010203", &mut [0; 8]).unwrap().to_vec().into()),
       from: None,
       gas_price: None,
       gas: Some(21_000.into()),
@@ -87,6 +88,9 @@ mod tests {
     assert_eq!(deserialized.gas, Some(21_000.into()));
     assert_eq!(deserialized.gas_price, None);
     assert_eq!(deserialized.value, Some(5_000_000.into()));
-    assert_eq!(deserialized.data, Some(hex::decode("010203").unwrap().into()));
+    assert_eq!(
+      deserialized.data,
+      Some(decode_hex_to_slice::<false>(b"010203", &mut [0; 8]).unwrap().to_vec().into())
+    );
   }
 }

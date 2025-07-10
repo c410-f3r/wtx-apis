@@ -1,4 +1,4 @@
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Value or Array
 #[derive(Debug)]

@@ -1,9 +1,17 @@
 #![allow(dead_code, reason = "Conditional features")]
 
-use chrono::{Datelike, NaiveDate};
-use serde::{Deserialize, de::Error};
+use serde::{Deserialize as _, de::Error};
+use wtx::calendar::{CalendarToken, Date};
 
-pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<NaiveDate>, D::Error>
+static TOKENS: &[CalendarToken] = &[
+  CalendarToken::FourDigitYear,
+  CalendarToken::Dash,
+  CalendarToken::TwoDigitMonth,
+  CalendarToken::Dash,
+  CalendarToken::TwoDigitDay,
+];
+
+pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Date>, D::Error>
 where
   D: serde::de::Deserializer<'de>,
 {
@@ -12,20 +20,23 @@ where
     return Ok(None);
   }
   Ok(Some(
-    NaiveDate::parse_from_str(str, "%Y-%m-%d").map_err(|_err| Error::custom("Invalid date"))?,
+    Date::parse(str.as_bytes(), TOKENS.iter().copied())
+      .map_err(|_err| Error::custom("Invalid date"))?,
   ))
 }
 
-pub(crate) fn serialize<S>(value: &Option<NaiveDate>, serializer: S) -> Result<S::Ok, S::Error>
+#[expect(clippy::ref_option, reason = "serde's signature")]
+#[expect(clippy::trivially_copy_pass_by_ref, reason = "serde's signature")]
+pub(crate) fn serialize<S>(value: &Option<Date>, serializer: S) -> Result<S::Ok, S::Error>
 where
   S: serde::Serializer,
 {
   match value {
     Some(elem) => serializer.collect_str(&format_args!(
       "{:04}-{:02}-{:02}",
-      elem.year(),
-      elem.month(),
-      elem.day(),
+      elem.year().num(),
+      elem.month().num(),
+      elem.day().num(),
     )),
     None => serializer.serialize_none(),
   }

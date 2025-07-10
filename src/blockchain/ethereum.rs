@@ -6,7 +6,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::dnsn::SerdeJson};
 //! use wtx_apis::blockchain::ethereum::{Ethereum, PkgsAux};
 //!
 //! let mut pkgs_aux =
@@ -47,7 +47,7 @@ use wtx::client_api_framework::{Api, misc::RequestThrottling};
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Ethereum {
   /// If some, tells that each request must respect calling intervals.
   pub rt: Option<RequestThrottling>,

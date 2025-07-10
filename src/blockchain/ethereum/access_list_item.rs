@@ -1,6 +1,6 @@
 use ethabi::Address;
 use ethereum_types::H256;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Access list item
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

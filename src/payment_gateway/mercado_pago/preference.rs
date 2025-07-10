@@ -1,7 +1,9 @@
 use crate::payment_gateway::mercado_pago::{BackUrls, Item, Payer, PaymentMethods, Shipments};
-use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::{
+  calendar::{DateTime, DynTz},
+  collection::Vector,
+};
 
 /// Differential pricing configuration.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -24,9 +26,9 @@ pub struct Preference<T> {
   /// Indicates if the preference expires.
   pub expires: Option<bool>,
   /// Start date of the preference validity.
-  pub expiration_date_from: Option<DateTime<Utc>>,
+  pub expiration_date_from: Option<DateTime<DynTz>>,
   /// End date of the preference validity.
-  pub expiration_date_to: Option<DateTime<Utc>>,
+  pub expiration_date_to: Option<DateTime<DynTz>>,
   /// External reference for synchronization with the payment system.
   pub external_reference: Option<T>,
   /// Information about the items.

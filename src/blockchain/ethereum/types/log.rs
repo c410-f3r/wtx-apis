@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::Bytes;
 use ethereum_types::{H160, H256, U64, U256};
-use wtx::misc::{ArrayString, Vector};
+use wtx::collection::{ArrayStringU8, Vector};
 
 /// A log produced by a transaction.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -26,7 +26,7 @@ pub struct Log {
   /// Log Index in Transaction
   pub transaction_log_index: Option<U256>,
   /// Log Type
-  pub log_type: Option<ArrayString<16>>,
+  pub log_type: Option<ArrayStringU8<16>>,
   /// Removed
   pub removed: Option<bool>,
 }
@@ -52,7 +52,7 @@ mod tests {
   use crate::blockchain::ethereum::types::log::Log;
   use ethabi::Address;
   use ethereum_types::{H160, H256};
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[test]
   fn is_removed_removed_true() {

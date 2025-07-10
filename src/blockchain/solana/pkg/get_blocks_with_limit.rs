@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getBlocksWithLimit")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux};
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

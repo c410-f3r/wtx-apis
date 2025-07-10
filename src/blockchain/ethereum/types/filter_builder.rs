@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{BlockNumber, Filter, ValueOrArray};
 use ethereum_types::{H160, H256};
-use wtx::misc::{Vector, Wrapper};
+use wtx::{collection::Vector, misc::Wrapper};
 
 /// Filter Builder
 #[derive(Debug, Default)]

@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("eth_getLogs")),
   id(crate::blockchain::ethereum::EthereumId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::ethereum::{Filter, HttpPkgsAux, Log};
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

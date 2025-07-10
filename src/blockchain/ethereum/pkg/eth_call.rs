@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("eth_call")),
   id(crate::blockchain::ethereum::EthereumId),
   transport(http)

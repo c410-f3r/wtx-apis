@@ -1,5 +1,5 @@
 use crate::{
-  misc::{_apply_auth_header, _manage_client_credentials, OauthResponse},
+  misc::{_manage_client_credentials, OauthResponse},
   payment_gateway::mercado_pago::{MercadoPago, OauthReq},
 };
 use wtx::{
@@ -7,11 +7,13 @@ use wtx::{
     HttpParams,
     transport::{SendingReceivingTransport, TransportParams},
   },
-  data_transformation::{
-    dnsn::De,
-    format::{VerbatimRequest, VerbatimResponse},
+  collection::{IndexedStorageMut, Vector},
+  de::{
+    DecodeSeq, Encode,
+    format::De,
+    protocol::{VerbatimDecoder, VerbatimEncoder},
   },
-  misc::{DecodeSeq, Encode, Vector},
+  http::ReqBuilder,
 };
 
 pub(crate) async fn manage_before_sending<DRSR, T>(
@@ -19,9 +21,9 @@ pub(crate) async fn manage_before_sending<DRSR, T>(
   buffer: &mut Vector<u8>,
 ) -> crate::Result<()>
 where
-  for<'any> VerbatimRequest<OauthReq<'any>>: Encode<De<&'any mut DRSR>>,
+  for<'any> VerbatimEncoder<OauthReq<'any>>: Encode<De<&'any mut DRSR>>,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'de> VerbatimResponse<OauthResponse<&'de str>>: DecodeSeq<'de, De<DRSR>>,
+  for<'de> VerbatimDecoder<OauthResponse<&'de str>>: DecodeSeq<'de, De<DRSR>>,
 {
   trans_params.ext_req_params_mut().uri.push_path(format_args!("/oauth/token"))?;
   let is_test = api.is_test;
@@ -33,7 +35,8 @@ where
     Ok(())
   })
   .await?;
+  let headers = &mut trans_params.ext_req_params_mut().headers;
+  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.common.access_token))?;
   trans_params.ext_req_params_mut().uri.truncate_with_initial_len();
-  _apply_auth_header(trans_params, &api.common.access_token)?;
   Ok(())
 }

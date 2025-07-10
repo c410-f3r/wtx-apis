@@ -14,7 +14,7 @@ pub use vault_response::*;
 use wtx::client_api_framework::Api;
 
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http))]
 pub struct Vault {
   token: String,
 }

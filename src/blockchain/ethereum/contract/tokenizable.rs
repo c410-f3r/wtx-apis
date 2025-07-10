@@ -2,7 +2,10 @@ use crate::blockchain::ethereum::{Bytes, contract::TokenizableItem};
 use alloc::{format, string::String};
 use ethabi::{Address, Token};
 use ethereum_types::{H256, U128, U256};
-use wtx::misc::{ArrayVector, Vector, Wrapper};
+use wtx::{
+  collection::{ArrayVectorU32, IndexedStorageMut, Vector},
+  misc::Wrapper,
+};
 
 /// Simplified output type for single value.
 pub trait Tokenizable {
@@ -23,7 +26,7 @@ where
   fn from_token(token: Token) -> crate::Result<Self> {
     if let Token::FixedArray(tokens) = token {
       let len = tokens.len();
-      return ArrayVector::from_iter(tokens.into_iter().flat_map(T::from_token))
+      return ArrayVectorU32::from_iter(tokens.into_iter().flat_map(T::from_token))
         .map_err(wtx::Error::from)?
         .into_inner()
         .map_err(|_err| {

@@ -11,12 +11,12 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::{
-    misc::{RequestLimit, RequestThrottling},
+    misc::{PairMut, RequestLimit, RequestThrottling},
     network::{HttpParams, WsParams, transport::SendingReceivingTransport},
   },
-  data_transformation::dnsn::SerdeJson,
+  collection::Vector,
+  de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::Vector,
 };
 
 const HTTP_URI: &str = "https://api.testnet.solana.com";
@@ -47,7 +47,7 @@ static BOB_PK: SolanaAddressHash = [
   24, 147, 209, 196, 197, 185, 156, 48, 170, 96, 192, 119, 193, 150, 129, 12, 221, 102, 119, 84,
   33, 221, 67, 224, 185, 107, 130, 157, 207, 85, 161, 30,
 ];
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static SOLANA: LazyLock<Mutex<Solana>> = LazyLock::new(|| {
   Mutex::new(Solana::new(Some(RequestThrottling::from_rl(RequestLimit::new(
@@ -831,13 +831,12 @@ create_http_test!(#[],
       .unwrap()
       .result
       .unwrap();
-    Solana::confirm_transaction(
+    let mut pair_mut = PairMut::new(&mut *pkgs_aux, &mut *trans);
+    confirm_solana_tx!(
       ConfirmTransactionOptions::default(),
-      &mut (&mut *pkgs_aux, &mut *trans).into(),
-      &tx_hash,
-    )
-    .await
-    .unwrap();
+      &mut pair_mut,
+      &tx_hash
+    ).await.unwrap();
 
     let _res = trans
       .send_pkg_recv_decode_contained(
@@ -1002,7 +1001,7 @@ fn http() -> (SerdeJson, HttpParams) {
 #[cfg(feature = "ed25519-dalek")]
 async fn latest_blockhash(
   pkgs_aux: &mut SolanaMutPkgsAux<'_, SerdeJson, HttpParams>,
-  mut trans: &ClientPoolTokioRustls<fn()>,
+  mut trans: &ClientPoolTokioRustls<fn(&()), (), ()>,
 ) -> SolanaAddressHash {
   trans
     .send_pkg_recv_decode_contained(
@@ -1019,7 +1018,7 @@ async fn latest_blockhash(
 
 async fn slot(
   pkgs_aux: &mut SolanaMutPkgsAux<'_, SerdeJson, HttpParams>,
-  mut trans: &ClientPoolTokioRustls<fn()>,
+  mut trans: &ClientPoolTokioRustls<fn(&()), (), ()>,
 ) -> u64 {
   trans
     .send_pkg_recv_decode_contained(&mut pkgs_aux.get_slot().data(None).build(), pkgs_aux)

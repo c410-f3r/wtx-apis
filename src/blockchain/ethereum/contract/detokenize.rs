@@ -1,7 +1,7 @@
 use crate::blockchain::ethereum::contract::Tokenizable;
 use alloc::format;
 use ethabi::Token;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Output type possible to deserialize from Contract ABI
 pub trait Detokenize {

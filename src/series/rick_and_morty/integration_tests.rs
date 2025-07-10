@@ -3,11 +3,11 @@ use alloc::string::String;
 use std::sync::LazyLock;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  data_transformation::dnsn::SerdeJson,
+  de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 
 create_http_test!(#[], RickAndMorty, http(), character, &*CLIENT, |pkgs_aux, trans| async {

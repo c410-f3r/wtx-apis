@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getLargestAccounts")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)
@@ -8,7 +8,7 @@ pub(crate) mod pkg {
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, SolanaAddressHashStr,
   };
   use serde::Serialize;
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

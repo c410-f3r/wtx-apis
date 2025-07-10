@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getRecentPrioritizationFees")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)
@@ -6,7 +6,7 @@
 pub(crate) mod pkg {
   use crate::blockchain::solana::HttpPkgsAux;
   use serde::Serialize;
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

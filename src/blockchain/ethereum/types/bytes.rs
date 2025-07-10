@@ -1,4 +1,4 @@
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Raw bytes wrapper
 #[derive(Debug, Default, Eq, PartialEq)]
@@ -17,10 +17,11 @@ where
 mod serde {
   use crate::blockchain::ethereum::Bytes;
   use alloc::string::String;
-  use core::fmt::{Display, Formatter};
-  use serde::{
-    Deserialize, Deserializer, Serialize, Serializer,
-    de::{Unexpected, Visitor},
+  use core::fmt::Formatter;
+  use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
+  use wtx::{
+    collection::{IndexedStorageMut, Vector},
+    de::{HexDisplay, decode_hex_to_slice},
   };
 
   impl<'de> Deserialize<'de> for Bytes {
@@ -39,7 +40,7 @@ mod serde {
     where
       S: Serializer,
     {
-      serializer.collect_str(&HexDisplay(&self.0))
+      serializer.collect_str(&HexDisplay::<true>(&self.0))
     }
   }
 
@@ -58,13 +59,12 @@ mod serde {
     where
       E: serde::de::Error,
     {
-      if value.len() >= 2 && value.get(..2).unwrap_or_default() == "0x" {
-        Ok(Bytes(
-          hex::decode(value.get(2..).unwrap_or_default()).map_err(|err| E::custom(err))?.into(),
-        ))
-      } else {
-        Err(E::invalid_value(Unexpected::Str(value), &"0x prefix"))
-      }
+      let mut vector = Vector::from_vec(alloc::vec![0; value.len() / 2]);
+      let len = decode_hex_to_slice::<true>(value.as_bytes(), &mut vector)
+        .map_err(|err| E::custom(err))?
+        .len();
+      vector.truncate(len);
+      Ok(Bytes(vector))
     }
 
     #[inline]
@@ -73,19 +73,6 @@ mod serde {
       E: serde::de::Error,
     {
       self.visit_str(value.as_ref())
-    }
-  }
-
-  struct HexDisplay<'bytes>(&'bytes [u8]);
-
-  impl<'bytes> Display for HexDisplay<'bytes> {
-    #[inline]
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-      write!(f, "0x")?;
-      for &byte in self.0.iter() {
-        write!(f, "{:02x}", byte)?;
-      }
-      Ok(())
     }
   }
 }

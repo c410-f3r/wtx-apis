@@ -1,3 +1,5 @@
+use wtx::calendar::{DateTime, DynTz};
+
 /// A struct representing the payer's address information.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Address<T> {
@@ -24,7 +26,7 @@ pub struct Payer<T> {
   /// Information about the buyer's address.
   pub address: Option<Address<T>>,
   /// Buyer's registration date.
-  pub date_created: Option<T>,
+  pub date_created: Option<DateTime<DynTz>>,
   /// Buyer's email.
   pub email: Option<T>,
   /// Information about the buyer's identification.

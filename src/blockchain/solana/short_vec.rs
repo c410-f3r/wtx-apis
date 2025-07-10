@@ -2,7 +2,6 @@ mod short_u16;
 mod short_u16_visitor;
 mod short_vec_visitor;
 
-use cl_aux::{Push, SingleTypeStorage, WithCapacity};
 use core::marker::PhantomData;
 use serde::{
   Deserialize, Serialize,
@@ -12,6 +11,10 @@ use serde::{
 use short_u16::*;
 use short_u16_visitor::*;
 use short_vec_visitor::*;
+use wtx::{
+  collection::{IndexedStorageMut, IndexedStorageSlice},
+  misc::SingleTypeStorage,
+};
 
 const MAX_ENCODING_LENGTH: usize = 3;
 
@@ -38,8 +41,8 @@ where
 pub(crate) fn deserialize<'de, D, T>(deserializer: D) -> Result<T, D::Error>
 where
   D: Deserializer<'de>,
-  T: Push<T::Item> + SingleTypeStorage + WithCapacity<Input = usize>,
-  T::Item: Deserialize<'de>,
+  T: Default + IndexedStorageMut<T::Item> + SingleTypeStorage,
+  <T::Slice as IndexedStorageSlice>::Unit: Deserialize<'de>,
 {
   let visitor = ShortVecVisitor(PhantomData);
   deserializer.deserialize_tuple(usize::MAX, visitor)

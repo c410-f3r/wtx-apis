@@ -16,7 +16,7 @@ pub struct MercadoPagoError<T> {
   /// Message
   pub message: T,
   /// Status
-  pub status: u16,
+  pub status: Option<u16>,
 }
 
 impl<S, T> MercadoPagoResponse<S, T> {

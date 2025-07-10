@@ -1,4 +1,7 @@
-use chrono::{DateTime, Utc};
+use wtx::{
+  calendar::{DateTime, DynTz},
+  de::U64String,
+};
 
 /// WebHook notification
 #[derive(Debug, Eq, PartialEq, serde::Deserialize)]
@@ -10,7 +13,7 @@ pub struct Notification {
   /// See [NotificationData].
   pub data: NotificationData,
   /// Date created
-  pub date_created: DateTime<Utc>,
+  pub date_created: DateTime<DynTz>,
   /// Id
   pub id: u64,
   /// Live mode
@@ -18,7 +21,7 @@ pub struct Notification {
   /// See [NotificationTy].
   pub r#type: NotificationTy,
   /// User id
-  pub user_id: u64,
+  pub user_id: U64String,
 }
 
 /// Api version
@@ -58,7 +61,7 @@ pub enum NotificationTy {
 #[derive(Debug, Eq, PartialEq, serde::Deserialize)]
 pub struct NotificationData {
   /// Id
-  pub id: u64,
+  pub id: U64String,
 }
 
 #[cfg(test)]
@@ -66,7 +69,7 @@ mod tests {
   use crate::payment_gateway::mercado_pago::{
     ApiVersion, Notification, NotificationAction, NotificationTy,
   };
-  use chrono::DateTime;
+  use wtx::calendar::DateTime;
 
   #[test]
   fn json() {
@@ -77,15 +80,15 @@ mod tests {
       .unwrap();
       assert_eq!(notification.action, NotificationAction::PaymentCreated);
       assert_eq!(notification.api_version, ApiVersion::V1);
-      assert_eq!(notification.data.id, 7547658345);
+      assert_eq!(&notification.data.id, "7547658345");
       assert_eq!(
         notification.date_created,
-        DateTime::parse_from_rfc3339("2025-01-14T19:19:25Z").unwrap()
+        DateTime::from_iso_8601(b"2025-01-14T19:19:25").unwrap(),
       );
       assert_eq!(notification.id, 636490643061);
       assert_eq!(notification.live_mode, false);
       assert_eq!(notification.r#type, NotificationTy::Payment);
-      assert_eq!(notification.user_id, 5437642344);
+      assert_eq!(&notification.user_id, "5437642344");
     }
 
     {
@@ -95,15 +98,15 @@ mod tests {
       .unwrap();
       assert_eq!(notification.action, NotificationAction::PaymentUpdated);
       assert_eq!(notification.api_version, ApiVersion::V1);
-      assert_eq!(notification.data.id, 123456);
+      assert_eq!(&notification.data.id, "123456");
       assert_eq!(
         notification.date_created,
-        DateTime::parse_from_rfc3339("2021-11-01T02:02:02Z").unwrap()
+        DateTime::from_iso_8601(b"2021-11-01T02:02:02").unwrap()
       );
       assert_eq!(notification.id, 123456);
       assert_eq!(notification.live_mode, false);
       assert_eq!(notification.r#type, NotificationTy::Payment);
-      assert_eq!(notification.user_id, 7657454343);
+      assert_eq!(&notification.user_id, "7657454343");
     }
   }
 }

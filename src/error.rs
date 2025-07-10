@@ -11,8 +11,6 @@ pub enum Error {
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
-  /// See [`cl_aux::Error`].
-  ClAux(cl_aux::Error),
   /// See [ed25519_dalek::SignatureError].
   #[cfg(feature = "ed25519-dalek")]
   Ed25519Dalek(ed25519_dalek::SignatureError),
@@ -77,6 +75,9 @@ pub enum Error {
   /// The system only supports v0 messages
   #[cfg(feature = "solana")]
   SolanaUnsupportedMessageFormat,
+  #[cfg(feature = "solana")]
+  /// Transaction error
+  SolanaTxError(crate::blockchain::solana::TransactionError),
 
   // SuperFrete
   //
@@ -94,13 +95,6 @@ impl From<bincode::Error> for Error {
   #[inline]
   fn from(from: bincode::Error) -> Self {
     Self::Bincode(from)
-  }
-}
-
-impl From<cl_aux::Error> for Error {
-  #[inline]
-  fn from(from: cl_aux::Error) -> Self {
-    Self::ClAux(from)
   }
 }
 
@@ -175,11 +169,7 @@ where
   #[inline]
   fn from(from: crate::carrier::super_frete::SuperFreteError<S>) -> Self {
     Self::SuperFreteError(
-      crate::carrier::super_frete::SuperFreteError {
-        error: from.error.map(|el| el.lease().into()),
-        message: from.message.lease().into(),
-      }
-      .into(),
+      crate::carrier::super_frete::SuperFreteError { message: from.message.lease().into() }.into(),
     )
   }
 }
