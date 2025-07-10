@@ -6,7 +6,7 @@ ed25519-dalek = { default-features = false, optional = true, version = "2.0" }
 ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
 ethereum-types = { default-features = false, features = ["serialize"], optional = true, version = "0.14" }
 primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
-rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
+rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.37" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
