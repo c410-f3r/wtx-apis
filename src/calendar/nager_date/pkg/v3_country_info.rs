@@ -1,10 +1,10 @@
-#[wtx_macros::pkg(data_format(json), id(crate::calendar::nager_date::NagerDateId), transport(http))]
+#[wtx::pkg(data_format(json), id(crate::calendar::nager_date::NagerDateId), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::NagerDateHttpPkgsAux;
   use alloc::boxed::Box;
   use wtx::{
     client_api_framework::network::{HttpParams, transport::TransportParams},
-    misc::Vector,
+    collection::Vector,
   };
 
   #[pkg::aux]

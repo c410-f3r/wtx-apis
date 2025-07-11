@@ -4,7 +4,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::dnsn::SerdeJson};
 //! use wtx_apis::series::rick_and_morty::{PkgsAux, RickAndMorty};
 //!
 //! let mut pkgs_aux =
@@ -26,7 +26,7 @@ pub use pkg::*;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
 pub struct RickAndMorty;
 
 wtx::create_packages_aux_wrapper!();

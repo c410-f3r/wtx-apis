@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   GenericTransaction, Reward, SolanaAddressHashStr, SolanaSignatureHashStr, TransactionMeta,
   TransactionVersion,
 };
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// A collection of transactions.
 #[derive(Debug, serde::Deserialize)]

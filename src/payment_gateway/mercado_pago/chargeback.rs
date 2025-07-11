@@ -1,4 +1,7 @@
-use wtx::misc::Vector;
+use wtx::{
+  calendar::{DateTime, DynTz},
+  collection::Vector,
+};
 
 /// Status of a chargeback
 #[derive(Debug, serde::Deserialize)]
@@ -24,9 +27,9 @@ pub struct Chargeback<T> {
   /// Currency of the chargeback amount.
   pub currency: T,
   /// Creation date of the chargeback.
-  pub date_created: T,
+  pub date_created: DateTime<DynTz>,
   /// Last modification date of the chargeback.
-  pub date_last_updated: T,
+  pub date_last_updated: DateTime<DynTz>,
   /// List of documentation received from the seller.
   pub documentation: Vector<ChargebackDocumentation<T>>,
   /// Indicates if the seller needs to send documentation for this chargeback.

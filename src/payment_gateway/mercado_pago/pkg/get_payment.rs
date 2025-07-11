@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json),
   id(crate::payment_gateway::mercado_pago::MercadoPagoId),
   transport(http)
@@ -12,8 +12,10 @@ pub(crate) mod pkg {
       HttpParams,
       transport::{SendingReceivingTransport, TransportParams},
     },
-    data_transformation::dnsn::SerdeJson,
-    misc::{LeaseMut, Vector},
+    collection::Vector,
+    de::format::SerdeJson,
+    http::Method,
+    misc::LeaseMut,
   };
 
   #[pkg::aux]
@@ -24,7 +26,7 @@ pub(crate) mod pkg {
     api: &mut MercadoPago,
     bytes: &mut Vector<u8>,
     drsr: &mut __DRSR,
-    params: &mut u64,
+    params: &mut &str,
     trans: &mut __TRANSPORT,
     trans_params: &mut HttpParams,
   ) -> crate::Result<()>
@@ -33,12 +35,13 @@ pub(crate) mod pkg {
     __DRSR: LeaseMut<SerdeJson>,
   {
     manage_before_sending((api, drsr.lease_mut(), trans, trans_params), bytes).await?;
+    trans_params.ext_req_params_mut().method = Method::Get;
     trans_params.ext_req_params_mut().uri.push_path(format_args!("/v1/payments/{}", *params))?;
     Ok(())
   }
 
   #[pkg::params]
-  pub type GetPaymentParams = u64;
+  pub type GetPaymentParams<'str> = &'str str;
 
   #[pkg::req_data]
   #[derive(Debug, serde::Serialize)]

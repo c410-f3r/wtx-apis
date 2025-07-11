@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Represents package type
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

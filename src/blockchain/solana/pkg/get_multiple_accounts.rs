@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(
+#[wtx::pkg(
   data_format(json_rpc("getMultipleAccounts")),
   id(crate::blockchain::solana::SolanaId),
   transport(http)
@@ -7,7 +7,7 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Account, AccountEncoding, Commitment, DataSlice, HttpPkgsAux, JsonRpcResponseResultWithContext,
   };
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

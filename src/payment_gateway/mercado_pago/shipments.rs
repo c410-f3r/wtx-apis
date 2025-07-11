@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::collection::Vector;
 
 /// Free shipping method.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

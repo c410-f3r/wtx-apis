@@ -12,6 +12,7 @@ mod quote_freight_res;
 mod send_freight_req;
 mod send_freight_res;
 mod super_frete_response;
+mod webhook;
 
 use alloc::string::String;
 pub use cancel_order_req::*;
@@ -24,6 +25,7 @@ pub use quote_freight_res::*;
 pub use send_freight_req::*;
 pub use send_freight_res::*;
 pub use super_frete_response::*;
+pub use webhook::*;
 
 /// Development URI
 pub static DEV_URI: &str = "https://sandbox.superfrete.com";
@@ -31,15 +33,14 @@ pub static DEV_URI: &str = "https://sandbox.superfrete.com";
 pub static PROD_URI: &str = "https://api.superfrete.com";
 
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
 pub struct SuperFrete {
   token: String,
 }
 
 impl SuperFrete {
   /// Creates a new instance with the given token.
-  pub fn new(mut token: String) -> Self {
-    token.insert_str(0, "Bearer ");
+  pub fn new(token: String) -> Self {
     SuperFrete { token }
   }
 }

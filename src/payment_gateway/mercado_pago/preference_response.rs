@@ -1,6 +1,9 @@
 use crate::payment_gateway::mercado_pago::{BackUrls, Item, Payer, PaymentMethods, Shipments};
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::{
+  calendar::{DateTime, DynTz},
+  collection::Vector,
+};
 
 /// Struct representing a preference for MercadoPago.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -18,16 +21,16 @@ pub struct PreferenceResponse<T> {
   pub binary_mode: Option<bool>,
   /// Exclusive ID used to identify the client. Obtained from the credentials used to create the preference. It is the Application ID.
   pub client_id: Option<T>,
-  /// Exclusive ID used to identify the collector, same as Cust ID.
-  pub collector_id: Option<i32>,
+  /// Exclusive ID used to identify the collector.
+  pub collector_id: Option<u64>,
   /// Date of registration.
-  pub date_created: Option<T>,
+  pub date_created: Option<DateTime<DynTz>>,
   /// Date in the format "yyyy-MM-dd'T'HH:mm:ssz" indicating the start of the validity period of the preference.
   /// This can be used for limited sales, where sellers make an offer between certain dates.
-  pub expiration_date_from: Option<T>,
+  pub expiration_date_from: Option<DateTime<DynTz>>,
   /// Date in the format "yyyy-MM-dd'T'HH:mm:ssz" indicating the end of the validity period of the preference.
   /// This can be used for limited sales, where sellers make an offer between certain dates.
-  pub expiration_date_to: Option<T>,
+  pub expiration_date_to: Option<DateTime<DynTz>>,
   /// Preference determining whether a preference expires.
   pub expires: Option<bool>,
   /// Exclusive auto-generated ID that identifies the preference.

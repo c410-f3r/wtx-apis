@@ -11,25 +11,11 @@ pub enum Error {
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
-  /// See [`cl_aux::Error`].
-  ClAux(cl_aux::Error),
   /// See [ed25519_dalek::SignatureError].
   #[cfg(feature = "ed25519-dalek")]
   Ed25519Dalek(ed25519_dalek::SignatureError),
-  /// See [ethabi::Error]
-  #[cfg(feature = "ethereum")]
-  EthAbi(ethabi::Error),
-  /// See [primitive_types::Error].
-  #[cfg(feature = "ethereum")]
-  PrimitiveTypes(primitive_types::Error),
   /// See [`wtx::Error`].
   Wtx(wtx::Error),
-
-  // Ethereum
-  //
-  /// Bad data serialization
-  #[cfg(feature = "ethereum")]
-  TokensInvalidOutputType(String),
 
   // Internal
   //
@@ -77,6 +63,9 @@ pub enum Error {
   /// The system only supports v0 messages
   #[cfg(feature = "solana")]
   SolanaUnsupportedMessageFormat,
+  #[cfg(feature = "solana")]
+  /// Transaction error
+  SolanaTxError(crate::blockchain::solana::TransactionError),
 
   // SuperFrete
   //
@@ -97,34 +86,11 @@ impl From<bincode::Error> for Error {
   }
 }
 
-impl From<cl_aux::Error> for Error {
-  #[inline]
-  fn from(from: cl_aux::Error) -> Self {
-    Self::ClAux(from)
-  }
-}
-
 #[cfg(feature = "ed25519-dalek")]
 impl From<ed25519_dalek::SignatureError> for Error {
   #[inline]
   fn from(from: ed25519_dalek::SignatureError) -> Self {
     Self::Ed25519Dalek(from)
-  }
-}
-
-#[cfg(feature = "ethereum")]
-impl From<ethabi::Error> for Error {
-  #[inline]
-  fn from(from: ethabi::Error) -> Self {
-    Self::EthAbi(from)
-  }
-}
-
-#[cfg(feature = "ethereum")]
-impl From<primitive_types::Error> for Error {
-  #[inline]
-  fn from(from: primitive_types::Error) -> Self {
-    Self::PrimitiveTypes(from)
   }
 }
 
@@ -175,11 +141,7 @@ where
   #[inline]
   fn from(from: crate::carrier::super_frete::SuperFreteError<S>) -> Self {
     Self::SuperFreteError(
-      crate::carrier::super_frete::SuperFreteError {
-        error: from.error.map(|el| el.lease().into()),
-        message: from.message.lease().into(),
-      }
-      .into(),
+      crate::carrier::super_frete::SuperFreteError { message: from.message.lease().into() }.into(),
     )
   }
 }

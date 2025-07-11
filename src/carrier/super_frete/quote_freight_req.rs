@@ -6,10 +6,13 @@ pub struct QuoteFreightReqGeneric<P, S> {
   /// Origin postal code.
   pub from: QuoteFreightReqPostalCode<S>,
   /// Optional freight service configurations.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub options: Option<QuoteFreightReqOptions>,
   /// Optional package information for the freight.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub package: Option<QuoteFreightReqPackage>,
   /// Optional products
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub products: Option<P>,
   /// Possible services separated by commas
   pub services: S,
@@ -21,12 +24,16 @@ pub struct QuoteFreightReqGeneric<P, S> {
 #[derive(Debug, serde::Serialize)]
 pub struct QuoteFreightReqOptions {
   /// Declared value for insurance purposes.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub insurance_value: Option<Decimal>,
   /// Indicates if "own hand" freight service is requested.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub own_hand: Option<bool>,
   /// Indicates if delivery receipt is required.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub receipt: Option<bool>,
   /// Indicates if `insurance_value` should be used for insurance calculation.
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub use_insurance_value: Option<bool>,
 }
 

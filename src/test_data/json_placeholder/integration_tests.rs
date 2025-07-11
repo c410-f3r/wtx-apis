@@ -2,7 +2,7 @@ use crate::test_data::json_placeholder::{GenericParams, JsonPlaceholder, PkgsAux
 use std::sync::LazyLock;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  data_transformation::dnsn::SerdeJson,
+  de::format::SerdeJson,
   http::{
     Method,
     client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
@@ -10,7 +10,7 @@ use wtx::{
 };
 
 const DEFAULT_GP: GenericParams<'_> = GenericParams::new(None, Method::Get, None, &[]);
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 
 create_http_test!(#[], JsonPlaceholder, http(), albums, &*CLIENT, |pkgs_aux, trans| async {

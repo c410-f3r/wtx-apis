@@ -13,25 +13,26 @@ use wtx::{
     },
     pkg::PkgsAux,
   },
-  data_transformation::{
-    dnsn::{De, DecodeWrapper},
-    format::VerbatimResponse,
+  collection::{ArrayStringU16, IndexedStorageMut, Vector},
+  de::{
+    Decode,
+    format::{De, DecodeWrapper},
+    protocol::VerbatimDecoder,
   },
   http::{Method, Mime},
-  misc::{ArrayString, Decode, Vector},
 };
 
-pub(crate) type TokenArray = ArrayString<{ 1024 + 512 }>;
+pub(crate) type TokenArray = ArrayStringU16<{ 2048 + 256 }>;
 
 /// How the Oauth token should be created.
 #[derive(Clone, Copy, Debug, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum OauthGrantType {
   /// Based on redirects with user interaction
-  AuthorizationToken,
+  AuthorizationCode,
   /// No user interaction
   ClientCredentials,
-  /// Refreshes [`OauthGrantType::AuthorizationToken`] tokens.
+  /// Refreshes [`OauthGrantType::AuthorizationCode`] tokens.
   RefreshToken,
 }
 
@@ -39,7 +40,7 @@ impl From<OauthGrantType> for &'static str {
   #[inline]
   fn from(from: OauthGrantType) -> Self {
     match from {
-      OauthGrantType::AuthorizationToken => "authorization_token",
+      OauthGrantType::AuthorizationCode => "authorization_code",
       OauthGrantType::ClientCredentials => "client_credentials",
       OauthGrantType::RefreshToken => "refresh_token",
     }
@@ -84,49 +85,59 @@ pub struct OauthResponse<T> {
   pub token_type: Option<T>,
 }
 
+/// Should be called before invoking [`send_oauth_req`].
 #[inline]
-fn encode_req(
+pub fn encode_oauth_req(
   bytes: &mut Vector<u8>,
-  (client_id, client_secret, refresh_token): (&str, &str, &str),
-  grant_type: OauthGrantType,
+  req: &OauthRequest<'_>,
   enc_cb: impl FnOnce(&mut Vector<u8>) -> crate::Result<()>,
 ) -> crate::Result<()> {
   bytes.clear();
   let _ = bytes.extend_from_copyable_slices([
     "grant_type=".as_bytes(),
-    <&str>::from(grant_type).as_bytes(),
+    <&str>::from(req.grant_type).as_bytes(),
     "&client_id=".as_bytes(),
-    client_id.as_bytes(),
+    req.client_id.as_bytes(),
     "&client_secret=".as_bytes(),
-    client_secret.as_bytes(),
+    req.client_secret.as_bytes(),
   ])?;
-  if let OauthGrantType::RefreshToken = grant_type {
-    let slices = ["&refresh_token=".as_bytes(), refresh_token.as_bytes()];
+  if let Some(elem) = req.code {
+    let slices = ["&code=".as_bytes(), elem.as_bytes()];
+    let _ = bytes.extend_from_copyable_slices(slices)?;
+  }
+  if let Some(elem) = req.redirect_uri {
+    let slices = ["&redirect_uri=".as_bytes(), elem.as_bytes()];
+    let _ = bytes.extend_from_copyable_slices(slices)?;
+  }
+  if let Some(elem) = req.refresh_token {
+    let slices = ["&refresh_token=".as_bytes(), elem.as_bytes()];
     let _ = bytes.extend_from_copyable_slices(slices)?;
   }
   enc_cb(bytes)?;
   Ok(())
 }
 
+/// Sends a [`OauthRequest`] that should first be encoded with [`encode_oauth_req`].
 #[inline]
-async fn send_req<'de, A, DRSR, T>(
+pub async fn send_oauth_req<'de, A, DRSR, T>(
   (api, drsr, mut trans, trans_params): (&mut A, &mut DRSR, T, &mut HttpParams),
   bytes: &'de mut Vector<u8>,
-) -> Result<VerbatimResponse<OauthResponse<&'de str>>, A::Error>
+) -> Result<OauthResponse<&'de str>, A::Error>
 where
   A: Api,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimResponse<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
 {
-  trans_params.reset();
-  trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
+  trans_params.ext_req_params_mut().headers.clear();
   trans_params.ext_req_params_mut().method = Method::Post;
+  trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);
+  pkgs_aux.log_body();
   let rslt = trans.send_bytes_recv(SendBytesSource::PkgsAux, &mut pkgs_aux).await;
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);
   rslt?;
   let dw = &mut DecodeWrapper::new(bytes);
-  let res = VerbatimResponse::<OauthResponse<&str>>::decode(pkgs_aux.drsr, dw)?;
-  Ok(res)
+  let res = VerbatimDecoder::<OauthResponse<&str>>::decode(pkgs_aux.drsr, dw)?;
+  Ok(res.data)
 }

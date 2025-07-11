@@ -56,7 +56,7 @@ pub struct SendFreightReqGeneric<P, S> {
   /// Products
   pub products: Option<P>,
   /// Service ID
-  pub service: u8,
+  pub service: u16,
   /// To address
   pub to: SendFreightReqAddressTo<S>,
   /// Volumes

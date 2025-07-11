@@ -1,5 +1,8 @@
 use rust_decimal::Decimal;
-use wtx::misc::Vector;
+use wtx::{
+  calendar::{DateTime, DynTz},
+  collection::Vector,
+};
 
 /// Response's result
 #[derive(Debug, serde::Deserialize)]
@@ -23,7 +26,7 @@ pub struct Refund<T> {
   #[serde(with = "rust_decimal::serde::float")]
   pub amount: Decimal,
   /// Date created
-  pub date_created: T,
+  pub date_created: DateTime<DynTz>,
   /// Id
   pub id: u64,
   /// Payment Id

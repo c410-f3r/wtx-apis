@@ -1,4 +1,4 @@
-#[wtx_macros::pkg(data_format(json), id(crate::secret_management::vault::VaultId), transport(http))]
+#[wtx::pkg(data_format(json), id(crate::secret_management::vault::VaultId), transport(http))]
 pub(crate) mod pkg {
   use crate::secret_management::vault::{HttpPkgsAux, PairVector, Vault, VaultResponse};
   use alloc::string::String;
@@ -19,7 +19,7 @@ pub(crate) mod pkg {
     trans_params
       .ext_req_params_mut()
       .headers
-      .push_from_iter(Header::from_name_and_value("x-vault-token", [api.token.as_bytes()]))?;
+      .push_from_iter(Header::from_name_and_value("x-vault-token", [api.token.as_str()]))?;
     trans_params
       .ext_req_params_mut()
       .uri

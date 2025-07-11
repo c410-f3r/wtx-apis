@@ -1,9 +1,9 @@
-#[wtx_macros::pkg(data_format(json), id(crate::calendar::nager_date::NagerDateId), transport(http))]
+#[wtx::pkg(data_format(json), id(crate::calendar::nager_date::NagerDateId), transport(http))]
 pub(crate) mod pkg {
   use crate::calendar::nager_date::{NagerDateHttpPkgsAux, V3PublicHoliday};
   use wtx::{
     client_api_framework::network::{HttpParams, transport::TransportParams},
-    misc::Vector,
+    collection::Vector,
   };
 
   #[pkg::aux]
@@ -23,5 +23,5 @@ pub(crate) mod pkg {
   pub struct V3NextPublicHolidaysWorldwideReq;
 
   #[pkg::res_data]
-  pub type V3NextPublicHolidaysWorldwideRes = Vector<V3PublicHoliday>;
+  pub type V3NextPublicHolidaysWorldwideRes<'de> = Vector<V3PublicHoliday<&'de str>>;
 }

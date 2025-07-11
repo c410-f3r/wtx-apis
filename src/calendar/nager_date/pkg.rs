@@ -13,7 +13,7 @@ pub use v3_long_weekend::pkg::*;
 pub use v3_next_public_holidays::pkg::*;
 pub use v3_next_public_holidays_worldwide::pkg::*;
 pub use v3_public_holidays::pkg::*;
-use wtx::misc::{ArrayString, Vector};
+use wtx::collection::{ArrayStringU8, Vector};
 
 /// The type of a public holiday
 #[derive(Debug, serde::Deserialize)]
@@ -35,21 +35,21 @@ pub enum V3HolidayTy {
 /// Used by all the endpoints that return holydays.
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct V3PublicHoliday {
+pub struct V3PublicHoliday<S> {
   /// The date.
-  pub date: ArrayString<10>,
+  pub date: ArrayStringU8<10>,
   /// Local name.
-  pub local_name: Option<ArrayString<144>>,
+  pub local_name: Option<S>,
   /// English name.
-  pub name: Option<ArrayString<144>>,
+  pub name: Option<S>,
   /// ISO 3166-1 alpha-2.
-  pub country_code: Option<ArrayString<2>>,
+  pub country_code: Option<ArrayStringU8<2>>,
   /// Is this public holiday every year on the same date.
   pub fixed: bool,
   /// Is this public holiday in every county (federal state).
   pub global: bool,
   /// ISO-3166-2 - Federal states.
-  pub counties: Option<Vector<ArrayString<8>>>,
+  pub counties: Option<Vector<ArrayStringU8<8>>>,
   /// The launch year of the public holiday
   pub launch_year: Option<i32>,
   /// A list of types the public holiday it is valid

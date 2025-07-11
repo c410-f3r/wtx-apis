@@ -1,6 +1,9 @@
 use crate::blockchain::solana::{AddressLookupTableAccount, SolanaAddressHash, SolanaBlockhash};
 use alloc::collections::BTreeMap;
-use wtx::misc::{Vector, Wrapper};
+use wtx::{
+  collection::{IndexedStorageMut, Vector},
+  misc::Wrapper,
+};
 
 /// Compiled [InstructionInput]
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -346,7 +349,7 @@ struct MessageBufferUniqueElem {
 
 #[cfg(test)]
 mod tests {
-  use wtx::misc::Vector;
+  use wtx::collection::Vector;
 
   use crate::blockchain::solana::{
     CompiledInstructionInput, InstructionAccountInput, InstructionInput, MessageAddressTableLookup,
