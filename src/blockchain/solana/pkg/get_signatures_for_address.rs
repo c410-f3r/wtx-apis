@@ -1,13 +1,13 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getSignaturesForAddress")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, SolanaSignatureHashStr, TransactionError,
   };
-  use alloc::{string::String, vec::Vec};
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -22,12 +22,12 @@ pub(crate) mod pkg {
   );
 
   #[pkg::res_data]
-  pub type GetSignaturesForAddressRes = Vec<GetSignaturesForAddress>;
+  pub type GetSignaturesForAddressRes<'any> = Vector<GetSignaturesForAddress<&'any str>>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = _generic_res_data_elem_doc!()]
   #[serde(rename_all = "camelCase")]
-  pub struct GetSignaturesForAddress {
+  pub struct GetSignaturesForAddress<S> {
     /// Base58 identifier
     pub signature: SolanaSignatureHashStr,
     /// The slot that contains the block with the transaction.
@@ -35,7 +35,7 @@ pub(crate) mod pkg {
     /// Filled if unsuccessful.
     pub err: Option<TransactionError>,
     /// Memo associated with the transaction, null if no memo is present.
-    pub memo: Option<String>,
+    pub memo: Option<S>,
     /// Estimated production time, as Unix timestamp
     pub block_time: Option<i64>,
     /// Commitment

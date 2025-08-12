@@ -1,9 +1,9 @@
 use crate::blockchain::solana::MessageInput;
 use core::fmt::Formatter;
 use serde::{
+  Deserialize, Deserializer, Serialize, Serializer,
   de::{self, SeqAccess, Visitor},
   ser::SerializeTuple,
-  Deserialize, Deserializer, Serialize, Serializer,
 };
 
 const MESSAGE_VERSION_PREFIX: u8 = 0x80;

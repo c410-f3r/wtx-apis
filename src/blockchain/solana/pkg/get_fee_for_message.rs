@@ -1,6 +1,6 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getFeeForMessage")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
@@ -9,6 +9,7 @@ pub(crate) mod pkg {
   };
   use alloc::string::String;
   use base64::Engine;
+  use wtx::collection::IndexedStorageMut;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {

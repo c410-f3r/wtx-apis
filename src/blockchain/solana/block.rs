@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   GenericTransaction, Reward, SolanaAddressHashStr, SolanaSignatureHashStr, TransactionMeta,
   TransactionVersion,
 };
-use alloc::vec::Vec;
+use wtx::collection::Vector;
 
 /// A collection of transactions.
 #[derive(Debug, serde::Deserialize)]
@@ -15,11 +15,11 @@ pub struct Block {
   /// The slot index of this block's parent.
   pub parent_slot: u64,
   /// Block transactions.
-  pub transactions: Vec<BlockTransaction>,
+  pub transactions: Vector<BlockTransaction>,
   /// Signatures corresponding to the transaction order in the block.
-  pub signatures: Option<Vec<SolanaSignatureHashStr>>,
+  pub signatures: Option<Vector<SolanaSignatureHashStr>>,
   /// Rewards
-  pub rewards: Option<Vec<Reward>>,
+  pub rewards: Option<Vector<Reward>>,
   /// Estimated production time, as Unix timestamp of when transaction was processed.
   pub block_time: Option<i64>,
   /// The number of blocks beneath this block.

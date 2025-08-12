@@ -4,10 +4,11 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::format::SerdeJson};
 //! use wtx_apis::calendar::nager_date::{NagerDate, PkgsAux};
 //!
-//! let mut pkgs_aux = PkgsAux::from_minimum(NagerDate, SerdeJson, HttpParams::from_uri("URL"));
+//! let mut pkgs_aux =
+//!   PkgsAux::from_minimum(NagerDate, SerdeJson, HttpParams::from_uri("URL".into()));
 //! let _ = pkgs_aux.v3_country_info().params("es").build();
 //! # Ok(()) }
 //! ```
@@ -16,16 +17,11 @@
 mod integration_tests;
 mod pkg;
 
-wtx::create_packages_aux_wrapper!();
-
 pub use pkg::*;
-use wtx::client_api_framework::Api;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
 pub struct NagerDate;
 
-impl Api for NagerDate {
-  type Error = crate::Error;
-}
+wtx::create_packages_aux_wrapper!();

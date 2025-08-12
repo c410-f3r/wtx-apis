@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getTokenAccountBalance")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{
-    program::spl_token::AccountBalance, Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext,
+    Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, program::spl_token::AccountBalance,
   };
 
   #[pkg::aux]

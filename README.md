@@ -2,8 +2,11 @@
 
 A set of API collections based on the `wtx` project.
 
- - [Ethereum](https://web3js.readthedocs.io/)
- - [Solana](https://docs.solana.com/developing/clients/jsonrpc-api)
- - [Nager date](https://date.nager.at)
- - [Rick and Morty](https://github.com/afuh/rick-and-morty-api)
- - [Json Placeholder](https://jsonplaceholder.typicode.com)
+ - [HashiCorp Vault](https://developer.hashicorp.com/vault/api-docs) (JSON)
+ - [Json Placeholder](https://jsonplaceholder.typicode.com) (JSON)
+ - [Mercado Pago](https://www.mercadopago.com/developers) (JSON)
+ - [Nager date](https://date.nager.at) (JSON)
+ - [Olist](https://ajuda.tiny.com.br/kb/articles/erp/integracoes/gestao-de-integracoes/aplicativos-api-v3-configuracoes-e-utilizacao) (JSON)
+ - [Rick and Morty](https://github.com/afuh/rick-and-morty-api) (GraphQL)
+ - [Solana](https://docs.solana.com/developing/clients/jsonrpc-api) (JSON-RPC)
+ - [SuperFrete](https://superfrete.readme.io) (JSON)

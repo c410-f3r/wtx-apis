@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getVersion")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::HttpPkgsAux;
-  use wtx::misc::ArrayString;
+  use wtx::collection::ArrayStringU8;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -19,7 +19,7 @@ pub(crate) mod pkg {
   #[pkg::res_data]
   pub struct GetVersionRes {
     /// Software version of solana-core.
-    pub solana_core: ArrayString<16>,
+    pub solana_core: ArrayStringU8<16>,
     /// Unique identifier of the current software's feature set.
     pub feature_set: u64,
   }

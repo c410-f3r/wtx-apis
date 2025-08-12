@@ -1,5 +1,9 @@
 use crate::blockchain::solana::{AddressLookupTableAccount, SolanaAddressHash, SolanaBlockhash};
-use alloc::{collections::BTreeMap, vec::Vec};
+use alloc::collections::BTreeMap;
+use wtx::{
+  collection::{IndexedStorageMut, Vector},
+  misc::Wrapper,
+};
 
 /// Compiled [InstructionInput]
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -9,26 +13,28 @@ pub struct CompiledInstructionInput {
   pub program_id_index: u8,
   /// Indexes in regards to the block array of accounts.
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub accounts: Vec<u8>,
+  pub accounts: Vector<u8>,
   /// Opaque bytes
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub data: Vec<u8>,
+  pub data: Vector<u8>,
 }
 
 /// Used when performing requests
+//
+// The order of the fields is important
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InstructionInput {
-  /// List of necessary accounts
-  pub accounts: Vec<InstructionAccountInput>,
-  /// Opaque data
-  pub data: Vec<u8>,
   /// Base58 identifier
   pub program_id: SolanaAddressHash,
+  /// List of necessary accounts
+  pub accounts: Vector<InstructionAccountInput>,
+  /// Opaque data
+  pub data: Vector<u8>,
 }
 
 /// Account information.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InstructionAccountInput {
   /// Base58 identifier.
@@ -69,19 +75,19 @@ pub struct MessageAddressTableLookup {
   pub account_key: SolanaBlockhash,
   /// Writeable account indexes
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub writable_indexes: Vec<u8>,
+  pub writable_indexes: Vector<u8>,
   /// Readonly account indexes
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub readonly_indexes: Vec<u8>,
+  pub readonly_indexes: Vector<u8>,
 }
 
 /// Internal auxiliary structure used to create a message
 #[derive(Debug, Default)]
 pub struct MessageBuffer {
-  adhocs: Vec<(SolanaAddressHash, MessageBufferUniqueElem)>,
+  adhocs: Vector<(SolanaAddressHash, MessageBufferUniqueElem)>,
   all: BTreeMap<SolanaAddressHash, MessageBufferUniqueElem>,
-  alta_readonly_pubkeys: Vec<SolanaAddressHash>,
-  alta_writable_pubkeys: Vec<SolanaAddressHash>,
+  alta_readonly_pubkeys: Vector<SolanaAddressHash>,
+  alta_writable_pubkeys: Vector<SolanaAddressHash>,
 }
 
 impl MessageBuffer {
@@ -102,15 +108,15 @@ pub struct MessageInput {
   pub header: MessageHeaderInput,
   /// All block accounts
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub account_keys: Vec<SolanaAddressHash>,
+  pub account_keys: Vector<SolanaAddressHash>,
   /// Recent blockhash
   pub recent_blockhash: SolanaBlockhash,
   /// All block instructions
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub instructions: Vec<CompiledInstructionInput>,
+  pub instructions: Vector<CompiledInstructionInput>,
   /// Address table lookups
   #[serde(with = "crate::blockchain::solana::short_vec")]
-  pub address_table_lookups: Vec<MessageAddressTableLookup>,
+  pub address_table_lookups: Vector<MessageAddressTableLookup>,
 }
 
 impl MessageInput {
@@ -125,15 +131,19 @@ impl MessageInput {
   ) -> crate::Result<Self> {
     buffer.clear();
     let mut fun = || {
-      let mut address_table_lookups = Vec::with_capacity(altas.len());
+      let mut address_table_lookups = Vector::with_capacity(altas.len())?;
       Self::fill_buffer_with_unique_accounts(buffer, instructions, payer);
       for alta in altas {
         Self::extract_table_lookup_accounts(&mut address_table_lookups, alta, buffer)?;
       }
       let (header, account_keys) = Self::build_adhoc_params(buffer, payer)?;
-      let mut compiled_instructions = Vec::new();
+      let mut compiled_instructions = Vector::new();
       for instruction in instructions {
-        compiled_instructions.push(Self::compile_instruction(&account_keys, buffer, instruction)?);
+        compiled_instructions.push(Self::compile_instruction(
+          &account_keys,
+          buffer,
+          instruction,
+        )?)?;
       }
       Ok(Self {
         account_keys,
@@ -186,14 +196,15 @@ impl MessageInput {
         .accounts
         .iter()
         .map(|elem| position(&elem.pubkey))
-        .collect::<Result<_, _>>()?,
+        .collect::<Result<Wrapper<Result<Vector<_>, _>>, _>>()?
+        .0?,
     })
   }
 
   fn build_adhoc_params(
     buffer: &mut MessageBuffer,
     payer: Option<SolanaAddressHash>,
-  ) -> crate::Result<(MessageHeaderInput, Vec<SolanaAddressHash>)> {
+  ) -> crate::Result<(MessageHeaderInput, Vector<SolanaAddressHash>)> {
     let mut num_of_writable_signers: usize = if let Some(elem) = payer.as_ref() {
       let _ = buffer.all.remove(elem);
       1
@@ -204,7 +215,7 @@ impl MessageInput {
     let mut num_of_writable_non_signers: usize = 0;
     let mut num_of_readonly_non_signers: usize = 0;
 
-    buffer.adhocs.extend(buffer.all.iter().map(|el| (*el.0, *el.1)));
+    buffer.adhocs.extend_from_iter(buffer.all.iter().map(|el| (*el.0, *el.1)))?;
     buffer.adhocs.sort_by(|first, second| {
       second
         .1
@@ -213,7 +224,7 @@ impl MessageInput {
         .then(second.1.is_writable.cmp(&first.1.is_writable))
     });
 
-    for (_, elem) in &buffer.adhocs {
+    for (_, elem) in buffer.adhocs.iter() {
       match [elem.is_signer, elem.is_writable] {
         [true, true] => num_of_writable_signers = num_of_writable_signers.wrapping_add(1),
         [true, false] => num_of_readonly_signers = num_of_readonly_signers.wrapping_add(1),
@@ -231,36 +242,41 @@ impl MessageInput {
           num_of_writable_signers.saturating_add(num_of_readonly_signers),
         )?,
       },
-      payer.into_iter().chain(buffer.adhocs.iter().map(|el| el.0)).collect(),
+      payer
+        .into_iter()
+        .chain(buffer.adhocs.iter().map(|el| el.0))
+        .collect::<Wrapper<Result<Vector<_>, _>>>()
+        .0?,
     ))
   }
 
   fn extract_table_lookup_accounts(
-    address_table_lookups: &mut Vec<MessageAddressTableLookup>,
+    address_table_lookups: &mut Vector<MessageAddressTableLookup>,
     alta: &AddressLookupTableAccount,
     buffer: &mut MessageBuffer,
   ) -> crate::Result<()> {
     if alta.addresses.len() > 256 {
       return Err(crate::Error::SolanaU8Overflow);
     }
-    let mut readonly_indexes = Vec::new();
-    let mut writable_indexes = Vec::new();
+    let mut readonly_indexes = Vector::new();
+    let mut writable_indexes = Vector::new();
+    #[expect(clippy::unwrap_used, reason = "`retain` does not allow the use of results")]
     buffer.all.retain(|pubkey, elem| {
       let mut alta_idx: u8 = 0;
-      for alta_pubkey in &alta.addresses {
+      for alta_pubkey in alta.addresses.iter() {
         if pubkey != alta_pubkey {
           alta_idx = alta_idx.wrapping_add(1);
           continue;
         }
         match [elem.is_invoked, elem.is_signer, elem.is_writable] {
           [false, false, false] => {
-            buffer.alta_readonly_pubkeys.push(*pubkey);
-            readonly_indexes.push(alta_idx);
+            buffer.alta_readonly_pubkeys.push(*pubkey).unwrap();
+            readonly_indexes.push(alta_idx).unwrap();
             return false;
           }
           [false, false, true] => {
-            buffer.alta_writable_pubkeys.push(*pubkey);
-            writable_indexes.push(alta_idx);
+            buffer.alta_writable_pubkeys.push(*pubkey).unwrap();
+            writable_indexes.push(alta_idx).unwrap();
             return false;
           }
           _ => {}
@@ -276,7 +292,7 @@ impl MessageInput {
       account_key: alta.key,
       writable_indexes,
       readonly_indexes,
-    });
+    })?;
     Ok(())
   }
 
@@ -333,12 +349,12 @@ struct MessageBufferUniqueElem {
 
 #[cfg(test)]
 mod tests {
+  use wtx::collection::Vector;
+
   use crate::blockchain::solana::{
-    address_lookup_table_account::AddressLookupTableAccount, CompiledInstructionInput,
-    InstructionAccountInput, InstructionInput, MessageAddressTableLookup, MessageHeaderInput,
-    MessageInput,
+    CompiledInstructionInput, InstructionAccountInput, InstructionInput, MessageAddressTableLookup,
+    MessageHeaderInput, MessageInput, address_lookup_table_account::AddressLookupTableAccount,
   };
-  use alloc::vec;
 
   #[test]
   fn with_params_generates_correct_output() {
@@ -348,23 +364,23 @@ mod tests {
         [[0; 32], [1; 32], [2; 32], [3; 32], [4; 32], [5; 32], [6; 32], [7; 32], [8; 32], [9; 32]];
       let payer = pubkeys[0];
       let program_id = pubkeys[6];
-      let instructions = vec![InstructionInput {
+      let instructions = wtx::vector![InstructionInput {
         program_id,
-        accounts: vec![
+        accounts: wtx::vector![
           InstructionAccountInput::sign_and_writable(pubkeys[1]),
           InstructionAccountInput::sign(pubkeys[2]),
           InstructionAccountInput::writable(pubkeys[3]),
           InstructionAccountInput::writable(pubkeys[4]),
           InstructionAccountInput::none(pubkeys[5]),
         ],
-        data: vec![],
+        data: Vector::new(),
       }];
-      let address_lookup_table_accounts = vec![
+      let address_lookup_table_accounts = wtx::vector![
         AddressLookupTableAccount {
           key: pubkeys[7],
-          addresses: vec![pubkeys[4], pubkeys[5], pubkeys[6]],
+          addresses: wtx::vector![pubkeys[4], pubkeys[5], pubkeys[6]],
         },
-        AddressLookupTableAccount { key: pubkeys[8], addresses: vec![] },
+        AddressLookupTableAccount { key: pubkeys[8], addresses: Vector::new() },
       ];
 
       let recent_blockhash = pubkeys[9];
@@ -378,21 +394,21 @@ mod tests {
         )
         .unwrap(),
         MessageInput {
-          account_keys: vec![pubkeys[0], pubkeys[1], pubkeys[2], pubkeys[3], program_id],
-          address_table_lookups: vec![MessageAddressTableLookup {
+          account_keys: wtx::vector![pubkeys[0], pubkeys[1], pubkeys[2], pubkeys[3], program_id],
+          address_table_lookups: wtx::vector![MessageAddressTableLookup {
             account_key: address_lookup_table_accounts[0].key,
-            writable_indexes: vec![0],
-            readonly_indexes: vec![1],
+            writable_indexes: wtx::vector![0],
+            readonly_indexes: wtx::vector![1],
           }],
           header: MessageHeaderInput {
             num_required_signatures: 3,
             num_readonly_signed_accounts: 1,
             num_readonly_unsigned_accounts: 1
           },
-          instructions: vec![CompiledInstructionInput {
+          instructions: wtx::vector![CompiledInstructionInput {
             program_id_index: 4,
-            accounts: vec![1, 2, 3, 5, 6],
-            data: vec![],
+            accounts: wtx::vector![1, 2, 3, 5, 6],
+            data: wtx::vector![],
           }],
           recent_blockhash,
         }

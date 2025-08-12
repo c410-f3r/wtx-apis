@@ -1,9 +1,10 @@
 use crate::blockchain::solana::{
-  program::spl_token::AccountBalance, CompiledInstructionJson, InnerInstructionJson,
-  InstructionJsonParsedGeneric, MessageJsonAccountKey, SolanaAddressHashStr, TransactionEncoding,
-  TransactionJson, TransactionVersion,
+  CompiledInstructionJson, InnerInstructionJson, InstructionJsonParsedGeneric,
+  MessageJsonAccountKey, SolanaAddressHashStr, TransactionEncoding, TransactionJson,
+  TransactionVersion, program::spl_token::AccountBalance,
 };
-use alloc::{string::String, vec::Vec};
+use alloc::string::String;
+use wtx::collection::Vector;
 
 /// A transaction can be represented in various formats.
 #[allow(clippy::large_enum_variant)]
@@ -164,16 +165,6 @@ pub enum InstructionError {
   /// Incorrect authority provided
   IncorrectAuthority,
 
-  /// Failed to serialize or deserialize account data
-  ///
-  /// Warning: This error should never be emitted by the runtime.
-  ///
-  /// This error includes strings from the underlying 3rd party Borsh crate
-  /// which can be dangerous because the error strings could change across
-  /// Borsh versions. Only programs can use this error because they are
-  /// consistent across Solana software versions.
-  BorshIoError(String),
-
   /// An account does not have enough lamports to be rent-exempt
   AccountNotRentExempt,
 
@@ -280,18 +271,18 @@ pub struct TransactionMeta {
   pub fee: u64,
   /// List of inner instructions or null if inner instruction recording was not enabled during
   /// this transaction.
-  pub inner_instructions: Vec<InnerInstructionJson>,
+  pub inner_instructions: Vector<InnerInstructionJson>,
   /// Lost of string log messages or null if log message recording was not enabled during this
   /// transaction.
-  pub log_messages: Option<Vec<String>>,
+  pub log_messages: Option<Vector<String>>,
   /// Debited or credited lamports of all accounts before applying the transaction.
-  pub post_balances: Vec<u64>,
+  pub post_balances: Vector<u64>,
   /// Debited or credited tokens of all accounts before applying the transaction.
-  pub post_token_balances: Option<Vec<TransactionTokenBalance>>,
+  pub post_token_balances: Option<Vector<TransactionTokenBalance>>,
   /// Debited or credited lamports of all accounts after applying the transaction.
-  pub pre_balances: Vec<u64>,
+  pub pre_balances: Vector<u64>,
   /// Debited or credited tokens of all accounts after applying the transaction.
-  pub pre_token_balances: Option<Vec<TransactionTokenBalance>>,
+  pub pre_token_balances: Option<Vector<TransactionTokenBalance>>,
 }
 
 /// Transaction output of a RPC request.

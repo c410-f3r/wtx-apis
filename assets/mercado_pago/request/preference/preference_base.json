@@ -1,0 +1,78 @@
+{
+  "additional_info": "Discount: 12.00",
+  "auto_return": "all",
+  "back_urls": {
+    "success": "http://test.com/success",
+    "pending": "http://test.com/pending",
+    "failure": "http://test.com/failure"
+  },
+  "binary_mode": true,
+  "date_of_expiration": "2022-02-10T10:10:10.000Z",
+  "expiration_date_from": "2022-01-10T10:10:10.000Z",
+  "expiration_date_to": "2022-02-10T10:10:10.000Z",
+  "expires": false,
+  "external_reference": "1643827245",
+  "items": [
+    {
+      "id": "1234",
+      "title": "Games",
+      "description": "PS5",
+      "picture_url": "http://picture.com/PS5",
+      "category_id": "games",
+      "quantity": 2,
+      "unit_price": 4000,
+      "currency_id": "BRL"
+    }
+  ],
+  "marketplace": "marketplace",
+  "marketplace_fee": 5,
+  "notification_url": "http://notificationurl.com",
+  "operation_type": "regular_payment",
+  "payer": {
+    "name": "Test",
+    "surname": "User",
+    "email": "test_user_64585784@testuser.com",
+    "phone": {
+      "area_code": "11",
+      "number": "4444-4444"
+    },
+    "identification": {
+      "type": "CPF",
+      "number": "19119119100"
+    },
+    "address": {
+      "zip_code": "06233200",
+      "street_name": "Street",
+      "street_number": "123"
+    }
+  },
+  "payment_methods": {
+    "excluded_payment_methods": [
+      {
+        "id": ""
+      }
+    ],
+    "excluded_payment_types": [
+      {
+        "id": "ticket"
+      }
+    ],
+    "default_payment_method_id": "master",
+    "installments": 5,
+    "default_installments": 1
+  },
+  "shipments": {
+    "mode": "custom",
+    "local_pickup": false,
+    "dimensions": "10x10x20,500",
+    "cost": 10,
+    "receiver_address": {
+      "zip_code": "06000000",
+      "street_name": "Street",
+      "street_number": "123",
+      "floor": "12",
+      "apartment": "120A"
+    }
+  },
+  "statement_descriptor": "Test Store"
+}

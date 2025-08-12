@@ -1,0 +1,72 @@
+{
+    "versao": "1.0.1",
+    "cnpj": "99999999999999",
+    "idEcommerce": 9999,
+    "tipo": "produto",
+    "dados": {
+        "id": "999999999",
+        "idMapeamento": "9999999",
+        "skuMapeamento": "4",
+        "nome": "Foo Bar Baz",
+        "codigo": "4",
+        "unidade": "pç",
+        "preco": "0.00",
+        "precoPromocional": "0.00",
+        "ncm": "9999.99.99",
+        "origem": "0",
+        "gtin": "9999999999999",
+        "gtinEmbalagem": "",
+        "localizacao": "",
+        "pesoLiquido": "0.17",
+        "pesoBruto": "0.37",
+        "estoqueMinimo": "0",
+        "estoqueMaximo": "0",
+        "idFornecedor": "999999999",
+        "codigoFornecedor": "",
+        "codigoPeloFornecedor": "",
+        "unidadePorCaixa": "",
+        "estoqueAtual": 5,
+        "precoCusto": "0.00",
+        "precoCustoMedio": "0.00",
+        "situacao": "A",
+        "descricaoComplementar": "Lorem ipsum",
+        "obs": "",
+        "garantia": "",
+        "cest": "999999",
+        "sobEncomenda": "N",
+        "marca": "Bar Brand",
+        "tipoEmbalagem": "2",
+        "alturaEmbalagem": "9",
+        "larguraEmbalagem": "99",
+        "comprimentoEmbalagem": "99",
+        "diametroEmbalagem": "0",
+        "classeProduto": "S",
+        "idCategoria": "999999999",
+        "descricaoCategoria": "Foo Category",
+        "descricaoArvoreCategoria": "Foo > Category",
+        "arvoreCategoria": [
+            {
+                "id": "999999999",
+                "idPai": "0",
+                "descricao": "Foo Description",
+                "descricaoCompleta": "Foo Description"
+            }
+        ],
+        "variacoes": [],
+        "anexos": [
+            {
+                "url": "https://foo.bar/baz.jpeg",
+                "nome": "baz.jpeg",
+                "tipo": "jpeg"
+            }
+        ],
+        "seo": {
+            "title": "Foo Bar",
+            "description": "Baz",
+            "keywords": "foo, bar, baz",
+            "linkVideo": "",
+            "slug": "foo-bar"
+        },
+        "kit": []
+    }
+}

@@ -1,25 +1,33 @@
 //! Utility functions and structures
 
 mod concat_array_str;
+#[cfg(any(feature = "mercado-pago", feature = "olist"))]
+mod oauth;
 mod slice_by_commas;
+#[cfg(feature = "olist")]
+pub(crate) mod yyyy_mm_dd;
+#[cfg(feature = "olist")]
+pub(crate) mod yyyy_mm_dd_opt;
 
 pub use concat_array_str::ConcatArrayStr;
 use core::{fmt::Display, str::FromStr};
-use serde::{de::IntoDeserializer, Deserialize, Deserializer, Serialize, Serializer};
+#[cfg(any(feature = "mercado-pago", feature = "olist"))]
+pub use oauth::*;
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::IntoDeserializer as _};
 pub use slice_by_commas::SliceByCommas;
-use wtx::misc::ArrayString;
+use wtx::collection::ArrayStringU8;
 
 const MAX_ASSET_ABBR_LEN: usize = 10;
 const MAX_NUMBER_LEN: usize = 31;
 
 /// Maximum asset abbreviation like BTC.
-pub type MaxAssetAbbr = ArrayString<MAX_ASSET_ABBR_LEN>;
+pub type MaxAssetAbbr = ArrayStringU8<MAX_ASSET_ABBR_LEN>;
 /// Maximum asset name like Bitcoin.
-pub type MaxAssetName = ArrayString<36>;
+pub type MaxAssetName = ArrayStringU8<36>;
 /// Maximum string representation of a number.
-pub type MaxNumberStr = ArrayString<MAX_NUMBER_LEN>;
+pub type MaxNumberStr = ArrayStringU8<MAX_NUMBER_LEN>;
 /// Maximum pair abbreviation like ETH-BTC
-pub type MaxPairAbbr = ArrayString<{ 2 * MAX_ASSET_ABBR_LEN + 1 }>;
+pub type MaxPairAbbr = ArrayStringU8<{ 2 * MAX_ASSET_ABBR_LEN + 1 }>;
 
 _create_blockchain_constants!(
   pub address_hash: MaxAddressHash = 32,
@@ -109,9 +117,9 @@ where
 #[cfg(test)]
 pub(crate) fn init_test_cfg() {
   use tracing_subscriber::{
-    fmt::{format::FmtSpan, Subscriber},
-    util::SubscriberInitExt,
     EnvFilter,
+    fmt::{Subscriber, format::FmtSpan},
+    util::SubscriberInitExt,
   };
   let _rslt = Subscriber::builder()
     .with_env_filter(EnvFilter::from_default_env())

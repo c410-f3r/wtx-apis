@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getBlockCommitment")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::HttpPkgsAux;
-  use alloc::vec::Vec;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -26,7 +26,7 @@ pub(crate) mod pkg {
   #[serde(rename_all = "camelCase")]
   pub struct GetBlockCommitment {
     /// Amount of cluster stake in lamports that has voted on the block .
-    pub commitment: Option<Vec<u64>>,
+    pub commitment: Option<Vector<u64>>,
     /// Total active stake, in lamports, of the current epoch.
     pub total_stake: u64,
   }

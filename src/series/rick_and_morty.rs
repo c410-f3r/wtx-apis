@@ -4,10 +4,11 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::format::SerdeJson};
 //! use wtx_apis::series::rick_and_morty::{PkgsAux, RickAndMorty};
 //!
-//! let mut pkgs_aux = PkgsAux::from_minimum(RickAndMorty, SerdeJson, HttpParams::from_uri("URL"));
+//! let mut pkgs_aux =
+//!   PkgsAux::from_minimum(RickAndMorty, SerdeJson, HttpParams::from_uri("URL".into()));
 //! let _ = pkgs_aux.character().data(&mut String::new(), 1)?.build();
 //! # Ok(()) }
 //! ```
@@ -21,16 +22,11 @@
 mod integration_tests;
 mod pkg;
 
-wtx::create_packages_aux_wrapper!();
-
 pub use pkg::*;
-use wtx::client_api_framework::Api;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http))]
+#[wtx::api(error(crate::Error), mode(auto), pkgs_aux(PkgsAux), transport(http))]
 pub struct RickAndMorty;
 
-impl Api for RickAndMorty {
-  type Error = crate::Error;
-}
+wtx::create_packages_aux_wrapper!();
