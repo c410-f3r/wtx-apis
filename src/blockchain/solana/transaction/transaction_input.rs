@@ -1,5 +1,5 @@
 use crate::blockchain::solana::{SolanaSignatureHash, VersionedMessageInput};
-use wtx::collection::{ArrayWrapper, IndexedStorage, Vector};
+use wtx::collection::{ArrayWrapper, Vector};
 #[cfg(feature = "ed25519-dalek")]
 use {
   crate::blockchain::solana::SolanaBlockhash,
@@ -79,7 +79,6 @@ impl TransactionInput {
     mut buffer: &mut Vector<u8>,
     sk: impl Clone + IntoIterator<Item = &'sk SigningKey>,
   ) -> crate::Result<()> {
-    use wtx::collection::IndexedStorageMut;
     buffer.clear();
     bincode::serialize_into(&mut buffer, &self.message)?;
     let signing_keypair_positions = {
@@ -113,7 +112,10 @@ impl TransactionInput {
   fn _set_empty_signatures(&mut self) -> crate::Result<()> {
     let VersionedMessageInput::V0(message) = &self.message;
     let len: usize = message.header.num_required_signatures.into();
-    self.signatures = wtx::vector![ArrayWrapper([0; 64]); len];
+    self.signatures.clear();
+    for _ in 0..len {
+      self.signatures.push(ArrayWrapper([0; 64]))?;
+    }
     Ok(())
   }
 }

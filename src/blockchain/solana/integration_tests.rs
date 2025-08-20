@@ -1016,7 +1016,7 @@ fn transfer_message(
   from_public_key: [u8; 32],
 ) -> crate::blockchain::solana::MessageInput {
   let transfer = crate::blockchain::solana::InstructionInput {
-    accounts: wtx::vector![
+    accounts: Vector::from_iter([
       crate::blockchain::solana::InstructionAccountInput {
         pubkey: *ALICE_PK,
         is_signer: true,
@@ -1027,8 +1027,9 @@ fn transfer_message(
         is_signer: false,
         is_writable: true,
       },
-    ],
-    data: wtx::vector![2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ])
+    .unwrap(),
+    data: Vector::from_iter([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).unwrap(),
     program_id: [0; 32],
   };
   crate::blockchain::solana::MessageInput::with_params(

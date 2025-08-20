@@ -15,7 +15,7 @@ use wtx::{
       transport::{SendingReceivingTransport, TransportParams},
     },
   },
-  collection::{IndexedStorageMut, Vector},
+  collection::Vector,
   de::{Decode, format::De, protocol::VerbatimDecoder},
   misc::LeaseMut,
 };

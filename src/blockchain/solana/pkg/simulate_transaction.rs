@@ -9,7 +9,6 @@ pub(crate) mod pkg {
   };
   use alloc::string::String;
   use base64::Engine;
-  use wtx::collection::IndexedStorageMut;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {

@@ -1,9 +1,6 @@
 use crate::blockchain::solana::{AddressLookupTableAccount, SolanaAddressHash, SolanaBlockhash};
 use alloc::collections::BTreeMap;
-use wtx::{
-  collection::{IndexedStorageMut, Vector},
-  misc::Wrapper,
-};
+use wtx::{collection::Vector, misc::Wrapper};
 
 /// Compiled [InstructionInput]
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -364,24 +361,27 @@ mod tests {
         [[0; 32], [1; 32], [2; 32], [3; 32], [4; 32], [5; 32], [6; 32], [7; 32], [8; 32], [9; 32]];
       let payer = pubkeys[0];
       let program_id = pubkeys[6];
-      let instructions = wtx::vector![InstructionInput {
+      let instructions = Vector::from_iter([InstructionInput {
         program_id,
-        accounts: wtx::vector![
+        accounts: Vector::from_iter([
           InstructionAccountInput::sign_and_writable(pubkeys[1]),
           InstructionAccountInput::sign(pubkeys[2]),
           InstructionAccountInput::writable(pubkeys[3]),
           InstructionAccountInput::writable(pubkeys[4]),
           InstructionAccountInput::none(pubkeys[5]),
-        ],
+        ])
+        .unwrap(),
         data: Vector::new(),
-      }];
-      let address_lookup_table_accounts = wtx::vector![
+      }])
+      .unwrap();
+      let address_lookup_table_accounts = Vector::from_iter([
         AddressLookupTableAccount {
           key: pubkeys[7],
-          addresses: wtx::vector![pubkeys[4], pubkeys[5], pubkeys[6]],
+          addresses: Vector::from_iter([pubkeys[4], pubkeys[5], pubkeys[6]]).unwrap(),
         },
         AddressLookupTableAccount { key: pubkeys[8], addresses: Vector::new() },
-      ];
+      ])
+      .unwrap();
 
       let recent_blockhash = pubkeys[9];
       assert_eq!(
@@ -394,22 +394,27 @@ mod tests {
         )
         .unwrap(),
         MessageInput {
-          account_keys: wtx::vector![pubkeys[0], pubkeys[1], pubkeys[2], pubkeys[3], program_id],
-          address_table_lookups: wtx::vector![MessageAddressTableLookup {
+          account_keys: Vector::from_iter([
+            pubkeys[0], pubkeys[1], pubkeys[2], pubkeys[3], program_id
+          ])
+          .unwrap(),
+          address_table_lookups: Vector::from_iter([MessageAddressTableLookup {
             account_key: address_lookup_table_accounts[0].key,
-            writable_indexes: wtx::vector![0],
-            readonly_indexes: wtx::vector![1],
-          }],
+            writable_indexes: Vector::from_iter([0]).unwrap(),
+            readonly_indexes: Vector::from_iter([1]).unwrap(),
+          }])
+          .unwrap(),
           header: MessageHeaderInput {
             num_required_signatures: 3,
             num_readonly_signed_accounts: 1,
             num_readonly_unsigned_accounts: 1
           },
-          instructions: wtx::vector![CompiledInstructionInput {
+          instructions: Vector::from_iter([CompiledInstructionInput {
             program_id_index: 4,
-            accounts: wtx::vector![1, 2, 3, 5, 6],
-            data: wtx::vector![],
-          }],
+            accounts: Vector::from_iter([1, 2, 3, 5, 6]).unwrap(),
+            data: Vector::new(),
+          }])
+          .unwrap(),
           recent_blockhash,
         }
       );

@@ -13,7 +13,7 @@ use wtx::{
     },
     pkg::PkgsAux,
   },
-  collection::{ArrayStringU16, IndexedStorageMut, Vector},
+  collection::{ArrayStringU16, Vector},
   de::{
     Decode,
     format::{De, DecodeWrapper},

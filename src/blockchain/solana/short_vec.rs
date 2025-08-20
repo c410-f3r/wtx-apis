@@ -11,10 +11,7 @@ use serde::{
 use short_u16::*;
 use short_u16_visitor::*;
 use short_vec_visitor::*;
-use wtx::{
-  collection::{IndexedStorageMut, IndexedStorageSlice},
-  misc::SingleTypeStorage,
-};
+use wtx::{collection::TryExtend, misc::SingleTypeStorage};
 
 const MAX_ENCODING_LENGTH: usize = 3;
 
@@ -40,8 +37,8 @@ where
 pub(crate) fn deserialize<'de, D, T>(deserializer: D) -> Result<T, D::Error>
 where
   D: Deserializer<'de>,
-  T: Default + IndexedStorageMut<T::Item> + SingleTypeStorage,
-  <T::Slice as IndexedStorageSlice>::Unit: Deserialize<'de>,
+  T: Default + SingleTypeStorage + TryExtend<[T::Item; 1]>,
+  T::Item: Deserialize<'de>,
 {
   let visitor = ShortVecVisitor(PhantomData);
   deserializer.deserialize_tuple(usize::MAX, visitor)

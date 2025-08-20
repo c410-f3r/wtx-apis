@@ -4,17 +4,14 @@ use serde::{
   Deserialize,
   de::{self, SeqAccess, Visitor},
 };
-use wtx::{
-  collection::{IndexedStorageMut, IndexedStorageSlice},
-  misc::SingleTypeStorage,
-};
+use wtx::{collection::TryExtend, misc::SingleTypeStorage};
 
 pub(crate) struct ShortVecVisitor<T>(pub(crate) PhantomData<T>);
 
 impl<'de, T> Visitor<'de> for ShortVecVisitor<T>
 where
-  T: Default + IndexedStorageMut<T::Item> + SingleTypeStorage,
-  <T::Slice as IndexedStorageSlice>::Unit: Deserialize<'de>,
+  T: Default + SingleTypeStorage + TryExtend<[T::Item; 1]>,
+  T::Item: Deserialize<'de>,
 {
   type Value = T;
 
@@ -33,7 +30,7 @@ where
     let mut result = T::default();
     for i in 0..len {
       let elem = seq.next_element()?.ok_or_else(|| de::Error::invalid_length(i, &self))?;
-      result.push(elem).map_err(|_err| de::Error::custom("Insufficient space"))?;
+      result.try_extend([elem]).map_err(|_err| de::Error::custom("Insufficient space"))?;
     }
     Ok(result)
   }

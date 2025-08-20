@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  collection::{ArrayVectorU8, IndexedStorageMut},
+  collection::{ArrayVectorU8, Vector},
   de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
@@ -40,7 +40,7 @@ create_http_test!(
             expiration_date_from: None,
             expiration_date_to: None,
             external_reference: None,
-            items: wtx::vector![Item {
+            items: Vector::from_iter([Item {
               id: "1",
               title: "Test title",
               description: Some("Test description"),
@@ -49,7 +49,7 @@ create_http_test!(
               quantity: Decimal::TEN,
               currency_id: None,
               unit_price: Decimal::PI,
-            }],
+            }]).unwrap(),
             marketplace: None,
             marketplace_fee: None,
             notification_url: None,

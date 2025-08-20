@@ -7,7 +7,7 @@ use wtx::{
     HttpParams,
     transport::{SendingReceivingTransport, TransportParams},
   },
-  collection::{IndexedStorageMut, Vector},
+  collection::Vector,
   de::{
     DecodeSeq, Encode,
     format::De,
