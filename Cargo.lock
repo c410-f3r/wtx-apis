@@ -894,8 +894,8 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "wtx"
-version = "0.35.0"
-source = "git+https://github.com/c410-f3r/wtx#bb2b6875e75fe1bb3c90b1db63b39e50d82a0eca"
+version = "0.36.1"
+source = "git+https://github.com/c410-f3r/wtx#6c73aef788a1c13a6724881676ca0cb974466632"
 dependencies = [
  "base64",
  "foldhash",
@@ -937,8 +937,8 @@ dependencies = [
 
 [[package]]
 name = "wtx-macros"
-version = "0.4.0"
-source = "git+https://github.com/c410-f3r/wtx#bb2b6875e75fe1bb3c90b1db63b39e50d82a0eca"
+version = "0.5.0"
+source = "git+https://github.com/c410-f3r/wtx#6c73aef788a1c13a6724881676ca0cb974466632"
 dependencies = [
  "proc-macro2",
  "quote",
