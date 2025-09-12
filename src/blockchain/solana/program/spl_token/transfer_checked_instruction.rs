@@ -1,4 +1,4 @@
-use crate::blockchain::solana::{program::spl_token::AccountBalance, SolanaAddressHashStr};
+use crate::blockchain::solana::{SolanaAddressHashStr, program::spl_token::AccountBalance};
 
 /// Data related to the checked transfer instruction.
 #[derive(Debug, serde::Deserialize)]

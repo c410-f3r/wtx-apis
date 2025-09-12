@@ -4,11 +4,11 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, data_transformation::dnsn::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, de::format::SerdeJson};
 //! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
-//!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_uri("URL"));
+//!   PkgsAux::from_minimum(Solana::new(None), SerdeJson, HttpParams::from_uri("URL".into()));
 //! let _ = pkgs_aux.get_slot().data(None).build();
 //! # Ok(()) }
 //! ```
@@ -20,8 +20,8 @@ mod account;
 mod address_lookup_table_account;
 mod block;
 mod filter;
-//#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
-//mod integration_tests;
+#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
+mod integration_tests;
 mod notification;
 mod pkg;
 pub mod program;
@@ -30,9 +30,6 @@ mod short_vec;
 mod slot_update;
 mod transaction;
 
-wtx::create_packages_aux_wrapper!();
-
-use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
 pub use block::*;
@@ -44,17 +41,18 @@ pub use slot_update::*;
 pub use transaction::*;
 use wtx::{
   client_api_framework::{
-    misc::{Pair, PairMut, RequestThrottling},
-    network::{transport::Transport, HttpParams},
-    pkg::Package,
     Api,
+    misc::{Pair, PairMut, RequestThrottling},
+    network::{HttpParams, transport::SendingReceivingTransport},
+    pkg::Package,
   },
-  data_transformation::format::{JsonRpcRequest, JsonRpcResponse},
-  misc::{ArrayString, FnMutFut},
+  collection::ArrayStringU8,
+  de::protocol::{JsonRpcDecoder, JsonRpcEncoder},
+  misc::FnMutFut,
 };
 
 pub(crate) type Epoch = u64;
-pub(crate) type SolanaProgramName = ArrayString<32>;
+pub(crate) type SolanaProgramName = ArrayStringU8<32>;
 
 _create_blockchain_constants!(
   pub address_hash: SolanaAddressHash = 32,
@@ -67,9 +65,9 @@ _create_blockchain_constants!(
   pub transaction_hash_str: SolanaTransactionHashStr = 90
 );
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[doc = _generic_api_doc!()]
-#[wtx_macros::api_params(pkgs_aux(PkgsAux), transport(http, ws))]
+#[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Solana {
   /// If some, tells that each request must respect calling intervals.
   pub rt: Option<RequestThrottling>,
@@ -81,66 +79,44 @@ impl Solana {
     Self { rt }
   }
 
-  /// Make successive HTTP requests over a period defined in `cto` until the transaction is
-  /// successful or expired.
-  pub async fn confirm_transaction<'th, A, DRSR, T>(
-    cto: ConfirmTransactionOptions,
+  #[doc(hidden)]
+  pub async fn check_confirmation<'th, A, DRSR, T>(
     pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
     tx_hash: &'th str,
-  ) -> Result<(), A::Error>
+  ) -> crate::Result<bool>
   where
     A: Api<Error = crate::Error>,
-    T: Transport<DRSR, Params = HttpParams>,
-    GetSignatureStatusesPkg<JsonRpcRequest<GetSignatureStatusesReq<[&'th str; 1]>>>:
+    T: SendingReceivingTransport<HttpParams>,
+    GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<[&'th str; 1]>>>:
       for<'de> Package<
-        A,
-        DRSR,
-        T::Params,
-        ExternalResponseContent<'de> = JsonRpcResponse<GetSignatureStatusesRes>,
-      >,
+          A,
+          DRSR,
+          T::Inner,
+          HttpParams,
+          ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
+        >,
   {
-    macro_rules! call {
-      () => {{
-        let signatures = [tx_hash];
-        if let Some(Some(GetSignatureStatuses {
-          confirmation_status: Commitment::Finalized, ..
-        })) = pair
-          .trans
-          .send_recv_decode_contained(
-            &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
-            &mut pair.pkgs_aux,
-          )
-          .await?
-          .result?
-          .value
-          .get(0)
-        {
-          true
-        } else {
-          false
-        }
-      }};
+    let signatures = [tx_hash];
+    if let Some(Some(GetSignatureStatuses {
+      confirmation_status: Commitment::Finalized,
+      err,
+      ..
+    })) = pair
+      .trans
+      .send_pkg_recv_decode_contained(
+        &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
+        &mut pair.pkgs_aux,
+      )
+      .await?
+      .result?
+      .value
+      .into_iter()
+      .next()
+    {
+      if let Some(elem) = err { Err(crate::Error::SolanaTxError(elem)) } else { Ok(true) }
+    } else {
+      Ok(false)
     }
-
-    match cto {
-      ConfirmTransactionOptions::Tries { number } => {
-        for _ in 0u16..number {
-          if call!() {
-            return Ok(());
-          }
-        }
-      }
-      ConfirmTransactionOptions::TriesWithInterval { interval, number } => {
-        for _ in 0u16..number {
-          if call!() {
-            return Ok(());
-          }
-          wtx::misc::sleep(interval).await?;
-        }
-      }
-    }
-
-    Err(crate::Error::CouldNotConfirmTransaction)
   }
 
   /// If existing, extracts the parsed spl token account ([program::spl_token::MintAccount]) out of
@@ -148,7 +124,7 @@ impl Solana {
   pub fn spl_token_mint_account(
     account_data: &AccountData,
   ) -> crate::Result<&program::spl_token::MintAccount> {
-    if let Some(program::spl_token::GenericAccount::Mint(ref elem)) =
+    if let Some(program::spl_token::GenericAccount::Mint(elem)) =
       Self::spl_token_account(account_data)
     {
       Ok(elem)
@@ -161,7 +137,7 @@ impl Solana {
   pub fn spl_token_normal_account(
     account_data: &AccountData,
   ) -> crate::Result<&program::spl_token::TokenAccount> {
-    if let Some(program::spl_token::GenericAccount::Account(ref elem)) =
+    if let Some(program::spl_token::GenericAccount::Account(elem)) =
       Self::spl_token_account(account_data)
     {
       Ok(elem)
@@ -179,25 +155,26 @@ impl Solana {
     pair: &mut Pair<HttpPkgsAux<API, DRSR>, T>,
     mut cb: impl for<'any> FnMutFut<
       (u8, &'any mut AUX, SolanaBlockhash, &'any mut Pair<HttpPkgsAux<API, DRSR>, T>),
-      Result<O, E>,
+      Result = Result<O, E>,
     >,
   ) -> Result<O, E>
   where
     API: Api<Error = crate::Error>,
     E: From<crate::Error>,
-    T: Transport<DRSR, Params = HttpParams>,
-    GetLatestBlockhashPkg<JsonRpcRequest<GetLatestBlockhashReq>>: for<'de> Package<
-      API,
-      DRSR,
-      HttpParams,
-      ExternalResponseContent<'de> = JsonRpcResponse<GetLatestBlockhashRes>,
-    >,
+    T: SendingReceivingTransport<HttpParams>,
+    GetLatestBlockhashPkg<JsonRpcEncoder<GetLatestBlockhashReq>>: for<'de> Package<
+        API,
+        DRSR,
+        T::Inner,
+        HttpParams,
+        ExternalResponseContent<'de> = JsonRpcDecoder<GetLatestBlockhashRes>,
+      >,
   {
     macro_rules! local_blockhash {
       ($local_pair:expr) => {
         $local_pair
           .trans
-          .send_recv_decode_contained(
+          .send_pkg_recv_decode_contained(
             &mut $local_pair.pkgs_aux.get_latest_blockhash().data(None).build(),
             &mut $local_pair.pkgs_aux,
           )
@@ -209,13 +186,13 @@ impl Solana {
           .blockhash
       };
     }
-    match cb((0, &mut aux, initial_blockhash, pair)).await {
+    match cb.call((0, &mut aux, initial_blockhash, pair)).await {
       Err(err) => {
         if let Some(n) = additional_tries.checked_sub(1) {
           let mut opt = None;
           for idx in 1..=n {
             let local_blockhash = local_blockhash!(pair);
-            if let Ok(elem) = cb((idx, &mut aux, local_blockhash, pair)).await {
+            if let Ok(elem) = cb.call((idx, &mut aux, local_blockhash, pair)).await {
               opt = Some(elem);
               break;
             }
@@ -224,7 +201,7 @@ impl Solana {
             Ok(elem)
           } else {
             let local_blockhash = local_blockhash!(pair);
-            let last = cb((additional_tries, &mut aux, local_blockhash, pair)).await?;
+            let last = cb.call((additional_tries, &mut aux, local_blockhash, pair)).await?;
             Ok(last)
           }
         } else {
@@ -250,6 +227,7 @@ impl Solana {
 
 impl Api for Solana {
   type Error = crate::Error;
+  type Id = SolanaId;
 
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     if let Some(ref mut rt) = self.rt {
@@ -258,3 +236,5 @@ impl Api for Solana {
     Ok(())
   }
 }
+
+wtx::create_packages_aux_wrapper!();

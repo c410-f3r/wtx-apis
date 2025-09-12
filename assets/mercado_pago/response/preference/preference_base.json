@@ -1,0 +1,105 @@
+{
+  "additional_info": "",
+  "auto_return": "",
+  "back_urls": {
+    "failure": "",
+    "pending": "",
+    "success": ""
+  },
+  "binary_mode": false,
+  "client_id": "1443600735136331",
+  "collector_id": 1553697567,
+  "coupon_code": null,
+  "coupon_labels": null,
+  "date_created": "2025-02-07T07:09:28.707-04:00",
+  "date_of_expiration": null,
+  "expiration_date_from": null,
+  "expiration_date_to": "2025-02-07T11:24:27.600+00:00",
+  "expires": true,
+  "external_reference": "1",
+  "id": "1553697567-71850f77-49ee-48fa-86c4-3a5433d0de19",
+  "init_point": "https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=1553697567-71850f77-49ee-48fa-86c4-3a5433d0de19",
+  "internal_metadata": null,
+  "items": [
+    {
+      "id": "1",
+      "category_id": "",
+      "currency_id": "BRL",
+      "description": "",
+      "title": "Realistic Product",
+      "quantity": 5,
+      "unit_price": 100
+    }
+  ],
+  "marketplace": "NONE",
+  "marketplace_fee": 0,
+  "metadata": {},
+  "notification_url": null,
+  "operation_type": "regular_payment",
+  "payer": {
+    "phone": {
+      "area_code": "",
+      "number": ""
+    },
+    "address": {
+      "zip_code": "",
+      "street_name": "",
+      "street_number": null
+    },
+    "email": "",
+    "identification": {
+      "number": "",
+      "type": ""
+    },
+    "name": "",
+    "surname": "",
+    "date_created": null,
+    "last_purchase": null
+  },
+  "payment_methods": {
+    "default_card_id": null,
+    "default_payment_method_id": null,
+    "excluded_payment_methods": [
+      {
+        "id": ""
+      }
+    ],
+    "excluded_payment_types": [
+      {
+        "id": "credit_card"
+      },
+      {
+        "id": "ticket"
+      }
+    ],
+    "installments": 1,
+    "default_installments": 1
+  },
+  "processing_modes": null,
+  "product_id": null,
+  "redirect_urls": {
+    "failure": "",
+    "pending": "",
+    "success": ""
+  },
+  "sandbox_init_point": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=1553697567-71850f77-49ee-48fa-86c4-3a5433d0de19",
+  "site_id": "MLB",
+  "shipments": {
+    "mode": "not_specified",
+    "default_shipping_method": null,
+    "cost": 5000,
+    "receiver_address": {
+      "zip_code": "",
+      "street_name": "",
+      "street_number": null,
+      "floor": "",
+      "apartment": "",
+      "city_name": null,
+      "state_name": null,
+      "country_name": null
+    }
+  },
+  "total_amount": null,
+  "last_updated": null,
+  "financing_group": ""
+}

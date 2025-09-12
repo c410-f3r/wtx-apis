@@ -1,0 +1,14 @@
+{
+    "versao": "1.0.0",
+    "cnpj": "99999999999999",
+    "tipo": "estoque",
+    "idEcommerce": 9999,
+    "dados": {
+        "tipoEstoque": "F",
+        "saldo": 5,
+        "idProduto": 999999999,
+        "sku": "4",
+        "skuMapeamento": "4",
+        "skuMapeamentoPai": ""
+    }
+}

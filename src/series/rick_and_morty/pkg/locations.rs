@@ -1,17 +1,14 @@
-#[wtx_macros::pkg(
-  api(crate::series::rick_and_morty::RickAndMorty),
-  data_format(json),
-  transport(http)
-)]
+#[wtx::pkg(data_format(json), id(crate::series::rick_and_morty::RickAndMortyId), transport(http))]
 pub(crate) mod pkg {
   use crate::series::rick_and_morty::{
-    Location, Pagination, RickAndMortyHttpPkgsAux, CHARACTER_FRAGMENT,
+    CHARACTER_FRAGMENT, Location, Pagination, RickAndMortyHttpPkgsAux,
   };
-  use alloc::{string::String, vec::Vec};
+  use alloc::string::String;
   use core::fmt::Write;
   use wtx::{
     client_api_framework::network::transport::TransportParams,
-    data_transformation::format::{GraphQlRequest, GraphQlResponse},
+    collection::Vector,
+    de::protocol::{GraphQlDecoder, GraphQlEncoder},
     http::Method,
   };
 
@@ -67,24 +64,24 @@ pub(crate) mod pkg {
   }
 
   #[pkg::req_data]
-  pub type LocationsReq<'any> = GraphQlRequest<(), &'any str, ()>;
+  pub type LocationsReq<'any> = GraphQlEncoder<(), &'any str, ()>;
 
   #[pkg::res_data]
-  pub type LocationsRes = GraphQlResponse<LocationsData, serde::de::IgnoredAny>;
+  pub type LocationsRes<'any> = GraphQlDecoder<LocationsData<&'any str>, serde::de::IgnoredAny>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = generic_data_doc!()]
-  pub struct Locations {
+  pub struct Locations<T> {
     /// Pagination
-    pub info: Pagination,
+    pub info: Pagination<T>,
     /// Locations
-    pub results: Vec<Location>,
+    pub results: Vector<Location<T>>,
   }
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = generic_data_doc!()]
-  pub struct LocationsData {
+  pub struct LocationsData<T> {
     /// Locations
-    pub locations: Locations,
+    pub locations: Locations<T>,
   }
 }

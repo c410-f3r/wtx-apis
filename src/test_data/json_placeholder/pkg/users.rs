@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::test_data::json_placeholder::JsonPlaceholder),
+#[wtx::pkg(
   data_format(json),
+  id(crate::test_data::json_placeholder::JsonPlaceholderId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::test_data::json_placeholder::{GenericParams, GenericRes, JsonPlaceholderHttpPkgsAux};
-  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
+  use wtx::client_api_framework::network::HttpParams;
 
   #[pkg::aux]
   impl<DRSR> JsonPlaceholderHttpPkgsAux<DRSR> {}
@@ -13,9 +13,9 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(
     params: &mut GenericParams<'_>,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    params.manage("users", req_params)?;
+    params.manage("users", trans_params)?;
     Ok(())
   }
 
@@ -27,65 +27,65 @@ pub(crate) mod pkg {
   pub struct UsersReq;
 
   #[pkg::res_data]
-  pub type UsersRes = GenericRes;
+  pub type UsersRes<'any> = GenericRes<&'any str>;
 
   /// User
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct User {
+  pub struct User<T> {
     /// Id
     pub id: u32,
     /// Name
-    pub name: ArrayString<24>,
+    pub name: T,
     /// Username
-    pub username: ArrayString<16>,
+    pub username: T,
     /// Email
-    pub email: ArrayString<25>,
+    pub email: T,
     /// Address
-    pub address: UserAddress,
+    pub address: UserAddress<T>,
     /// Phone
-    pub phone: ArrayString<21>,
+    pub phone: T,
     /// Website
-    pub website: ArrayString<14>,
+    pub website: T,
     /// Company
-    pub company: UserCompany,
+    pub company: UserCompany<T>,
   }
 
   /// User address
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct UserAddress {
+  pub struct UserAddress<T> {
     /// Street
-    pub street: ArrayString<17>,
+    pub street: T,
     /// Suite
-    pub suite: ArrayString<10>,
+    pub suite: T,
     /// City
-    pub city: ArrayString<14>,
+    pub city: T,
     /// Zip-code
-    pub zipcode: ArrayString<11>,
+    pub zipcode: T,
     /// User geographic parameters
-    pub geo: UserGeoParams,
+    pub geo: UserGeoParams<T>,
   }
 
   /// User company
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct UserCompany {
+  pub struct UserCompany<T> {
     /// Name
-    pub name: ArrayString<18>,
+    pub name: T,
     /// What the company does.
-    pub catch_phrase: ArrayString<40>,
+    pub catch_phrase: T,
     /// Tags
-    pub bs: ArrayString<36>,
+    pub bs: T,
   }
 
   /// User geographic parameters.
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct UserGeoParams {
+  pub struct UserGeoParams<T> {
     /// Latitude
-    pub lat: ArrayString<9>,
+    pub lat: T,
     /// Longitude
-    pub lng: ArrayString<9>,
+    pub lng: T,
   }
 }

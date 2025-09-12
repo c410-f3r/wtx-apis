@@ -1,0 +1,12 @@
+{
+    "versao": "1.0.0",
+    "cnpj": "99999999999999",
+    "tipo": "situacao_pedido",
+    "idEcommerce": 9999,
+    "dados": {
+        "idPedidoEcommerce": "999999",
+        "idVendaTiny": 999999999,
+        "situacao": "aprovado",
+        "descricaoSituacao": "Aprovado"
+    }
+}

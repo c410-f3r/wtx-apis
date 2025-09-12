@@ -1,18 +1,15 @@
-#[wtx_macros::pkg(
-  api(crate::series::rick_and_morty::RickAndMorty),
-  data_format(json),
-  transport(http)
-)]
+#[wtx::pkg(data_format(json), id(crate::series::rick_and_morty::RickAndMortyId), transport(http))]
 pub(crate) mod pkg {
   use crate::{
     misc::SliceByCommas,
-    series::rick_and_morty::{Character, RickAndMortyHttpPkgsAux, CHARACTER_FRAGMENT},
+    series::rick_and_morty::{CHARACTER_FRAGMENT, Character, RickAndMortyHttpPkgsAux},
   };
-  use alloc::{string::String, vec::Vec};
+  use alloc::string::String;
   use core::fmt::Write;
   use wtx::{
     client_api_framework::network::transport::TransportParams,
-    data_transformation::format::{GraphQlRequest, GraphQlResponse},
+    collection::Vector,
+    de::protocol::{GraphQlDecoder, GraphQlEncoder},
     http::Method,
   };
 
@@ -44,16 +41,17 @@ pub(crate) mod pkg {
   }
 
   #[pkg::req_data]
-  pub type CharactersByIdsReq<'any> = GraphQlRequest<(), &'any str, ()>;
+  pub type CharactersByIdsReq<'any> = GraphQlEncoder<(), &'any str, ()>;
 
   #[pkg::res_data]
-  pub type CharactersByIdsRes = GraphQlResponse<CharactersByIdsData, serde::de::IgnoredAny>;
+  pub type CharactersByIdsRes<'any> =
+    GraphQlDecoder<CharactersByIdsData<&'any str>, serde::de::IgnoredAny>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = generic_data_doc!()]
   #[serde(rename_all = "camelCase")]
-  pub struct CharactersByIdsData {
+  pub struct CharactersByIdsData<T> {
     /// Characters by ids
-    pub characters_by_ids: Vec<Character>,
+    pub characters_by_ids: Vector<Character<T>>,
   }
 }

@@ -11,14 +11,14 @@ jobs:
     name: Internal tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions-rs/toolchain@v1
         with:
           components: clippy,rustfmt
           override: true
           profile: minimal
-          toolchain: nightly-2024-07-10
+          toolchain: nightly-2025-06-11
 
       - uses: Swatinem/rust-cache@v2
 
@@ -28,14 +28,14 @@ jobs:
     name: Integration tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions-rs/toolchain@v1
         with:
           components: clippy,rustfmt
           override: true
           profile: minimal
-          toolchain: nightly-2024-07-10
+          toolchain: nightly-2025-06-11
 
       - uses: Swatinem/rust-cache@v2
 

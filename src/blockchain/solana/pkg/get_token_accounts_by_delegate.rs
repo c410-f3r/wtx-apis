@@ -1,6 +1,6 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getTokenAccountsByDelegate")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
@@ -8,7 +8,7 @@ pub(crate) mod pkg {
     Account, AccountEncoding, Commitment, DataSlice, HttpPkgsAux, JsonRpcResponseResultWithContext,
     MintOrProgramId, SolanaAddressHashStr,
   };
-  use alloc::vec::Vec;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -25,7 +25,7 @@ pub(crate) mod pkg {
 
   #[pkg::res_data]
   pub type GetTokenAccountsByDelegateRes =
-    JsonRpcResponseResultWithContext<Vec<GetTokenAccountsByDelegate>>;
+    JsonRpcResponseResultWithContext<Vector<GetTokenAccountsByDelegate>>;
 
   #[derive(Debug, serde::Deserialize)]
   #[doc = _generic_res_data_elem_doc!()]

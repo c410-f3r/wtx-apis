@@ -1,46 +1,37 @@
-cargo-features = ["edition2024"]
-
 [dependencies]
 base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
-cl-aux = { default-features = false, features = ["alloc", "serde"], version = "5.0" }
-ed25519-dalek = { default-features = false, optional = true, version = "2.0" }
-ethabi = { default-features = false, features = ["full-serde"], optional = true, version = "18.0" }
-ethereum-types = { default-features = false, features = ["serialize"], optional = true, version = "0.14" }
-hex = { default-features = false, optional = true, version = "0.4" }
-primitive-types = { default-features = false, features = ["serde"], optional = true, version = "0.12" }
+ed25519-dalek = { default-features = false, optional = true, version = "3.0.0-pre.1" }
+rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
-wtx = { default-features = false, features = ["client-api-framework", "serde", "web-socket"], version = "0.15" }
-wtx-macros = { default-features = false, version = "0.2" }
+wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
+rust_decimal_macros = { default-features = false, version = "1.0" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
-wtx = { default-features = false, features = ["client-api-framework", "http-client-framework", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], version = "0.15" }
+wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
 
 [features]
-_integration-tests = []
-base64 = ["dep:base64"]
-bincode = ["dep:bincode"]
-bs58 = ["dep:bs58"]
 default = []
-ed25519-dalek = ["dep:ed25519-dalek"]
-ethabi = ["dep:ethabi"]
-ethereum = ["ethabi", "ethereum-types", "hex", "primitive-types"]
-ethereum-types = ["dep:ethereum-types"]
-hex = ["dep:hex"]
 json-placeholder = []
-nager-date = []
+mercado-pago = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
+olist = ["rust_decimal/serde-with-str", "wtx/serde_urlencoded"]
 pagar-me = ["base64", "wtx/serde"]
-primitive-types = ["dep:primitive-types"]
 rick-and-morty = []
 solana = ["base64", "bincode", "bs58", "wtx/std"]
 std = []
-tokio-rustls = ["dep:tokio-rustls"]
+super-frete = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str"]
+vault = []
+
+_integration-tests = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
 
 [package]
 categories = ["asynchronous", "data-structures", "encoding", "network-programming", "no-std"]
@@ -51,7 +42,7 @@ license = "Apache-2.0"
 name = "wtx-apis"
 readme = "README.md"
 repository = "https://github.com/c410-f3r/wtx-apis"
-version = "0.2.0"
+version = "0.1.0"
 
 [package.metadata.docs.rs]
 all-features = true
