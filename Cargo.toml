@@ -3,7 +3,7 @@ base64 = { default-features = false, features = ["alloc"], optional = true, vers
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
 ed25519-dalek = { default-features = false, optional = true, version = "3.0.0-pre.1" }
-rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
+rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.38" }
 serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
