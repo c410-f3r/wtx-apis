@@ -10,7 +10,7 @@ wtx = { default-features = false, features = ["client-api-framework", "macros", 
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
-rust_decimal_macros = { default-features = false, version = "1.0" }
+rust_decimal_macros = { default-features = false, version = "1.39" }
 serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
