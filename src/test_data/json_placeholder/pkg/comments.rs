@@ -1,12 +1,12 @@
-#[wtx_macros::pkg(
-  api(crate::test_data::json_placeholder::JsonPlaceholder),
+#[wtx::pkg(
   data_format(json),
+  id(crate::test_data::json_placeholder::JsonPlaceholderId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::test_data::json_placeholder::{GenericParams, GenericRes, JsonPlaceholderHttpPkgsAux};
   use alloc::string::String;
-  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
+  use wtx::client_api_framework::network::HttpParams;
 
   #[pkg::aux]
   impl<DRSR> JsonPlaceholderHttpPkgsAux<DRSR> {}
@@ -14,9 +14,9 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(
     params: &mut GenericParams<'_>,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    params.manage("comments", req_params)?;
+    params.manage("comments", trans_params)?;
     Ok(())
   }
 
@@ -28,21 +28,21 @@ pub(crate) mod pkg {
   pub struct CommentsReq;
 
   #[pkg::res_data]
-  pub type CommentsRes = GenericRes;
+  pub type CommentsRes<'any> = GenericRes<String>;
 
   /// Comment
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct Comment {
+  pub struct Comment<T> {
     /// Post id
     pub post_id: u32,
     /// Id
     pub id: u32,
     /// Name
-    pub name: ArrayString<81>,
+    pub name: T,
     /// Email
-    pub email: ArrayString<33>,
+    pub email: T,
     /// Body
-    pub body: String,
+    pub body: T,
   }
 }

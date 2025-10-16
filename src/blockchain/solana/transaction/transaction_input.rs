@@ -1,6 +1,5 @@
 use crate::blockchain::solana::{SolanaSignatureHash, VersionedMessageInput};
-use alloc::vec;
-use wtx::misc::Vector;
+use wtx::collection::{ArrayWrapper, Vector};
 #[cfg(feature = "ed25519-dalek")]
 use {
   crate::blockchain::solana::SolanaBlockhash,
@@ -40,11 +39,14 @@ impl TransactionInput {
 
   /// Checks if all signatures are actually signed.
   pub fn check_signatures(&self) -> crate::Result<()> {
-    let default = SolanaSignatureHash::default();
+    let default = [0; 64];
     let mut filled: usize = 0;
     let all_are_signed = self.signatures.iter().all(|signature| {
-      filled = filled.wrapping_add(1);
-      signature != &default
+      let is_signed = signature.as_slice() != &default;
+      if is_signed {
+        filled = filled.wrapping_add(1);
+      }
+      is_signed
     });
     if all_are_signed {
       Ok(())
@@ -65,7 +67,7 @@ impl TransactionInput {
     let VersionedMessageInput::V0(message) = &mut self.message;
     if blockhash != message.recent_blockhash {
       message.recent_blockhash = blockhash;
-      self.signatures.iter_mut().for_each(|signature| *signature = SolanaSignatureHash::default());
+      self.signatures.iter_mut().for_each(|signature| *signature = [0; 64].into());
     }
     self.do_sign(buffer, sk)?;
     Ok(())
@@ -110,7 +112,10 @@ impl TransactionInput {
   fn _set_empty_signatures(&mut self) -> crate::Result<()> {
     let VersionedMessageInput::V0(message) = &self.message;
     let len: usize = message.header.num_required_signatures.into();
-    self.signatures = Vector::from_vec(vec![SolanaSignatureHash::default(); len]);
+    self.signatures.clear();
+    for _ in 0..len {
+      self.signatures.push(ArrayWrapper([0; 64]))?;
+    }
     Ok(())
   }
 }

@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "PAC",
+    "price": 28.24,
+    "discount": "5.46",
+    "currency": "R$",
+    "delivery_time": 5,
+    "delivery_range": {
+      "min": 5,
+      "max": 5
+    },
+    "packages": [
+      {
+        "price": 28.24,
+        "discount": "5.46",
+        "format": "box",
+        "dimensions": {
+          "height": "36",
+          "width": "36",
+          "length": "24"
+        },
+        "weight": "5",
+        "insurance_value": 0
+      }
+    ],
+    "additional_services": {
+      "receipt": false,
+      "own_hand": false
+    },
+    "company": {
+      "id": 1,
+      "name": "Correios",
+      "picture": "https://storage.googleapis.com/sandbox-api-superfrete.appspot.com/logos/correios.png"
+    },
+    "has_error": false
+  },
+  {
+    "id": 2,
+    "name": "SEDEX",
+    "price": 21.01,
+    "discount": "14.79",
+    "currency": "R$",
+    "delivery_time": 1,
+    "delivery_range": {
+      "min": 1,
+      "max": 1
+    },
+    "packages": [
+      {
+        "price": 21.01,
+        "discount": "14.79",
+        "format": "box",
+        "dimensions": {
+          "height": "36",
+          "width": "36",
+          "length": "24"
+        },
+        "weight": "5",
+        "insurance_value": 0
+      }
+    ],
+    "additional_services": {
+      "receipt": false,
+      "own_hand": false
+    },
+    "company": {
+      "id": 1,
+      "name": "Correios",
+      "picture": "https://storage.googleapis.com/sandbox-api-superfrete.appspot.com/logos/correios.png"
+    },
+    "has_error": false
+  }
+]

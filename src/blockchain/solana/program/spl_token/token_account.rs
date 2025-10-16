@@ -1,6 +1,6 @@
 use crate::blockchain::solana::{
-  program::spl_token::{AccountBalance, AccountState},
   SolanaAddressHashStr,
+  program::spl_token::{AccountBalance, AccountState},
 };
 
 /// Holds a certain amount of tokens issued by a mint.

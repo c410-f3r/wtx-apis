@@ -1,5 +1,5 @@
 use crate::blockchain::solana::short_vec::{
-  visit_byte, ShortU16, VisitError, VisitStatus, MAX_ENCODING_LENGTH,
+  MAX_ENCODING_LENGTH, ShortU16, VisitError, VisitStatus, visit_byte,
 };
 use core::fmt::Formatter;
 use serde::de::{SeqAccess, Visitor};

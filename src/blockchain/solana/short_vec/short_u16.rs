@@ -1,5 +1,5 @@
 use crate::blockchain::solana::short_vec::ShortU16Visitor;
-use serde::{de::Deserializer, ser::SerializeTuple, Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer, de::Deserializer, ser::SerializeTuple};
 
 pub(crate) struct ShortU16(pub(crate) u16);
 
@@ -18,10 +18,9 @@ impl Serialize for ShortU16 {
     S: Serializer,
   {
     let mut seq = serializer.serialize_tuple(1)?;
-
     let mut rem_val = self.0;
     loop {
-      let mut elem = (rem_val & 0x7f).to_ne_bytes()[0];
+      let mut elem = (rem_val & 0x7f) as u8;
       rem_val = rem_val.wrapping_shr(7);
       if rem_val == 0 {
         seq.serialize_element(&elem)?;

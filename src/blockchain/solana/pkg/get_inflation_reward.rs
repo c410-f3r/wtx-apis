@@ -1,11 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::blockchain::solana::Solana),
+#[wtx::pkg(
   data_format(json_rpc("getInflationReward")),
+  id(crate::blockchain::solana::SolanaId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux};
-  use alloc::vec::Vec;
+  use wtx::collection::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -20,7 +20,7 @@ pub(crate) mod pkg {
   );
 
   #[pkg::res_data]
-  pub type GetInflationRewardRes = Vec<GetInflationReward>;
+  pub type GetInflationRewardRes = Vector<GetInflationReward>;
 
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]

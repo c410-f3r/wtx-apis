@@ -1,0 +1,16 @@
+{
+    "versao": "1.0.0",
+    "cnpj": "99999999999999",
+    "idEcommerce": 9999,
+    "tipo": "nota_fiscal",
+    "dados": {
+        "chaveAcesso": "99999999999999999999999999999999999999999999",
+        "numero": "000001",
+        "serie": "1",
+        "urlDanfe": "https://erp.tiny.com.br/doc.view?id=99999999999999999999999999999999",
+        "idPedidoEcommerce": "999999",
+        "dataEmissao": "2025-07-19",
+        "valorNota": "99.99",
+        "idNotaFiscalTiny": "999999999"
+    }
+}

@@ -12,37 +12,41 @@ pub use posts::pkg::*;
 pub use todos::pkg::*;
 pub use users::pkg::*;
 
-use alloc::{boxed::Box, vec::Vec};
-use wtx::{client_api_framework::network::HttpReqParams, http::Method};
+use alloc::boxed::Box;
+use wtx::{
+  client_api_framework::network::{HttpParams, transport::TransportParams},
+  collection::Vector,
+  http::Method,
+};
 
 /// Generic response used by all packages.
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
-pub enum GenericRes {
+pub enum GenericRes<T> {
   /// One album.
-  Album(Box<Album>),
+  Album(Box<Album<T>>),
   /// Multiple albums.
-  Albums(Vec<Album>),
+  Albums(Vector<Album<T>>),
   /// One comment.
-  Comment(Box<Comment>),
+  Comment(Box<Comment<T>>),
   /// Multiple comments.
-  Comments(Vec<Comment>),
+  Comments(Vector<Comment<T>>),
   /// One photo.
-  Photo(Box<Photo>),
+  Photo(Box<Photo<T>>),
   /// Multiple photos.
-  Photos(Vec<Photo>),
+  Photos(Vector<Photo<T>>),
   /// One post.
-  Post(Box<Post>),
+  Post(Box<Post<T>>),
   /// Multiple posts.
-  Posts(Vec<Post>),
+  Posts(Vector<Post<T>>),
   /// One todo.
-  Todo(Box<Todo>),
+  Todo(Box<Todo<T>>),
   /// Multiple todos.
-  Todos(Vec<Todo>),
+  Todos(Vector<Todo<T>>),
   /// One user.
-  User(Box<User>),
+  User(Box<User<T>>),
   /// Multiple users.
-  Users(Vec<User>),
+  Users(Vector<User<T>>),
 }
 
 /// Generic parameters used by all packages.
@@ -69,19 +73,26 @@ impl<'any> GenericParams<'any> {
   pub(crate) fn manage(
     &mut self,
     endpoint: &str,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    req_params.method = self.method;
+    trans_params.ext_req_params_mut().method = self.method;
     match (self.id_opt, self.nested_opt) {
-      (None, None) | (None, Some(_)) => req_params.uri.push_path(format_args!("/{endpoint}"))?,
-      (Some(id), None) => req_params.uri.push_path(format_args!("/{endpoint}/{id}"))?,
-      (Some(id), Some(nested)) => {
-        req_params.uri.push_path(format_args!("/{endpoint}/{id}/{nested}"))?
+      (None, None) | (None, Some(_)) => {
+        trans_params.ext_req_params_mut().uri.push_path(format_args!("/{endpoint}"))?
       }
+      (Some(id), None) => {
+        trans_params.ext_req_params_mut().uri.push_path(format_args!("/{endpoint}/{id}"))?
+      }
+      (Some(id), Some(nested)) => trans_params
+        .ext_req_params_mut()
+        .uri
+        .push_path(format_args!("/{endpoint}/{id}/{nested}"))?,
     }
-    let mut query_writer = req_params.uri.query_writer()?;
-    for (key, value) in self.query {
-      query_writer = query_writer.write(key, value)?;
+    if let [first, rest @ ..] = self.query {
+      let mut qw = trans_params.ext_req_params_mut().uri.query_writer(first.0, first.1)?;
+      for (key, value) in rest {
+        qw = qw.write(key, value)?;
+      }
     }
     Ok(())
   }

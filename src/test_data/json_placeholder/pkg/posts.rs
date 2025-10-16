@@ -1,12 +1,11 @@
-#[wtx_macros::pkg(
-  api(crate::test_data::json_placeholder::JsonPlaceholder),
+#[wtx::pkg(
   data_format(json),
+  id(crate::test_data::json_placeholder::JsonPlaceholderId),
   transport(http)
 )]
 pub(crate) mod pkg {
   use crate::test_data::json_placeholder::{GenericParams, GenericRes, JsonPlaceholderHttpPkgsAux};
-  use alloc::string::String;
-  use wtx::{client_api_framework::network::HttpReqParams, misc::ArrayString};
+  use wtx::client_api_framework::network::HttpParams;
 
   #[pkg::aux]
   impl<DRSR> JsonPlaceholderHttpPkgsAux<DRSR> {}
@@ -14,9 +13,9 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(
     params: &mut GenericParams<'_>,
-    req_params: &mut HttpReqParams,
+    trans_params: &mut HttpParams,
   ) -> crate::Result<()> {
-    params.manage("posts", req_params)?;
+    params.manage("posts", trans_params)?;
     Ok(())
   }
 
@@ -28,19 +27,19 @@ pub(crate) mod pkg {
   pub struct PostsReq;
 
   #[pkg::res_data]
-  pub type PostsRes = GenericRes;
+  pub type PostsRes<'any> = GenericRes<&'any str>;
 
   /// Post
   #[derive(Debug, serde::Deserialize)]
   #[serde(rename_all = "camelCase")]
-  pub struct Post {
+  pub struct Post<T> {
     /// User id
     pub user_id: u32,
     /// Id
     pub id: u32,
     /// Title
-    pub title: ArrayString<86>,
+    pub title: T,
     /// Body
-    pub body: String,
+    pub body: T,
   }
 }

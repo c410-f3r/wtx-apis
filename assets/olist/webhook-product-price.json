@@ -1,0 +1,15 @@
+{
+    "versao": "1.0.0",
+    "cnpj": "99999999999999",
+    "idEcommerce": 9999,
+    "tipo": "precos",
+    "dados": {
+        "idMapeamento": 9999999,
+        "skuMapeamento": "4",
+        "skuMapeamentoPai": "",
+        "nome": "Foo Bar Baz",
+        "codigo": "4",
+        "preco": 0,
+        "precoPromocional": 0
+    }
+}
