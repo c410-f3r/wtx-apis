@@ -19,8 +19,6 @@ $rt check-with-features . bincode
 $rt check-with-features . bs58
 $rt check-with-features . default
 $rt check-with-features . ed25519-dalek
-$rt check-with-features . json-placeholder
 $rt check-with-features . mercado-pago
-$rt check-with-features . rick-and-morty
 $rt check-with-features . solana
 $rt check-with-features . std

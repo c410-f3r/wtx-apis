@@ -18,11 +18,10 @@ wtx = { default-features = false, features = ["client-api-framework", "http-clie
 
 [features]
 default = []
-json-placeholder = []
+hyperliquid = []
 mercado-pago = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
 olist = ["rust_decimal/serde-with-str", "wtx/serde_urlencoded"]
 pagar-me = ["base64", "wtx/serde"]
-rick-and-morty = []
 solana = ["base64", "bincode", "bs58", "wtx/std"]
 std = []
 super-frete = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str"]

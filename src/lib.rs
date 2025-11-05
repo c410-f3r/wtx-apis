@@ -15,11 +15,10 @@ pub mod blockchain;
 pub mod carrier;
 pub mod erp;
 mod error;
+pub mod exchange;
 pub mod misc;
 pub mod payment_gateway;
 pub mod secret_management;
-pub mod series;
-pub mod test_data;
 #[cfg(all(feature = "std", test))]
 mod tests;
 

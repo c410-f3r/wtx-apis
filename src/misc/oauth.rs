@@ -138,6 +138,6 @@ where
   mem::swap(&mut pkgs_aux.byte_buffer, bytes);
   rslt?;
   let dw = &mut DecodeWrapper::new(bytes);
-  let res = VerbatimDecoder::<OauthResponse<&str>>::decode(pkgs_aux.drsr, dw)?;
+  let res = VerbatimDecoder::<OauthResponse<&str>>::decode(dw)?;
   Ok(res.data)
 }
