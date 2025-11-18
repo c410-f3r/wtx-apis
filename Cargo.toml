@@ -10,7 +10,7 @@ serde_json = { default-features = false, features = ["alloc"], optional = true, 
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
 
-crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.9" }
+crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.10" }
 k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "=0.14.0-pre.11" }
 sha3 = { default-features = false, optional = true, version = "=0.11.0-rc.2" }
 signature = { default-features = false, optional = true, version = "=3.0.0-rc.4" }
