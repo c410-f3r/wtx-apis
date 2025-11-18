@@ -10,9 +10,9 @@ pub(crate) mod yyyy_mm_dd;
 pub(crate) mod yyyy_mm_dd_opt;
 
 pub use concat_array_str::ConcatArrayStr;
-use core::{fmt::Display, str::FromStr};
 #[cfg(any(feature = "mercado-pago", feature = "olist"))]
 pub use oauth::*;
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::IntoDeserializer as _};
 pub use slice_by_commas::SliceByCommas;
 use wtx::collection::ArrayStringU8;
@@ -41,7 +41,7 @@ _create_blockchain_constants!(
 );
 
 /// Deserializes an Base58 string as an array of bytes.
-#[cfg(feature = "bs58")]
+#[cfg(all(feature = "bs58", feature = "serde"))]
 #[inline]
 pub fn deserialize_array_from_base58<'de, D, const N: usize>(
   deserializer: D,
@@ -65,11 +65,12 @@ where
 }
 
 /// Deserializes an arbitrary type from a string.
+#[cfg(feature = "serde")]
 #[inline]
 pub fn deserialize_from_str<'de, D, T>(deserializer: D) -> Result<T, D::Error>
 where
-  T: FromStr,
-  T::Err: Display,
+  T: core::str::FromStr,
+  T::Err: core::fmt::Display,
   D: Deserializer<'de>,
 {
   let s: &str = Deserialize::deserialize(deserializer)?;
@@ -77,6 +78,7 @@ where
 }
 
 /// Deserializes an arbitrary type ignoring its contents.
+#[cfg(feature = "serde")]
 #[inline]
 pub fn deserialize_ignore_any<'de, D, T>(deserializer: D) -> Result<T, D::Error>
 where
@@ -89,6 +91,7 @@ where
 /// Deserializes an arbitrary type from an optional string.
 ///
 /// If the deserialized string is empty, then returns `None`.
+#[cfg(feature = "serde")]
 #[inline]
 pub fn deserialize_opt_considering_empty_str<'de, D, T>(
   deserializer: D,
@@ -104,6 +107,7 @@ where
 }
 
 /// Serializes an arbitrary type as a tuple
+#[cfg(feature = "serde")]
 #[inline]
 pub fn serialize_as_tuple<T, S>(field: T, serializer: S) -> Result<S::Ok, S::Error>
 where

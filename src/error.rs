@@ -11,11 +11,26 @@ pub enum Error {
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
-  /// See [ed25519_dalek::SignatureError].
-  #[cfg(feature = "ed25519-dalek")]
-  Ed25519Dalek(ed25519_dalek::SignatureError),
+  /// See [`rmp_serde::encode::Error`].
+  #[cfg(feature = "rmp-serde")]
+  RmpSerdeEncode(rmp_serde::encode::Error),
+  /// See [`signature::Error`].
+  #[cfg(feature = "signature")]
+  Signature(signature::Error),
+  /// See [`serde_json::Error`].
+  #[cfg(feature = "serde_json")]
+  SerdeJson(serde_json::Error),
   /// See [`wtx::Error`].
   Wtx(wtx::Error),
+
+  // Ethereum
+  //
+  /// A sequence of bytes has a length greater than 32
+  BytesAreGreaterThanWord,
+  /// Indices couldn't identify decoding bytes
+  UnknownDecodingBytes,
+  /// A word points to unknown bytes
+  WordIdxDoesNotHaveCorrespondingBytes,
 
   // Internal
   //
@@ -86,11 +101,27 @@ impl From<bincode::Error> for Error {
   }
 }
 
-#[cfg(feature = "ed25519-dalek")]
-impl From<ed25519_dalek::SignatureError> for Error {
+#[cfg(feature = "signature")]
+impl From<signature::Error> for Error {
   #[inline]
-  fn from(from: ed25519_dalek::SignatureError) -> Self {
-    Self::Ed25519Dalek(from)
+  fn from(from: signature::Error) -> Self {
+    Self::Signature(from)
+  }
+}
+
+#[cfg(feature = "rmp-serde")]
+impl From<rmp_serde::encode::Error> for Error {
+  #[inline]
+  fn from(from: rmp_serde::encode::Error) -> Self {
+    Self::RmpSerdeEncode(from)
+  }
+}
+
+#[cfg(feature = "serde_json")]
+impl From<serde_json::Error> for Error {
+  #[inline]
+  fn from(from: serde_json::Error) -> Self {
+    Self::SerdeJson(from)
   }
 }
 

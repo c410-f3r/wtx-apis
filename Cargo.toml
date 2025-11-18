@@ -2,33 +2,43 @@
 base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
-ed25519-dalek = { default-features = false, optional = true, version = "3.0.0-pre.1" }
+ed25519-dalek = { default-features = false, optional = true, version = "=3.0.0-pre.1" }
+rmp-serde = { default-features = false, optional = true, version = "1.0" }
 rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
-serde = { default-features = false, features = ["alloc", "derive"], version = "1.0" }
+serde = { default-features = false, features = ["alloc", "derive"], optional = true, version = "1.0" }
+serde_json = { default-features = false, features = ["alloc"], optional = true, version = "1.0" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx" }
+
+crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.9" }
+k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "=0.14.0-pre.11" }
+sha3 = { default-features = false, optional = true, version = "=0.11.0-rc.2" }
+signature = { default-features = false, optional = true, version = "=3.0.0-rc.4" }
+
+ecdsa = { default-features = false, optional = true, version = "=0.17.0-rc.7" }
+elliptic-curve = { default-features = false, optional = true, version = "=0.14.0-rc.16" }
+rfc6979 = { default-features = false, optional = true, version = "=0.5.0-rc.1" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
 rust_decimal_macros = { default-features = false, version = "1.0" }
-serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
 tracing-subscriber = { default-features = false, features = ["env-filter", "fmt", "tracing-log"], version = "0.3" }
 wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "pool", "serde_json", "tokio", "tokio-rustls", "tracing", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx" }
 
 [features]
 default = []
-json-placeholder = []
-mercado-pago = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
+ethereum = ["crypto-bigint", "serde", "sha3"]
+hyperliquid = ["ethereum", "k256", "rmp-serde", "rust_decimal/serde", "serde_json", "signature"]
+mercado-pago = ["serde", "serde_json", "rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
 olist = ["rust_decimal/serde-with-str", "wtx/serde_urlencoded"]
 pagar-me = ["base64", "wtx/serde"]
-rick-and-morty = []
-solana = ["base64", "bincode", "bs58", "wtx/std"]
+solana = ["base64", "bincode", "bs58", "ed25519-dalek", "serde", "signature", "wtx/std"]
 std = []
 super-frete = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str"]
 vault = []
 
-_integration-tests = []
+_integration-tests = ["std"]
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

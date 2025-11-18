@@ -18,18 +18,18 @@ pub(crate) mod pkg {
       config: Option<SendTransactionConfig>,
       tx: &TransactionInput,
     ) -> crate::Result<SendTransactionReq> {
-      self.byte_buffer.clear();
-      bincode::serialize_into(&mut self.byte_buffer, tx)?;
+      self.bytes_buffer.clear();
+      bincode::serialize_into(&mut self.bytes_buffer, tx)?;
       let encoded = if let Some(SendTransactionConfig {
         encoding: Some(SendTransactionEncoding::Base64),
         ..
       }) = config
       {
-        base64::engine::general_purpose::STANDARD.encode(&self.byte_buffer)
+        base64::engine::general_purpose::STANDARD.encode(&self.bytes_buffer)
       } else {
-        bs58::encode(&self.byte_buffer).into_string()
+        bs58::encode(&self.bytes_buffer).into_string()
       };
-      self.byte_buffer.clear();
+      self.bytes_buffer.clear();
       Ok(SendTransactionReq(encoded, config))
     }
   }

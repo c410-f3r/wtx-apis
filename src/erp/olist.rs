@@ -53,7 +53,7 @@ pub use webhook_request::*;
 use wtx::{
   client_api_framework::{
     Api,
-    misc::{RequestLimit, RequestThrottling},
+    misc::{RequestCounter, RequestLimit},
   },
   misc::{Lease, LeaseMut},
   sync::Arc,
@@ -69,7 +69,7 @@ pub const ACC_PROD_URI: &str =
 #[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http))]
 pub struct Olist {
   common: OauthRefreshToken,
-  rt: RequestThrottling,
+  rc: RequestCounter,
 }
 
 impl Olist {
@@ -84,7 +84,7 @@ impl Olist {
     const _1_MIN: Duration = Duration::from_secs(30);
     Ok(Self {
       common: OauthRefreshToken::new(client_id, client_secret, token_ttl_slack),
-      rt: RequestThrottling::from_rl(match plan {
+      rc: RequestCounter::new(match plan {
         Plan::Crescer => RequestLimit::new(30, _1_MIN),
         Plan::Evoluir => RequestLimit::new(60, _1_MIN),
         Plan::Potencializar => RequestLimit::new(100, _1_MIN),
@@ -103,7 +103,7 @@ impl Api for Olist {
   type Id = OlistId;
 
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
-    self.rt.rc.update_params(&self.rt.rl).await?;
+    self.rc.update_params().await?;
     Ok(())
   }
 }

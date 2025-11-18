@@ -18,7 +18,7 @@ jobs:
           components: clippy,rustfmt
           override: true
           profile: minimal
-          toolchain: nightly-2025-06-11
+          toolchain: nightly-2025-10-31
 
       - uses: Swatinem/rust-cache@v2
 
@@ -35,7 +35,7 @@ jobs:
           components: clippy,rustfmt
           override: true
           profile: minimal
-          toolchain: nightly-2025-06-11
+          toolchain: nightly-2025-10-31
 
       - uses: Swatinem/rust-cache@v2
 

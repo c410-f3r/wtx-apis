@@ -1,5 +1,4 @@
 use core::fmt::{Display, Formatter};
-use serde::Serialize;
 
 #[derive(Debug)]
 /// Utility that serializes strings as a single string.
@@ -18,7 +17,8 @@ impl<const N: usize> Display for ConcatArrayStr<'_, N> {
   }
 }
 
-impl<const N: usize> Serialize for ConcatArrayStr<'_, N> {
+#[cfg(feature = "serde")]
+impl<const N: usize> serde::Serialize for ConcatArrayStr<'_, N> {
   #[inline]
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
   where

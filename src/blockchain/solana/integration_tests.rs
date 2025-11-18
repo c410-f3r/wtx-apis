@@ -11,7 +11,7 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::{
-    misc::{PairMut, RequestLimit, RequestThrottling},
+    misc::{PairMut, RequestCounter, RequestLimit},
     network::{HttpParams, WsParams, transport::SendingReceivingTransport},
   },
   collection::Vector,
@@ -50,10 +50,7 @@ static BOB_PK: SolanaAddressHash = [
 static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static SOLANA: LazyLock<Mutex<Solana>> = LazyLock::new(|| {
-  Mutex::new(Solana::new(Some(RequestThrottling::from_rl(RequestLimit::new(
-    1,
-    Duration::from_secs(3),
-  )))))
+  Mutex::new(Solana::new(Some(RequestCounter::new(RequestLimit::new(1, Duration::from_secs(3))))))
 });
 
 create_http_test!(
@@ -798,7 +795,7 @@ create_http_test!(#[],
     let from_keypair = ed25519_dalek::SigningKey::from_bytes(&ALICE_SK);
     let blockhash = latest_blockhash(pkgs_aux, trans).await;
     let tx = crate::blockchain::solana::TransactionInput::new(
-      &mut pkgs_aux.byte_buffer,
+      &mut pkgs_aux.bytes_buffer,
       blockhash,
       transfer_message(blockhash, *ALICE_PK).into(),
       &[from_keypair],
@@ -869,7 +866,6 @@ create_ws_test!(
   &mut *SOLANA.lock().await,
   ws(),
   account_subscribe,
-  (account_unsubscribe),
   |pkgs_aux, trans| async {
     [trans
       .send_pkg_recv_decode_contained(
@@ -895,7 +891,6 @@ create_ws_test!(
   &mut *SOLANA.lock().await,
   ws(),
   root_subscribe,
-  (root_unsubscribe),
   |pkgs_aux, trans| async {
     [trans
       .send_pkg_recv_decode_contained(&mut pkgs_aux.root_subscribe().build(), pkgs_aux)
@@ -912,7 +907,6 @@ create_ws_test!(
   &mut *SOLANA.lock().await,
   ws(),
   slot_subscribe,
-  (slot_unsubscribe),
   |pkgs_aux, trans| async {
     [trans
       .send_pkg_recv_decode_contained(&mut pkgs_aux.slot_subscribe().build(), pkgs_aux)
@@ -929,7 +923,6 @@ create_ws_test!(
   &mut *SOLANA.lock().await,
   ws(),
   slot_updates_subscribe,
-  (slots_updates_unsubscribe),
   |pkgs_aux, trans| async {
     [trans
       .send_pkg_recv_decode_contained(&mut pkgs_aux.slots_updates_subscribe().build(), pkgs_aux)
@@ -946,7 +939,6 @@ create_ws_test!(
   &mut *SOLANA.lock().await,
   ws(),
   ws_reqs_with_array,
-  (account_unsubscribe, account_unsubscribe),
   |pkgs_aux, trans| async {
     let mut array = [
       &mut pkgs_aux

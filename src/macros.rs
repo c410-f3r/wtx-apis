@@ -70,7 +70,6 @@ macro_rules! create_ws_test {
     $api:expr,
     $drsr_exp:expr,
     $test:ident,
-    ($($unsub:ident),+),
     |$parts_cb_pkgs_aux:ident, $parts_cb_trans:ident| $parts_cb:expr
   ) => {
     $crate::create_generic_test! {
@@ -79,15 +78,7 @@ macro_rules! create_ws_test {
       $drsr_exp,
       $test,
       |$parts_cb_pkgs_aux, $parts_cb_trans| $parts_cb,
-      |pkgs_aux, trans, subs| async move {
-        use wtx::client_api_framework::network::transport::SendingTransport;
-        let mut iter = subs.into_iter();
-        let ids = &mut [$( pkgs_aux.$unsub().data(iter.next().unwrap()).build(), )+][..];
-        let _res = trans.send_pkg(
-          &mut wtx::client_api_framework::pkg::BatchPkg::new(ids, pkgs_aux),
-          pkgs_aux
-        ).await.unwrap();
-      },
+      |_pkgs_aux, _trans, _subs| async {},
       {
         let uri = wtx::misc::Uri::new($uri);
         wtx::web_socket::WebSocketConnector::default()

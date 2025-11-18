@@ -18,10 +18,10 @@ pub(crate) mod pkg {
       config: Option<GetFeeForMessageConfig>,
       message: &MessageInput,
     ) -> crate::Result<GetFeeForMessageReq> {
-      self.byte_buffer.clear();
-      bincode::serialize_into(&mut self.byte_buffer, message)?;
-      let string = base64::engine::general_purpose::STANDARD.encode(&self.byte_buffer);
-      self.byte_buffer.clear();
+      self.bytes_buffer.clear();
+      bincode::serialize_into(&mut self.bytes_buffer, message)?;
+      let string = base64::engine::general_purpose::STANDARD.encode(&self.bytes_buffer);
+      self.bytes_buffer.clear();
       Ok(GetFeeForMessageReq(string, config))
     }
   }

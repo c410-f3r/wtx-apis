@@ -42,7 +42,7 @@ pub use transaction::*;
 use wtx::{
   client_api_framework::{
     Api,
-    misc::{Pair, PairMut, RequestThrottling},
+    misc::{Pair, PairMut, RequestCounter},
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
@@ -70,13 +70,13 @@ _create_blockchain_constants!(
 #[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Solana {
   /// If some, tells that each request must respect calling intervals.
-  pub rt: Option<RequestThrottling>,
+  pub rc: Option<RequestCounter>,
 }
 
 impl Solana {
   /// If desired, it is possible to instantiate directly instead of using this method.
-  pub const fn new(rt: Option<RequestThrottling>) -> Self {
-    Self { rt }
+  pub const fn new(rt: Option<RequestCounter>) -> Self {
+    Self { rc: rt }
   }
 
   #[doc(hidden)]
@@ -230,8 +230,8 @@ impl Api for Solana {
   type Id = SolanaId;
 
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
-    if let Some(ref mut rt) = self.rt {
-      rt.rc.update_params(&rt.rl).await?;
+    if let Some(rc) = &mut self.rc {
+      rc.update_params().await?;
     }
     Ok(())
   }

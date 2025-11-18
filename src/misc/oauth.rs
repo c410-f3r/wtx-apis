@@ -6,7 +6,7 @@ use core::{fmt::Debug, mem};
 pub use refresh_token::*;
 use wtx::{
   client_api_framework::{
-    Api, SendBytesSource,
+    Api,
     network::{
       HttpParams,
       transport::{SendingReceivingTransport, TransportParams as _},
@@ -132,12 +132,12 @@ where
   trans_params.ext_req_params_mut().method = Method::Post;
   trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
-  mem::swap(&mut pkgs_aux.byte_buffer, bytes);
-  pkgs_aux.log_body();
-  let rslt = trans.send_bytes_recv(SendBytesSource::PkgsAux, &mut pkgs_aux).await;
-  mem::swap(&mut pkgs_aux.byte_buffer, bytes);
+  mem::swap(&mut pkgs_aux.bytes_buffer, bytes);
+  pkgs_aux.send_bytes_buffer = true;
+  let rslt = trans.send_bytes_recv(&[], &mut pkgs_aux).await;
+  mem::swap(&mut pkgs_aux.bytes_buffer, bytes);
   rslt?;
   let dw = &mut DecodeWrapper::new(bytes);
-  let res = VerbatimDecoder::<OauthResponse<&str>>::decode(pkgs_aux.drsr, dw)?;
+  let res = VerbatimDecoder::<OauthResponse<&str>>::decode(dw)?;
   Ok(res.data)
 }
