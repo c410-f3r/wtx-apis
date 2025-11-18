@@ -17,7 +17,7 @@ signature = { default-features = false, optional = true, version = "=3.0.0-rc.4"
 
 ecdsa = { default-features = false, optional = true, version = "=0.17.0-rc.7" }
 elliptic-curve = { default-features = false, optional = true, version = "=0.14.0-rc.16" }
-rfc6979 = { default-features = false, optional = true, version = "=0.5.0-rc.1" }
+rfc6979 = { default-features = false, optional = true, version = "=0.5.0-rc.3" }
 
 [dev-dependencies]
 dotenv = { default-features = false, version = "0.15" }
