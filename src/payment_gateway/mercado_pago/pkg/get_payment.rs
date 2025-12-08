@@ -36,7 +36,11 @@ pub(crate) mod pkg {
   {
     manage_before_sending((api, drsr.lease_mut(), trans, trans_params), bytes).await?;
     trans_params.ext_req_params_mut().method = Method::Get;
-    trans_params.ext_req_params_mut().uri.push_path(format_args!("/v1/payments/{}", *params))?;
+    trans_params
+      .ext_req_params_mut()
+      .rrb
+      .uri
+      .push_path(format_args!("/v1/payments/{}", *params))?;
     Ok(())
   }
 

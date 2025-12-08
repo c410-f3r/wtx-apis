@@ -12,7 +12,7 @@ use wtx::{
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static MERCADO_PAGO: LazyLock<Mutex<MercadoPago>> = LazyLock::new(|| {
   let client_id = std::env::var("MERCADO_PAGO_CLIENT_ID").unwrap();
@@ -40,7 +40,7 @@ create_http_test!(
             expiration_date_from: None,
             expiration_date_to: None,
             external_reference: None,
-            items: Vector::from_iter([Item {
+            items: Vector::from_iterator([Item {
               id: "1",
               title: "Test title",
               description: Some("Test description"),
@@ -59,7 +59,7 @@ create_http_test!(
               default_payment_method_id: None,
               excluded_payment_methods: None,
               excluded_payment_types: Some(
-                ArrayVectorU8::from_iter([ExcludedPaymentType { id: PaymentTypeId::Ticket }])
+                ArrayVectorU8::from_iterator([ExcludedPaymentType { id: PaymentTypeId::Ticket }])
                   .unwrap(),
               ),
               installments: Some(12),

@@ -25,7 +25,7 @@ where
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
   for<'de> VerbatimDecoder<OauthResponse<&'de str>>: DecodeSeq<'de, De<DRSR>>,
 {
-  trans_params.ext_req_params_mut().uri.push_path(format_args!("/oauth/token"))?;
+  trans_params.ext_req_params_mut().rrb.uri.push_path(format_args!("/oauth/token"))?;
   let is_test = api.is_test;
   _manage_client_credentials((api, drsr, trans, trans_params), buffer, |local_bytes| {
     let _ = local_bytes.extend_from_copyable_slices([
@@ -35,8 +35,8 @@ where
     Ok(())
   })
   .await?;
-  let headers = &mut trans_params.ext_req_params_mut().headers;
+  let headers = &mut trans_params.ext_req_params_mut().rrb.headers;
   let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.common.access_token))?;
-  trans_params.ext_req_params_mut().uri.truncate_with_initial_len();
+  trans_params.ext_req_params_mut().rrb.uri.truncate_with_initial_len();
   Ok(())
 }

@@ -361,9 +361,9 @@ mod tests {
         [[0; 32], [1; 32], [2; 32], [3; 32], [4; 32], [5; 32], [6; 32], [7; 32], [8; 32], [9; 32]];
       let payer = pubkeys[0];
       let program_id = pubkeys[6];
-      let instructions = Vector::from_iter([InstructionInput {
+      let instructions = Vector::from_iterator([InstructionInput {
         program_id,
-        accounts: Vector::from_iter([
+        accounts: Vector::from_iterator([
           InstructionAccountInput::sign_and_writable(pubkeys[1]),
           InstructionAccountInput::sign(pubkeys[2]),
           InstructionAccountInput::writable(pubkeys[3]),
@@ -374,10 +374,10 @@ mod tests {
         data: Vector::new(),
       }])
       .unwrap();
-      let address_lookup_table_accounts = Vector::from_iter([
+      let address_lookup_table_accounts = Vector::from_iterator([
         AddressLookupTableAccount {
           key: pubkeys[7],
-          addresses: Vector::from_iter([pubkeys[4], pubkeys[5], pubkeys[6]]).unwrap(),
+          addresses: Vector::from_iterator([pubkeys[4], pubkeys[5], pubkeys[6]]).unwrap(),
         },
         AddressLookupTableAccount { key: pubkeys[8], addresses: Vector::new() },
       ])
@@ -394,14 +394,14 @@ mod tests {
         )
         .unwrap(),
         MessageInput {
-          account_keys: Vector::from_iter([
+          account_keys: Vector::from_iterator([
             pubkeys[0], pubkeys[1], pubkeys[2], pubkeys[3], program_id
           ])
           .unwrap(),
-          address_table_lookups: Vector::from_iter([MessageAddressTableLookup {
+          address_table_lookups: Vector::from_iterator([MessageAddressTableLookup {
             account_key: address_lookup_table_accounts[0].key,
-            writable_indexes: Vector::from_iter([0]).unwrap(),
-            readonly_indexes: Vector::from_iter([1]).unwrap(),
+            writable_indexes: Vector::from_iterator([0]).unwrap(),
+            readonly_indexes: Vector::from_iterator([1]).unwrap(),
           }])
           .unwrap(),
           header: MessageHeaderInput {
@@ -409,9 +409,9 @@ mod tests {
             num_readonly_signed_accounts: 1,
             num_readonly_unsigned_accounts: 1
           },
-          instructions: Vector::from_iter([CompiledInstructionInput {
+          instructions: Vector::from_iterator([CompiledInstructionInput {
             program_id_index: 4,
-            accounts: Vector::from_iter([1, 2, 3, 5, 6]).unwrap(),
+            accounts: Vector::from_iterator([1, 2, 3, 5, 6]).unwrap(),
             data: Vector::new(),
           }])
           .unwrap(),

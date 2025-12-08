@@ -183,12 +183,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
-
-[[package]]
 name = "ecdsa"
 version = "0.17.0-rc.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -379,12 +373,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2874a2af47a2325c2001a6e6fad9b16a53b802102b528163885171cf92b15976"
 
 [[package]]
-name = "log"
-version = "0.4.28"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
-
-[[package]]
 name = "matchers"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -408,6 +396,15 @@ dependencies = [
  "libc",
  "wasi",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "nu-ansi-term"
+version = "0.50.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
+dependencies = [
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -891,17 +888,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tracing-log"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee855f1f400bd0e5c02d150ae5de3840039a3f54b025156404e34c23c03f47c3"
-dependencies = [
- "log",
- "once_cell",
- "tracing-core",
-]
-
-[[package]]
 name = "tracing-subscriber"
 version = "0.3.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -914,7 +900,17 @@ dependencies = [
  "thread_local",
  "tracing",
  "tracing-core",
- "tracing-log",
+]
+
+[[package]]
+name = "tracing-tree"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac87aa03b6a4d5a7e4810d1a80c19601dbe0f8a837e9177f23af721c7ba7beec"
+dependencies = [
+ "nu-ansi-term",
+ "tracing-core",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -1120,8 +1116,9 @@ checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
 
 [[package]]
 name = "wtx"
-version = "0.39.0"
-source = "git+https://github.com/c410-f3r/wtx#0027fa7fdddca22cfe165ee39e5eb35e234c8033"
+version = "0.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75edb3e264dcd7c3f0e441dbcdc2c3cd1399cd741a8591498492642a9f6b62c1"
 dependencies = [
  "base64",
  "foldhash",
@@ -1138,6 +1135,8 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tracing",
+ "tracing-subscriber",
+ "tracing-tree",
  "webpki-roots",
  "wtx-macros",
 ]
@@ -1150,12 +1149,8 @@ dependencies = [
  "bincode",
  "bs58",
  "crypto-bigint",
- "dotenv",
- "ecdsa",
  "ed25519-dalek",
- "elliptic-curve",
  "k256",
- "rfc6979",
  "rmp-serde",
  "rust_decimal",
  "rust_decimal_macros",
@@ -1165,14 +1160,14 @@ dependencies = [
  "signature",
  "tokio",
  "tokio-rustls",
- "tracing-subscriber",
  "wtx",
 ]
 
 [[package]]
 name = "wtx-macros"
-version = "0.5.0"
-source = "git+https://github.com/c410-f3r/wtx#0027fa7fdddca22cfe165ee39e5eb35e234c8033"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b18ac6e4ca3007aeee595dbec02f27823fee3838d06aba3690070d5f2f54acdd"
 dependencies = [
  "proc-macro2",
  "quote",

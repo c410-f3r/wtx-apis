@@ -19,27 +19,24 @@ use wtx::{
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
-const HTTP_URI: &str = "https://api.testnet.solana.com";
-const TO_NORMAL_ACCOUNT: &str = "FiuQrMbFUYka1Goec4wdhoiNq3Ms99cxGrW8JWsWfPnJ";
-const TO_SOL_TOKEN_ACCOUNT: &str = "CDqKzghiixHryqny9r8RPJzYfg3hiiF7e8JecsF6fuJw";
+const HTTP_URI: &str = "https://api.devnet.solana.com";
+const TO_NORMAL_ACCOUNT: &str = "9fpynsTdxijRFifMx8HsBijF73kksrGddzAac3aFNjVx";
+const TO_SOL_TOKEN_ACCOUNT: &str = "8oPiFowg2iDT1a9nsPfyEyfLuM1iKXFjpGrzfqEzRbXH";
 const TO_SOL_TOKEN_MINT: &str = "So11111111111111111111111111111111111111112";
-const TOKEN_PROGRAM: &str = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
-const WS_URI: &str = "wss://api.testnet.solana.com";
+const TOKEN_PROGRAM: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+const WS_URI: &str = "wss://api.devnet.solana.com";
 
 #[cfg(feature = "ed25519-dalek")]
-static ALICE_PK: LazyLock<SolanaAddressHash> = LazyLock::new(|| {
-  let mut buffer = SolanaAddressHash::default();
-  for (s, b) in std::env::var("ALICE_PK").unwrap().split(',').zip(&mut buffer) {
-    *b = s.parse().unwrap();
-  }
-  buffer
-});
+static ALICE_PK: SolanaAddressHash = [
+  31, 10, 146, 126, 107, 120, 34, 80, 255, 53, 26, 202, 40, 215, 173, 96, 136, 120, 105, 168, 157,
+  98, 85, 80, 101, 195, 154, 183, 240, 144, 33, 168,
+];
 #[cfg(feature = "ed25519-dalek")]
 static ALICE_SK: LazyLock<SolanaAddressHash> = LazyLock::new(|| {
+  use wtx::de::decode_hex;
+  let alice_sk = std::env::var("ALICE_SK").unwrap();
   let mut buffer = SolanaAddressHash::default();
-  for (s, b) in std::env::var("ALICE_SK").unwrap().split(',').zip(&mut buffer) {
-    *b = s.parse().unwrap();
-  }
+  let _ = decode_hex(alice_sk.as_bytes(), &mut buffer).unwrap();
   buffer
 });
 #[cfg(feature = "ed25519-dalek")]
@@ -47,7 +44,7 @@ static BOB_PK: SolanaAddressHash = [
   24, 147, 209, 196, 197, 185, 156, 48, 170, 96, 192, 119, 193, 150, 129, 12, 221, 102, 119, 84,
   33, 221, 67, 224, 185, 107, 130, 157, 207, 85, 161, 30,
 ];
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static SOLANA: LazyLock<Mutex<Solana>> = LazyLock::new(|| {
   Mutex::new(Solana::new(Some(RequestCounter::new(RequestLimit::new(1, Duration::from_secs(3))))))
@@ -200,8 +197,9 @@ create_http_test!(#[],
   &*CLIENT,
   |pkgs_aux, trans| async {
     let slot = slot(pkgs_aux, trans).await;
+    let pkg = &mut pkgs_aux.get_block_time().data(slot).build();
     let _res = trans
-      .send_pkg_recv_decode_contained(&mut pkgs_aux.get_block_time().data(slot).build(), pkgs_aux)
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
       .await
       .unwrap()
       .result
@@ -270,7 +268,7 @@ create_http_test!(#[],
         .send_pkg_recv_decode_contained(
           &mut pkgs_aux
             .get_fee_for_message()
-            .data(None, &transfer_message(blockhash, *ALICE_PK))
+            .data(None, &transfer_message(blockhash, ALICE_PK))
             .unwrap()
             .build(),
           pkgs_aux
@@ -655,21 +653,23 @@ create_http_test!(#[],
   get_token_accounts_by_owner,
   &*CLIENT,
   |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux
+      .get_token_accounts_by_owner()
+      .data(
+        TO_NORMAL_ACCOUNT,
+        MintOrProgramId::Mint(TO_SOL_TOKEN_MINT),
+        Some(GetTokenAccountsByOwnerConfig {
+          commitment: None,
+          data_slice: None,
+          encoding: Some(AccountEncoding::JsonParsed),
+          min_context_slot: None,
+        }),
+      )
+      .build();
+    pkgs_aux.log_body();
     let _res = trans
       .send_pkg_recv_decode_contained(
-        &mut pkgs_aux
-          .get_token_accounts_by_owner()
-          .data(
-            TO_NORMAL_ACCOUNT,
-            MintOrProgramId::Mint(TO_SOL_TOKEN_MINT),
-            Some(GetTokenAccountsByOwnerConfig {
-              commitment: None,
-              data_slice: None,
-              encoding: Some(AccountEncoding::JsonParsed),
-              min_context_slot: None,
-            }),
-          )
-          .build(),
+        pkg,
         pkgs_aux,
       )
       .await
@@ -797,7 +797,7 @@ create_http_test!(#[],
     let tx = crate::blockchain::solana::TransactionInput::new(
       &mut pkgs_aux.bytes_buffer,
       blockhash,
-      transfer_message(blockhash, *ALICE_PK).into(),
+      transfer_message(blockhash, ALICE_PK).into(),
       &[from_keypair],
     )
     .unwrap();
@@ -975,7 +975,7 @@ fn http() -> (SerdeJson, HttpParams) {
 #[cfg(feature = "ed25519-dalek")]
 async fn latest_blockhash(
   pkgs_aux: &mut SolanaMutPkgsAux<'_, SerdeJson, HttpParams>,
-  mut trans: &ClientPoolTokioRustls<fn(&()), (), ()>,
+  mut trans: &ClientPoolTokioRustls<fn(&()), ()>,
 ) -> SolanaAddressHash {
   trans
     .send_pkg_recv_decode_contained(
@@ -992,14 +992,10 @@ async fn latest_blockhash(
 
 async fn slot(
   pkgs_aux: &mut SolanaMutPkgsAux<'_, SerdeJson, HttpParams>,
-  mut trans: &ClientPoolTokioRustls<fn(&()), (), ()>,
+  mut trans: &ClientPoolTokioRustls<fn(&()), ()>,
 ) -> u64 {
-  trans
-    .send_pkg_recv_decode_contained(&mut pkgs_aux.get_slot().data(None).build(), pkgs_aux)
-    .await
-    .unwrap()
-    .result
-    .unwrap()
+  let pkg = &mut pkgs_aux.get_slot().data(None).build();
+  trans.send_pkg_recv_decode_contained(pkg, pkgs_aux).await.unwrap().result.unwrap()
 }
 
 #[cfg(feature = "ed25519-dalek")]
@@ -1008,9 +1004,9 @@ fn transfer_message(
   from_public_key: [u8; 32],
 ) -> crate::blockchain::solana::MessageInput {
   let transfer = crate::blockchain::solana::InstructionInput {
-    accounts: Vector::from_iter([
+    accounts: Vector::from_iterator([
       crate::blockchain::solana::InstructionAccountInput {
-        pubkey: *ALICE_PK,
+        pubkey: ALICE_PK,
         is_signer: true,
         is_writable: true,
       },
@@ -1021,7 +1017,7 @@ fn transfer_message(
       },
     ])
     .unwrap(),
-    data: Vector::from_iter([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).unwrap(),
+    data: Vector::from_iterator([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).unwrap(),
     program_id: [0; 32],
   };
   crate::blockchain::solana::MessageInput::with_params(

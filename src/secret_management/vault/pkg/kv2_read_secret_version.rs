@@ -18,14 +18,16 @@ pub(crate) mod pkg {
   ) -> crate::Result<()> {
     trans_params
       .ext_req_params_mut()
+      .rrb
       .headers
       .push_from_iter(Header::from_name_and_value("x-vault-token", [api.token.as_str()]))?;
     trans_params
       .ext_req_params_mut()
+      .rrb
       .uri
       .push_path(format_args!("/{}/data/{}", params.secret_mount_path, params.path))?;
     if let Some(elem) = params.version {
-      let _ = trans_params.ext_req_params_mut().uri.query_writer("version", elem)?;
+      let _ = trans_params.ext_req_params_mut().rrb.uri.query_writer("version", elem)?;
     }
     Ok(())
   }

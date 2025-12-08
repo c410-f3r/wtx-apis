@@ -116,18 +116,3 @@ where
 {
   (field,).serialize(serializer)
 }
-
-#[allow(dead_code)]
-#[cfg(test)]
-pub(crate) fn init_test_cfg() {
-  use tracing_subscriber::{
-    EnvFilter,
-    fmt::{Subscriber, format::FmtSpan},
-    util::SubscriberInitExt,
-  };
-  let _rslt = Subscriber::builder()
-    .with_env_filter(EnvFilter::from_default_env())
-    .with_span_events(FmtSpan::CLOSE | FmtSpan::NEW)
-    .finish()
-    .try_init();
-}

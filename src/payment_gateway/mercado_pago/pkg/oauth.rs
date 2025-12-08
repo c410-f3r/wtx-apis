@@ -19,7 +19,7 @@ pub(crate) mod pkg {
   #[pkg::before_sending]
   async fn before_sending(trans_params: &mut HttpParams) -> crate::Result<()> {
     trans_params.ext_req_params_mut().method = Method::Post;
-    trans_params.ext_req_params_mut().uri.push_path(format_args!("/oauth/token"))?;
+    trans_params.ext_req_params_mut().rrb.uri.push_path(format_args!("/oauth/token"))?;
     Ok(())
   }
 

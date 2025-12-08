@@ -34,7 +34,7 @@ static PRODUCTS: [QuoteFreightReqProduct; 2] = [
   },
 ];
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static SUPER_FRETE: LazyLock<Mutex<SuperFrete>> = LazyLock::new(|| {
   let token = std::env::var("SUPER_FRETE_TOKEN").unwrap();

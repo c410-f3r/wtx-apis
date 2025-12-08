@@ -14,10 +14,7 @@ macro_rules! create_generic_test {
     #[test]
     fn $test() {
       $crate::tests::_RUNTIME.block_on(async {
-        #[cfg(test)]
-        $crate::misc::init_test_cfg();
-        #[cfg(test)]
-        let _path = dotenv::dotenv();
+        let _tracing = wtx::misc::tracing_tree_init(None);
         let api = $api;
         let (drsr, ext_req_params) = $drsr_exp;
         let mut pair = wtx::client_api_framework::misc::Pair::new(

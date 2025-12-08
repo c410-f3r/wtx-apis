@@ -36,12 +36,13 @@ pub(crate) mod pkg {
     __DRSR: LeaseMut<SerdeJson>,
   {
     manage_before_sending((api, drsr.lease_mut(), trans, trans_params), bytes).await?;
-    trans_params.ext_req_params_mut().headers.push_from_iter(Header::from_name_and_value(
+    trans_params.ext_req_params_mut().rrb.headers.push_from_iter(Header::from_name_and_value(
       "x-idempotency-key",
       [params.idempotency_key].into_iter(),
     ))?;
     trans_params
       .ext_req_params_mut()
+      .rrb
       .uri
       .push_path(format_args!("/v1/chargebacks/{}", params.id))?;
     Ok(())

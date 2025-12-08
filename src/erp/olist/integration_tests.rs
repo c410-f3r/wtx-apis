@@ -9,7 +9,7 @@ use wtx::{
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
-static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn(&()), (), ()>> =
+static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static OLIST: LazyLock<Mutex<Olist>> = LazyLock::new(|| {
   let access_token = std::env::var("OLIST_ACCESS_TOKEN").unwrap();

@@ -128,7 +128,7 @@ where
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
   for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
 {
-  trans_params.ext_req_params_mut().headers.clear();
+  trans_params.ext_req_params_mut().rrb.headers.clear();
   trans_params.ext_req_params_mut().method = Method::Post;
   trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);

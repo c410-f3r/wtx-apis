@@ -11,8 +11,8 @@ pub(crate) async fn manage_before_sending(
   cb: impl FnOnce(&mut UriString) -> wtx::Result<()>,
 ) -> crate::Result<()> {
   api.common.manage_access_token().await;
-  cb(&mut trans_params.ext_req_params_mut().uri)?;
-  let headers = &mut trans_params.ext_req_params_mut().headers;
+  cb(&mut trans_params.ext_req_params_mut().rrb.uri)?;
+  let headers = &mut trans_params.ext_req_params_mut().rrb.headers;
   let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.common.access_token))?;
   Ok(())
 }
