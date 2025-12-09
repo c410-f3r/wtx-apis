@@ -493,9 +493,9 @@ checksum = "7a2d987857b319362043e95f5353c0535c1f58eec5336fdfcf626430af7def58"
 
 [[package]]
 name = "rfc6979"
-version = "0.5.0-rc.1"
+version = "0.5.0-rc.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d369f9c4f79388704648e7bcb92749c0d6cf4397039293a9b747694fa4fb4bae"
+checksum = "63b8e2323084c987a72875b2fd682b7307d5cf14d47e3875bb5e89948e8809d4"
 dependencies = [
  "hmac",
  "subtle",
