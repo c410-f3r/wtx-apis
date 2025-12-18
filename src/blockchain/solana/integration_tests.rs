@@ -5,7 +5,13 @@ use crate::blockchain::solana::{
   SolanaMutPkgsAux,
 };
 #[cfg(feature = "ed25519-dalek")]
-use crate::blockchain::{ConfirmTransactionOptions, solana::SolanaAddressHash};
+use crate::{
+  blockchain::{
+    ConfirmTransactionOptions,
+    solana::{SolanaAddressHash, confirm_signatures},
+  },
+  tests::_VARS,
+};
 use core::time::Duration;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
@@ -26,26 +32,18 @@ const TO_SOL_TOKEN_MINT: &str = "So11111111111111111111111111111111111111112";
 const TOKEN_PROGRAM: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const WS_URI: &str = "wss://api.devnet.solana.com";
 
+static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
+  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 #[cfg(feature = "ed25519-dalek")]
-static ALICE_PK: SolanaAddressHash = [
-  31, 10, 146, 126, 107, 120, 34, 80, 255, 53, 26, 202, 40, 215, 173, 96, 136, 120, 105, 168, 157,
-  98, 85, 80, 101, 195, 154, 183, 240, 144, 33, 168,
-];
-#[cfg(feature = "ed25519-dalek")]
-static ALICE_SK: LazyLock<SolanaAddressHash> = LazyLock::new(|| {
-  use wtx::de::decode_hex;
-  let alice_sk = std::env::var("ALICE_SK").unwrap();
-  let mut buffer = SolanaAddressHash::default();
-  let _ = decode_hex(alice_sk.as_bytes(), &mut buffer).unwrap();
-  buffer
-});
-#[cfg(feature = "ed25519-dalek")]
-static BOB_PK: SolanaAddressHash = [
+static RECEIVER_PK: SolanaAddressHash = [
   24, 147, 209, 196, 197, 185, 156, 48, 170, 96, 192, 119, 193, 150, 129, 12, 221, 102, 119, 84,
   33, 221, 67, 224, 185, 107, 130, 157, 207, 85, 161, 30,
 ];
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
-  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
+#[cfg(feature = "ed25519-dalek")]
+static SIGNKER_PK: SolanaAddressHash = [
+  31, 10, 146, 126, 107, 120, 34, 80, 255, 53, 26, 202, 40, 215, 173, 96, 136, 120, 105, 168, 157,
+  98, 85, 80, 101, 195, 154, 183, 240, 144, 33, 168,
+];
 static SOLANA: LazyLock<Mutex<Solana>> = LazyLock::new(|| {
   Mutex::new(Solana::new(Some(RequestCounter::new(RequestLimit::new(1, Duration::from_secs(3))))))
 });
@@ -268,7 +266,7 @@ create_http_test!(#[],
         .send_pkg_recv_decode_contained(
           &mut pkgs_aux
             .get_fee_for_message()
-            .data(None, &transfer_message(blockhash, ALICE_PK))
+            .data(None, &transfer_message(blockhash, SIGNKER_PK))
             .unwrap()
             .build(),
           pkgs_aux
@@ -792,12 +790,12 @@ create_http_test!(#[],
   http_get_latest_blockhash_send_transaction_and_get_transaction,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let from_keypair = ed25519_dalek::SigningKey::from_bytes(&ALICE_SK);
+    let from_keypair = ed25519_dalek::SigningKey::from_bytes(&_VARS.solana_sk);
     let blockhash = latest_blockhash(pkgs_aux, trans).await;
     let tx = crate::blockchain::solana::TransactionInput::new(
       &mut pkgs_aux.bytes_buffer,
       blockhash,
-      transfer_message(blockhash, ALICE_PK).into(),
+      transfer_message(blockhash, SIGNKER_PK).into(),
       &[from_keypair],
     )
     .unwrap();
@@ -811,11 +809,15 @@ create_http_test!(#[],
       .result
       .unwrap();
     let mut pair_mut = PairMut::new(&mut *pkgs_aux, &mut *trans);
-    confirm_solana_tx!(
+    let [rslt0] = confirm_signatures(
       ConfirmTransactionOptions::default(),
       &mut pair_mut,
-      &tx_hash
-    ).await.unwrap();
+      [tx_hash.as_str()].into(),
+      |_| {}
+    )
+    .await
+    .unwrap();
+    assert!(rslt0.unwrap());
 
     let _res = trans
       .send_pkg_recv_decode_contained(
@@ -1006,12 +1008,12 @@ fn transfer_message(
   let transfer = crate::blockchain::solana::InstructionInput {
     accounts: Vector::from_iterator([
       crate::blockchain::solana::InstructionAccountInput {
-        pubkey: ALICE_PK,
+        pubkey: SIGNKER_PK,
         is_signer: true,
         is_writable: true,
       },
       crate::blockchain::solana::InstructionAccountInput {
-        pubkey: BOB_PK,
+        pubkey: RECEIVER_PK,
         is_signer: false,
         is_writable: true,
       },

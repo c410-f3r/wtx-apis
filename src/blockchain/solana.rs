@@ -30,6 +30,7 @@ mod short_vec;
 mod slot_update;
 mod transaction;
 
+use crate::blockchain::ConfirmTransactionOptions;
 pub use account::*;
 pub use address_lookup_table_account::*;
 pub use block::*;
@@ -46,7 +47,7 @@ use wtx::{
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
-  collection::ArrayStringU8,
+  collection::{ArrayStringU8, ArrayWrapper},
   de::protocol::{JsonRpcDecoder, JsonRpcEncoder},
   misc::FnMutFut,
 };
@@ -77,46 +78,6 @@ impl Solana {
   /// If desired, it is possible to instantiate directly instead of using this method.
   pub const fn new(rt: Option<RequestCounter>) -> Self {
     Self { rc: rt }
-  }
-
-  #[doc(hidden)]
-  pub async fn check_confirmation<'th, A, DRSR, T>(
-    pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
-    tx_hash: &'th str,
-  ) -> crate::Result<bool>
-  where
-    A: Api<Error = crate::Error>,
-    T: SendingReceivingTransport<HttpParams>,
-    GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<[&'th str; 1]>>>:
-      for<'de> Package<
-          A,
-          DRSR,
-          T::Inner,
-          HttpParams,
-          ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
-        >,
-  {
-    let signatures = [tx_hash];
-    if let Some(Some(GetSignatureStatuses {
-      confirmation_status: Commitment::Finalized,
-      err,
-      ..
-    })) = pair
-      .trans
-      .send_pkg_recv_decode_contained(
-        &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build(),
-        &mut pair.pkgs_aux,
-      )
-      .await?
-      .result?
-      .value
-      .into_iter()
-      .next()
-    {
-      if let Some(elem) = err { Err(crate::Error::SolanaTxError(elem)) } else { Ok(true) }
-    } else {
-      Ok(false)
-    }
   }
 
   /// If existing, extracts the parsed spl token account ([program::spl_token::MintAccount]) out of
@@ -235,6 +196,100 @@ impl Api for Solana {
     }
     Ok(())
   }
+}
+
+/// Makes successive HTTP requests over a period defined in `cto` until the transaction is
+/// successful or expired.
+pub async fn confirm_signatures<'th, A, DRSR, T, const N: usize>(
+  cto: ConfirmTransactionOptions,
+  pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
+  signatures: ArrayWrapper<&'th str, N>,
+  mut cb: impl FnMut(&mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>),
+) -> crate::Result<[Result<bool, TransactionError>; N]>
+where
+  A: Api<Error = crate::Error>,
+  T: SendingReceivingTransport<HttpParams>,
+  GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
+    for<'de> Package<
+        A,
+        DRSR,
+        T::Inner,
+        HttpParams,
+        ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
+      >,
+{
+  fn should_stop<const N: usize>(slice: &[Result<bool, TransactionError>; N]) -> bool {
+    let mut should_stop = true;
+    for rslt in slice {
+      if let Ok(false) = rslt {
+        should_stop = false;
+        break;
+      }
+    }
+    should_stop
+  }
+
+  match cto {
+    ConfirmTransactionOptions::Tries { number } => {
+      for _ in 0..number {
+        let array = check_confirmation(pair, signatures, &mut cb).await?;
+        if should_stop(&array) {
+          return Ok(array);
+        }
+      }
+    }
+    ConfirmTransactionOptions::TriesWithInterval { interval, number } => {
+      let mut iter = 0..number;
+      if let Some(_) = iter.next() {
+        let array = check_confirmation(pair, signatures, &mut cb).await?;
+        if should_stop(&array) {
+          return Ok(array);
+        }
+      }
+      for _ in iter {
+        wtx::misc::sleep(interval).await?;
+        let array = check_confirmation(pair, signatures, &mut cb).await?;
+        if should_stop(&array) {
+          return Ok(array);
+        }
+      }
+    }
+  }
+  Err(crate::Error::CouldNotConfirmTransaction)
+}
+
+async fn check_confirmation<'th, A, DRSR, T, const N: usize>(
+  pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
+  signatures: ArrayWrapper<&'th str, N>,
+  cb: &mut impl FnMut(&mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>),
+) -> crate::Result<[Result<bool, TransactionError>; N]>
+where
+  A: Api<Error = crate::Error>,
+  T: SendingReceivingTransport<HttpParams>,
+  GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
+    for<'de> Package<
+        A,
+        DRSR,
+        T::Inner,
+        HttpParams,
+        ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
+      >,
+{
+  const {
+    assert!(N <= 8);
+  }
+  let mut rslt = [const { Ok(false) }; N];
+  let pkg = &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build();
+  cb(pair);
+  let res = pair.trans.send_pkg_recv_decode_contained(pkg, &mut pair.pkgs_aux).await?;
+  for (res_elem, rslt_elem) in res.result?.value.into_iter().zip(&mut rslt) {
+    if let Some(GetSignatureStatuses { confirmation_status: Commitment::Finalized, err, .. }) =
+      res_elem
+    {
+      *rslt_elem = if let Some(elem) = err { Err(elem) } else { Ok(true) }
+    }
+  }
+  Ok(rslt)
 }
 
 wtx::create_packages_aux_wrapper!();

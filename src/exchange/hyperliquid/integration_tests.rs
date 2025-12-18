@@ -10,16 +10,6 @@ use wtx::{
   de::{HexDecMode, decode_hex_to_slice, format::SerdeJson},
 };
 
-static HYPERLIQUID_PK: LazyLock<[u8; 32]> = LazyLock::new(|| {
-  let mut buffer = [0; 32];
-  decode_hex_to_slice(
-    std::env::var("HYPERLIQUID_PK").unwrap().as_bytes(),
-    HexDecMode::Automatic,
-    &mut buffer,
-  )
-  .unwrap();
-  buffer
-});
 static HYPERLIQUID: LazyLock<Mutex<Hyperliquid>> =
   LazyLock::new(|| Mutex::new(Hyperliquid::new(false)));
 
@@ -30,7 +20,7 @@ create_ws_test!(
   ws(),
   bulk_order,
   |pkgs_aux, trans| async {
-    let mut signing_key = k256::ecdsa::SigningKey::from_bytes((&*HYPERLIQUID_PK).into()).unwrap();
+    let mut signing_key = k256::ecdsa::SigningKey::from_bytes(_VARS.hyperliquid_sk.into()).unwrap();
     let _res = trans
       .send_pkg_recv_decode_contained(
         &mut pkgs_aux.bulk_order().data(

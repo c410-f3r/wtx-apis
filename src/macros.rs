@@ -97,42 +97,6 @@ macro_rules! create_ws_test {
   };
 }
 
-/// Makes successive HTTP requests over a period defined in `cto` until the transaction is
-/// successful or expired.
-#[cfg(feature = "solana")]
-#[macro_export]
-macro_rules! confirm_solana_tx {
-  ($cto:expr, $pair:expr, $tx_hash:expr $(,)?) => {
-    async move {
-      match $cto {
-        $crate::blockchain::ConfirmTransactionOptions::Tries { number } => {
-          for _ in 0u16..number {
-            if $crate::blockchain::solana::Solana::check_confirmation($pair, $tx_hash).await? {
-              return Ok(());
-            }
-          }
-        }
-        $crate::blockchain::ConfirmTransactionOptions::TriesWithInterval { interval, number } => {
-          let mut iter = 0u16..number;
-          if let Some(_) = iter.next() {
-            if $crate::blockchain::solana::Solana::check_confirmation($pair, $tx_hash).await? {
-              return Ok(());
-            }
-          }
-          for _ in iter {
-            wtx::misc::sleep(interval).await?;
-            if $crate::blockchain::solana::Solana::check_confirmation($pair, $tx_hash).await? {
-              return Ok(());
-            }
-          }
-        }
-      }
-
-      Err($crate::Error::CouldNotConfirmTransaction)
-    }
-  };
-}
-
 macro_rules! _create_blockchain_constants {
   (
     $address_hash_vis:vis address_hash: $address_hash:ident = $_1:literal,

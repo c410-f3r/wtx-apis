@@ -41,5 +41,18 @@ jobs:
 
       - run: .scripts/integration-tests.sh
         env:
-          ALICE_PK: ${{ secrets.ALICE_PK }}
-          ALICE_SK: ${{ secrets.ALICE_SK }}
+          HYPERLIQUID_SK: ${{ secrets.HYPERLIQUID_SK }}
+
+          MERCADO_PAGO_CLIENT_ID: ${{ secrets.MERCADO_PAGO_CLIENT_ID }}
+          MERCADO_PAGO_CLIENT_SECRET: ${{ secrets.MERCADO_PAGO_CLIENT_SECRET }}
+
+          OLIST_ACCESS_TOKEN: ${{ secrets.OLIST_ACCESS_TOKEN }}
+          OLIST_CLIENT_ID: ${{ secrets.OLIST_CLIENT_ID }}
+          OLIST_CLIENT_SECRET: ${{ secrets.OLIST_CLIENT_SECRET }}
+
+          SOLANA_SK: ${{ secrets.ALICE_SK }}
+
+          SUPER_FRETE_TOKEN: ${{ secrets.SUPER_FRETE_TOKEN }}
+
+          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+          VAULT_URI: ${{ secrets.VAULT_URI }}

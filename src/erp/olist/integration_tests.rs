@@ -1,4 +1,7 @@
-use crate::erp::olist::{API_PROD_URI, ContactPost, Olist, OrderPost, PersonTy, PkgsAux, Plan};
+use crate::{
+  erp::olist::{API_PROD_URI, ContactPost, Olist, OrderPost, PersonTy, PkgsAux, Plan},
+  tests::_VARS,
+};
 use alloc::string::ToString;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
@@ -12,14 +15,13 @@ use wtx::{
 static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static OLIST: LazyLock<Mutex<Olist>> = LazyLock::new(|| {
-  let access_token = std::env::var("OLIST_ACCESS_TOKEN").unwrap();
-  let client_id = std::env::var("OLIST_CLIENT_ID").unwrap();
-  let client_secret = std::env::var("OLIST_CLIENT_SECRET").unwrap();
-  let this = Olist::new(client_id, client_secret, 0, Plan::Crescer).unwrap();
+  let this =
+    Olist::new(_VARS.olist_client_id.clone(), _VARS.olist_client_secret.clone(), 0, Plan::Crescer)
+      .unwrap();
   this
     .sync()
     .update_params(
-      &access_token,
+      &_VARS.olist_access_token,
       "",
       Instant::now_date_time(0).unwrap().add(Duration::from_seconds(120).unwrap()).unwrap(),
     )
