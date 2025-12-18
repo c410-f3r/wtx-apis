@@ -13,7 +13,7 @@ pub enum Error {
   Bincode(bincode::Error),
   /// See [`rmp_serde::encode::Error`].
   #[cfg(feature = "rmp-serde")]
-  RmpSerdeEncode(rmp_serde::encode::Error),
+  RmpSerdeEncode(Box<rmp_serde::encode::Error>),
   /// See [`signature::Error`].
   #[cfg(feature = "signature")]
   Signature(signature::Error),
@@ -51,7 +51,7 @@ pub enum Error {
   //
   /// Olist error
   #[cfg(feature = "olist")]
-  OlistError(crate::erp::olist::OlistError<String>),
+  OlistError(Box<crate::erp::olist::OlistError<String>>),
   /// Unexpected token response
   OlistUnexpectedTokenResponse,
 
@@ -113,7 +113,7 @@ impl From<signature::Error> for Error {
 impl From<rmp_serde::encode::Error> for Error {
   #[inline]
   fn from(from: rmp_serde::encode::Error) -> Self {
-    Self::RmpSerdeEncode(from)
+    Self::RmpSerdeEncode(from.into())
   }
 }
 
@@ -158,7 +158,7 @@ where
 impl From<crate::erp::olist::OlistError<String>> for Error {
   #[inline]
   fn from(from: crate::erp::olist::OlistError<String>) -> Self {
-    Self::OlistError(from)
+    Self::OlistError(from.into())
   }
 }
 

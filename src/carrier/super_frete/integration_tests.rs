@@ -1,7 +1,10 @@
-use crate::carrier::super_frete::{
-  CancelOrderReqOrder, PROD_URI, PkgsAux, QuoteFreightReq, QuoteFreightReqPostalCode,
-  QuoteFreightReqProduct, SendFreightReq, SendFreightReqAddress, SendFreightReqAddressTo,
-  SendFreightReqOptions, SendFreightReqProduct, SendFreightReqVolumes, SuperFrete,
+use crate::{
+  carrier::super_frete::{
+    CancelOrderReqOrder, PROD_URI, PkgsAux, QuoteFreightReq, QuoteFreightReqPostalCode,
+    QuoteFreightReqProduct, SendFreightReq, SendFreightReqAddress, SendFreightReqAddressTo,
+    SendFreightReqOptions, SendFreightReqProduct, SendFreightReqVolumes, SuperFrete,
+  },
+  tests::_VARS,
 };
 use alloc::string::String;
 use rust_decimal_macros::dec;
@@ -36,10 +39,8 @@ static PRODUCTS: [QuoteFreightReqProduct; 2] = [
 
 static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
-static SUPER_FRETE: LazyLock<Mutex<SuperFrete>> = LazyLock::new(|| {
-  let token = std::env::var("SUPER_FRETE_TOKEN").unwrap();
-  Mutex::new(SuperFrete::new(token))
-});
+static SUPER_FRETE: LazyLock<Mutex<SuperFrete>> =
+  LazyLock::new(|| Mutex::new(SuperFrete::new(_VARS.super_frete_token.clone())));
 
 create_http_test!(
   #[ignore],

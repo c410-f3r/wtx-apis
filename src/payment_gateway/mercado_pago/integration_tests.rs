@@ -1,6 +1,9 @@
-use crate::payment_gateway::mercado_pago::{
-  ExcludedPaymentType, Item, MercadoPago, PROD_URI, PaymentMethods, PaymentTypeId, PkgsAux,
-  Preference,
+use crate::{
+  payment_gateway::mercado_pago::{
+    ExcludedPaymentType, Item, MercadoPago, PROD_URI, PaymentMethods, PaymentTypeId, PkgsAux,
+    Preference,
+  },
+  tests::_VARS,
 };
 use rust_decimal::Decimal;
 use std::sync::LazyLock;
@@ -15,9 +18,12 @@ use wtx::{
 static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
   LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
 static MERCADO_PAGO: LazyLock<Mutex<MercadoPago>> = LazyLock::new(|| {
-  let client_id = std::env::var("MERCADO_PAGO_CLIENT_ID").unwrap();
-  let client_secret = std::env::var("MERCADO_PAGO_CLIENT_SECRET").unwrap();
-  Mutex::new(MercadoPago::new(client_id, client_secret, 60, true))
+  Mutex::new(MercadoPago::new(
+    _VARS.mercado_pago_client_id.clone(),
+    _VARS.mercado_pago_client_secret.clone(),
+    60,
+    true,
+  ))
 });
 
 create_http_test!(
