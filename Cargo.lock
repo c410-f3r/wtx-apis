@@ -148,9 +148,9 @@ dependencies = [
 
 [[package]]
 name = "curve25519-dalek"
-version = "5.0.0-pre.4"
+version = "5.0.0-pre.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ae8b2fe5e4995d7fd08a7604e794dc569a65ed19659f5939d529813ed816d38"
+checksum = "92419e1cdc506051ffd30713ad09d0ec6a24bba9197e12989de389e35b19c77a"
 dependencies = [
  "cfg-if",
  "cpufeatures",
@@ -220,9 +220,9 @@ dependencies = [
 
 [[package]]
 name = "ed25519-dalek"
-version = "3.0.0-pre.4"
+version = "3.0.0-pre.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4b9f613e0c236c699bf70d39f825594d9b03aadfd8dd856ea40685f782a4ef2"
+checksum = "5d6d275a4ffdfc16e98fbcb5f5417214a06957c7cdc6eb2815c2dc50dce1c1dd"
 dependencies = [
  "curve25519-dalek",
  "ed25519",
@@ -1121,9 +1121,9 @@ checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
 
 [[package]]
 name = "wtx"
-version = "0.41.6"
+version = "0.41.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2263639867ae0e49b0040c5d0dc74c7e1378f64b84c5de9b267f2c374a49f6e9"
+checksum = "bd2e27017587694d603b721df19579ca7715c01a7f341d216dc276cb6bf6aab5"
 dependencies = [
  "base64",
  "foldhash",
