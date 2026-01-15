@@ -2,7 +2,7 @@
 base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
-ed25519-dalek = { default-features = false, optional = true, version = "=3.0.0-pre.3" }
+ed25519-dalek = { default-features = false, optional = true, version = "=3.0.0-pre.4" }
 rmp-serde = { default-features = false, optional = true, version = "1.0" }
 rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
 serde = { default-features = false, features = ["alloc", "derive"], optional = true, version = "1.0" }
@@ -10,10 +10,10 @@ serde_json = { default-features = false, features = ["alloc"], optional = true, 
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], version = "0.41" }
 
-crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.10" }
-k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "=0.14.0-rc.1" }
+crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.18" }
+k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "=0.14.0-rc.4" }
 sha3 = { default-features = false, optional = true, version = "=0.11.0-rc.3" }
-signature = { default-features = false, optional = true, version = "=3.0.0-rc.5" }
+signature = { default-features = false, optional = true, version = "=3.0.0-rc.6" }
 
 [dev-dependencies]
 rust_decimal_macros = { default-features = false, version = "1.0" }

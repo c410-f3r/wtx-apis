@@ -810,9 +810,10 @@ create_http_test!(#[],
       .unwrap();
     let mut pair_mut = PairMut::new(&mut *pkgs_aux, &mut *trans);
     let [rslt0] = confirm_signatures(
+      Commitment::Finalized,
       ConfirmTransactionOptions::default(),
       &mut pair_mut,
-      [tx_hash.as_str()].into(),
+      [tx_hash.as_str()],
       |_| {}
     )
     .await

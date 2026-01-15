@@ -1,5 +1,5 @@
 /// Block commitment
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Commitment {
   /// Middle ground between `Processed` and `Finalized`

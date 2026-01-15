@@ -198,12 +198,50 @@ impl Api for Solana {
   }
 }
 
+/// Makes a single HTTP request to see the status of the provided signatures.
+pub async fn check_signatures<'th, A, DRSR, T, const N: usize>(
+  commitment: Commitment,
+  pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
+  signatures: [&'th str; N],
+  cb: &mut impl FnMut(&mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>),
+) -> crate::Result<[Result<bool, TransactionError>; N]>
+where
+  A: Api<Error = crate::Error>,
+  T: SendingReceivingTransport<HttpParams>,
+  GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
+    for<'de> Package<
+        A,
+        DRSR,
+        T::Inner,
+        HttpParams,
+        ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
+      >,
+{
+  const {
+    assert!(N <= 8);
+  }
+  let mut rslt = [const { Ok(false) }; N];
+  let pkg =
+    &mut pair.pkgs_aux.get_signature_statuses().data(ArrayWrapper(signatures), None).build();
+  cb(pair);
+  let res = pair.trans.send_pkg_recv_decode_contained(pkg, &mut pair.pkgs_aux).await?;
+  for (res_elem, rslt_elem) in res.result?.value.into_iter().zip(&mut rslt) {
+    if let Some(statuses) = res_elem
+      && statuses.confirmation_status == commitment
+    {
+      *rslt_elem = if let Some(elem) = statuses.err { Err(elem) } else { Ok(true) }
+    }
+  }
+  Ok(rslt)
+}
+
 /// Makes successive HTTP requests over a period defined in `cto` until the transaction is
 /// successful or expired.
 pub async fn confirm_signatures<'th, A, DRSR, T, const N: usize>(
+  commitment: Commitment,
   cto: ConfirmTransactionOptions,
   pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
-  signatures: ArrayWrapper<&'th str, N>,
+  signatures: [&'th str; N],
   mut cb: impl FnMut(&mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>),
 ) -> crate::Result<[Result<bool, TransactionError>; N]>
 where
@@ -232,7 +270,7 @@ where
   match cto {
     ConfirmTransactionOptions::Tries { number } => {
       for _ in 0..number {
-        let array = check_confirmation(pair, signatures, &mut cb).await?;
+        let array = check_signatures(commitment, pair, signatures, &mut cb).await?;
         if should_stop(&array) {
           return Ok(array);
         }
@@ -241,14 +279,14 @@ where
     ConfirmTransactionOptions::TriesWithInterval { interval, number } => {
       let mut iter = 0..number;
       if let Some(_) = iter.next() {
-        let array = check_confirmation(pair, signatures, &mut cb).await?;
+        let array = check_signatures(commitment, pair, signatures, &mut cb).await?;
         if should_stop(&array) {
           return Ok(array);
         }
       }
       for _ in iter {
         wtx::misc::sleep(interval).await?;
-        let array = check_confirmation(pair, signatures, &mut cb).await?;
+        let array = check_signatures(commitment, pair, signatures, &mut cb).await?;
         if should_stop(&array) {
           return Ok(array);
         }
@@ -256,40 +294,6 @@ where
     }
   }
   Err(crate::Error::CouldNotConfirmTransaction)
-}
-
-async fn check_confirmation<'th, A, DRSR, T, const N: usize>(
-  pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
-  signatures: ArrayWrapper<&'th str, N>,
-  cb: &mut impl FnMut(&mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>),
-) -> crate::Result<[Result<bool, TransactionError>; N]>
-where
-  A: Api<Error = crate::Error>,
-  T: SendingReceivingTransport<HttpParams>,
-  GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
-    for<'de> Package<
-        A,
-        DRSR,
-        T::Inner,
-        HttpParams,
-        ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
-      >,
-{
-  const {
-    assert!(N <= 8);
-  }
-  let mut rslt = [const { Ok(false) }; N];
-  let pkg = &mut pair.pkgs_aux.get_signature_statuses().data(signatures, None).build();
-  cb(pair);
-  let res = pair.trans.send_pkg_recv_decode_contained(pkg, &mut pair.pkgs_aux).await?;
-  for (res_elem, rslt_elem) in res.result?.value.into_iter().zip(&mut rslt) {
-    if let Some(GetSignatureStatuses { confirmation_status: Commitment::Finalized, err, .. }) =
-      res_elem
-    {
-      *rslt_elem = if let Some(elem) = err { Err(elem) } else { Ok(true) }
-    }
-  }
-  Ok(rslt)
 }
 
 wtx::create_packages_aux_wrapper!();
