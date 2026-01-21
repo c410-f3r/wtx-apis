@@ -10,7 +10,7 @@ serde_json = { default-features = false, features = ["alloc"], optional = true, 
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], version = "0.41" }
 
-crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.18" }
+crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "=0.7.0-rc.21" }
 k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "=0.14.0-rc.4" }
 sha3 = { default-features = false, optional = true, version = "=0.11.0-rc.3" }
 signature = { default-features = false, optional = true, version = "=3.0.0-rc.6" }
