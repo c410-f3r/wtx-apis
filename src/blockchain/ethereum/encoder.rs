@@ -13,19 +13,19 @@ pub struct Encoder {
 }
 
 impl Encoder {
-  //  pub(crate) fn from_buffer(mut buffer: Vector<u8>) -> Self {
-  //    buffer.clear();
-  //    Self { buffer, last_tail_idx: 0, tail_idxs: ArrayVectorU8::new() }
-  //  }
+  //pub(crate) fn from_buffer(mut buffer: Vector<u8>) -> Self {
+  //  buffer.clear();
+  //  Self { buffer, last_tail_idx: 0, tail_idxs: ArrayVectorU8::new() }
+  //}
 
   #[cfg(test)]
   pub(crate) const fn new() -> Self {
     Self { buffer: Vector::new(), last_tail_idx: 0, tail_idxs: ArrayVectorU8::new() }
   }
 
-  //  pub(crate) const fn buffer_mut(&mut self) -> &mut Vector<u8> {
-  //    &mut self.buffer
-  //  }
+  //pub(crate) const fn buffer_mut(&mut self) -> &mut Vector<u8> {
+  //  &mut self.buffer
+  //}
 
   pub(crate) fn bump_tail_idx(&mut self, words: usize) {
     if let Some(last) = self.tail_idxs.last_mut() {

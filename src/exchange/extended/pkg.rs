@@ -1,0 +1,10 @@
+mod v1_info_markets_get;
+mod v1_info_markets_orderbook_get;
+mod v1_user_balance_get;
+mod v1_user_fees_get;
+mod v1_user_open_orders_get;
+mod v1_user_open_positions_get;
+mod v1_user_order_get;
+mod v1_user_order_id_delete;
+mod v1_user_order_mass_cancel_post;
+mod v1_user_order_post;

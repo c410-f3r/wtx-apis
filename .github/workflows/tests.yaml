@@ -41,6 +41,9 @@ jobs:
 
       - run: .scripts/integration-tests.sh
         env:
+          ASTER_API_KEY: ${{ secrets.ASTER_API_KEY }}
+          ASTER_SECRET_KEY: ${{ secrets.ASTER_SECRET_KEY }}
+
           HYPERLIQUID_SK: ${{ secrets.HYPERLIQUID_SK }}
 
           MERCADO_PAGO_CLIENT_ID: ${{ secrets.MERCADO_PAGO_CLIENT_ID }}

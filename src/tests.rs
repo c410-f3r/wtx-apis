@@ -8,6 +8,13 @@ pub(crate) static _VARS: LazyLock<_Vars> =
 
 #[derive(Debug, wtx::FromVars)]
 pub(crate) struct _Vars {
+  #[allow(unused, reason = "testnet key")]
+  #[cfg(feature = "aster")]
+  pub(crate) aster_api_key: alloc::string::String,
+  #[allow(unused, reason = "testnet key")]
+  #[cfg(feature = "aster")]
+  pub(crate) aster_secret_key: alloc::string::String,
+
   #[allow(unused, reason = "implementation is almost finished")]
   #[cfg(feature = "hyperliquid")]
   #[from_vars(map_hyperliquid_sk)]
@@ -25,6 +32,7 @@ pub(crate) struct _Vars {
   #[cfg(feature = "olist")]
   pub(crate) olist_client_secret: alloc::string::String,
 
+  #[allow(unused, reason = "a new testnet accounts needs to be created")]
   #[cfg(feature = "ed25519-dalek")]
   #[from_vars(map_solana_sk)]
   pub(crate) solana_sk: crate::blockchain::solana::SolanaAddressHash,

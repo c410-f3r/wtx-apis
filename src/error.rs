@@ -32,6 +32,18 @@ pub enum Error {
   /// A word points to unknown bytes
   WordIdxDoesNotHaveCorrespondingBytes,
 
+  // Extended
+  //
+  // Http error
+  //#[cfg(feature = "extended")]
+  //ExtendedHttpResError(Box<crate::exchange::extended::HttpResponseError<Box<str>>>),
+  // WebSocket error
+  //#[cfg(feature = "extended")]
+  //ExtendedStreamResError(Box<str>),
+  // Invalid asset
+  //#[cfg(feature = "extended")]
+  //ExtendedBadAssetValue,
+
   // Internal
   //
   /// An submitted transaction could not be confirmed by an external actor.
