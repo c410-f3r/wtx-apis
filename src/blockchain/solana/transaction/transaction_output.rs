@@ -203,6 +203,9 @@ pub enum TransactionError {
   /// The from `Pubkey` does not have sufficient balance to pay the fee to schedule the transaction
   InsufficientFundsForFee,
 
+  /// Account doesn't have funds to exist
+  InsufficientFundsForRent,
+
   /// This account may not be used to pay transaction fees
   InvalidAccountForFee,
 

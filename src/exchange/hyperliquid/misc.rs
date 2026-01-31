@@ -1,5 +1,5 @@
 use crate::{
-  blockchain::ethereum::{Address, Eip712, Eip712Domain, SolTy, encoder::Encoder},
+  blockchain::ethereum::{Address, Eip712, Eip712Domain, Encoder, SolTy},
   exchange::hyperliquid::{
     Hyperliquid, PkgsAux, action::Action, agent::Agent, payload::ExchangePayload,
     signature::Signature,
@@ -167,8 +167,8 @@ mod tests {
         213, 48, 174, 199, 132, 28,
       ];
       let sig = sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap();
-      assert_eq!(sig.r.to_be_bytes(), &expected[..32]);
-      assert_eq!(sig.s.to_be_bytes(), &expected[32..64]);
+      assert_eq!(sig.r.to_be_bytes().as_slice(), &expected[..32]);
+      assert_eq!(sig.s.to_be_bytes().as_slice(), &expected[32..64]);
       assert_eq!(sig.v(), expected[64]);
     }
     {
@@ -179,8 +179,8 @@ mod tests {
         128, 168, 129, 67, 28,
       ];
       let sig = sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap();
-      assert_eq!(sig.r.to_be_bytes(), &expected[..32]);
-      assert_eq!(sig.s.to_be_bytes(), &expected[32..64]);
+      assert_eq!(sig.r.to_be_bytes().as_slice(), &expected[..32]);
+      assert_eq!(sig.s.to_be_bytes().as_slice(), &expected[32..64]);
       assert_eq!(sig.v(), expected[64])
     }
   }

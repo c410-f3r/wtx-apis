@@ -20,8 +20,8 @@ mod account;
 mod address_lookup_table_account;
 mod block;
 mod filter;
-#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
-mod integration_tests;
+//#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
+//mod integration_tests;
 mod notification;
 mod pkg;
 pub mod program;

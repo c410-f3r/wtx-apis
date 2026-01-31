@@ -100,10 +100,7 @@ mod tests {
     blockchain::ethereum::{PackedSeq, SolTy, Word},
     exchange::hyperliquid::agent::Agent,
   };
-  use wtx::{
-    collection::Vector,
-    de::{HexDecMode, decode_hex_to_slice},
-  };
+  use wtx::{collection::Vector, de::decode_hex};
 
   #[test]
   fn basic() {
@@ -118,27 +115,16 @@ mod tests {
 
     assert_eq!(
       &agent.eip712_data_word(&mut Vector::new()).unwrap().0,
-      decode_hex_to_slice(
-        b"96e29d9f3d1099610ffecd9159335362360a93f5d2e4d3147c8a76710d16b51d",
-        HexDecMode::Automatic,
-        &mut [0; 32]
-      )
-      .unwrap()
+      decode_hex(b"96e29d9f3d1099610ffecd9159335362360a93f5d2e4d3147c8a76710d16b51d", &mut [0; 32])
+        .unwrap()
     );
 
     let mut word = [0; 32];
-    decode_hex_to_slice(
-      b"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
-      HexDecMode::Automatic,
-      &mut word,
-    )
-    .unwrap();
+    decode_hex(b"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20", &mut word)
+      .unwrap();
     assert_eq!(
       agent.tokenize().unwrap(),
-      (
-        PackedSeq(decode_hex_to_slice(b"616263", HexDecMode::Automatic, &mut [0; 3]).unwrap()),
-        Word(word)
-      )
+      (PackedSeq(decode_hex(b"616263", &mut [0; 3]).unwrap()), Word(word))
     );
   }
 }

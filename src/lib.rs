@@ -24,6 +24,10 @@ mod tests;
 mod tuple_impls;
 
 pub use error::Error;
-
 /// Alias of `core::result::Result<T, wtx_apis::Error>`
 pub type Result<T> = core::result::Result<T, Error>;
+
+/// For example, a token, a stock or a commodity.
+pub type AssetName = wtx::collection::ArrayStringU8<10>;
+/// For example, BTC/USDT or KCH26/USD
+pub type PairName = wtx::collection::ArrayStringU8<14>;

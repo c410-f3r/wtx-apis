@@ -120,10 +120,7 @@ mod tests {
     BulkOrder, OrderGrouping, OrderLimitParams, OrderReq, OrderTif, OrderTpsl, OrderTriggerParams,
     OrderTy, action::Action, misc::sign_l1_action,
   };
-  use wtx::{
-    collection::Vector,
-    de::{HexDecMode, decode_hex_to_slice},
-  };
+  use wtx::{collection::Vector, de::decode_hex};
 
   #[test]
   fn sign_order_limit() {
@@ -145,17 +142,15 @@ mod tests {
     let connection_id = action.hash(&mut buffer, 1583838, None).unwrap();
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap().all_bytes(),
-      decode_hex_to_slice(
+      decode_hex(
         b"0x77957e58e70f43b6b68581f2dc42011fc384538a2e5b7bf42d5b936f19fbb67360721a8598727230f67080efee48c812a6a4442013fd3b0eed509171bef9f23f1c",
-        HexDecMode::Automatic,
         &mut [0; 65]
       ).unwrap()
     );
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap().all_bytes(),
-      decode_hex_to_slice(
+      decode_hex(
         b"0xcd0925372ff1ed499e54883e9a6205ecfadec748f80ec463fe2f84f1209648776377961965cb7b12414186b1ea291e95fd512722427efcbcfb3b0b2bcd4d79d01c",
-        HexDecMode::Automatic,
         &mut [0; 65]
       ).unwrap()
     );
@@ -181,17 +176,15 @@ mod tests {
     let connection_id = action.hash(&mut buffer, 1583838, None).unwrap();
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap().all_bytes(),
-      decode_hex_to_slice(
+      decode_hex(
         b"0xd3e894092eb27098077145714630a77bbe3836120ee29df7d935d8510b03a08f456de5ec1be82aa65fc6ecda9ef928b0445e212517a98858cfaa251c4cd7552b1c",
-        HexDecMode::Automatic,
         &mut [0; 65]
       ).unwrap()
     );
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap().all_bytes(),
-      decode_hex_to_slice(
+      decode_hex(
         b"0x3768349dbb22a7fd770fc9fc50c7b5124a7da342ea579b309f58002ceae49b4357badc7909770919c45d850aabb08474ff2b7b3204ae5b66d9f7375582981f111c",
-        HexDecMode::Automatic,
         &mut [0; 65]
       ).unwrap()
     );
@@ -235,11 +228,11 @@ mod tests {
       let connection_id = action.hash(&mut buffer, 1583838, None).unwrap();
       assert_eq!(
         sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap().all_bytes(),
-        decode_hex_to_slice(mainnet, HexDecMode::Automatic, &mut [0; 65]).unwrap()
+        decode_hex(mainnet, &mut [0; 65]).unwrap()
       );
       assert_eq!(
         sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap().all_bytes(),
-        decode_hex_to_slice(testnet, HexDecMode::Automatic, &mut [0; 65]).unwrap()
+        decode_hex(testnet, &mut [0; 65]).unwrap()
       );
     }
   }
