@@ -1,7 +1,7 @@
 use crate::{
   exchange::aster::{
-    Aster, OrderSide, OrderType, PROD_SPOT_HTTP_URI, PROD_SPOT_WS_URI, PkgsAux,
-    V1OrderGetReqParams, V1OrderPostReqParams, sign_params::SignParams,
+    Aster, OrderGetReqParams, OrderPostReqParams, OrderSide, OrderType, PROD_SPOT_HTTP_URI,
+    PROD_SPOT_WS_URI, PkgsAux, sign_params::SignParams,
   },
   tests::_VARS,
 };
@@ -38,13 +38,50 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
+  v1_account,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let (now, _) = timestamp_millis_str().unwrap();
+    let pkg = &mut pkgs_aux
+      .v1_account()
+      .data(&SignParams { recv_window: None, timestamp: now })
+      .unwrap()
+      .build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
+  v1_exchange_info,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux.v1_exchange_info().build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
   v1_order_get,
   &*CLIENT,
   |pkgs_aux, trans| async {
     let (now, _) = timestamp_millis_str().unwrap();
     let pkg = &mut pkgs_aux
       .v1_order_get()
-      .data(&V1OrderGetReqParams {
+      .data(&OrderGetReqParams {
         order_id: Some(290307),
         orig_client_order_id: None,
         sign_params: SignParams { timestamp: now, recv_window: None },
@@ -71,7 +108,7 @@ create_http_test!(
     let (now, _) = timestamp_millis_str().unwrap();
     let pkg = &mut pkgs_aux
       .v1_order_post()
-      .data(&V1OrderPostReqParams {
+      .data(&OrderPostReqParams {
         new_client_order_id: None,
         price: None,
         quantity: Some(Decimal::from_parts(5, 0, 0, false, 0)),
