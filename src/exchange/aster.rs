@@ -5,8 +5,6 @@
 mod order;
 mod pkg;
 mod sign_params;
-mod v1_order_get;
-mod v1_order_post;
 mod web_socket;
 
 use alloc::string::String;
@@ -14,9 +12,8 @@ use core::fmt::Arguments;
 use hmac::{Hmac, KeyInit, Mac};
 pub use order::*;
 pub use pkg::*;
+use serde::Serialize;
 pub use sign_params::SignParams;
-pub use v1_order_get::*;
-pub use v1_order_post::*;
 pub use web_socket::*;
 use wtx::{
   client_api_framework::{
@@ -25,7 +22,7 @@ use wtx::{
     network::{HttpParams, HttpReqParams, transport::TransportParams},
   },
   collection::{ArrayVectorU8, Vector},
-  de::{HexEncMode, encode_hex},
+  de::{AsciiSet, FormUrlSerializer, HexEncMode, encode_hex},
   http::{Header, Method},
   misc::Secret,
 };
@@ -58,15 +55,20 @@ impl Aster {
     Self { api_key, rt, secret_key }
   }
 
-  fn auth_req<const IS_POST: bool>(
+  fn auth_req<const IS_POST: bool, T>(
     &self,
     bytes_buffer: &mut Vector<u8>,
+    params: &T,
     path: Arguments<'_>,
     send_bytes_buffer: &mut bool,
-    trans_params: &mut HttpParams,
-  ) -> crate::Result<()> {
-    let HttpReqParams { host, mime, rrb, user_agent_default, .. } =
-      trans_params.ext_req_params_mut();
+    tp: &mut HttpParams,
+  ) -> crate::Result<()>
+  where
+    T: Serialize,
+  {
+    bytes_buffer.clear();
+    params.serialize(FormUrlSerializer::new(AsciiSet::NON_ALPHANUMERIC, bytes_buffer))?;
+    let HttpReqParams { host, method, mime, rrb, user_agent_default, .. } = tp.ext_req_params_mut();
     let _ = bytes_buffer.extend_from_copyable_slices([
       b"&signature=",
       sign(&mut [0; _], bytes_buffer, &self.secret_key)?.as_bytes(),
@@ -74,7 +76,7 @@ impl Aster {
     if IS_POST {
       rrb.uri.push_path(path)?;
     } else {
-      // SAFETY: URL encode is ASCII
+      // SAFETY: URL encoding is ASCII
       let query = unsafe { core::str::from_utf8_unchecked(bytes_buffer) };
       let rslt = rrb.uri.push_path(format_args!("{path}?{query}"));
       bytes_buffer.clear();
@@ -85,12 +87,12 @@ impl Aster {
       [self.api_key.as_str()].into_iter(),
     )])?;
     *host = false;
+    if IS_POST {
+      *method = Method::Post;
+    }
     *mime = Some(wtx::http::Mime::ApplicationXWwwFormUrlEncoded);
     *send_bytes_buffer = true;
     *user_agent_default = false;
-    if IS_POST {
-      trans_params.ext_req_params_mut().method = Method::Post;
-    }
     Ok(())
   }
 }

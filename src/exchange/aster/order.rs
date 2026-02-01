@@ -74,6 +74,8 @@ pub enum PositionSide {
 pub enum TimeInForce {
   /// Fill or Kill - execute immediately and completely or cancel.
   Fok,
+  /// Hidden from other participants
+  Hidden,
   /// Immediate or Cancel - execute immediately, cancel unfilled portion.
   Ioc,
   /// Good Till Cancel - remain active until filled or canceled.
