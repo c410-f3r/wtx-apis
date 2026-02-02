@@ -200,14 +200,14 @@ dependencies = [
 
 [[package]]
 name = "crypto-bigint"
-version = "0.7.0-rc.22"
+version = "0.7.0-rc.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "053c3561863ce55e3226ecc48b08679f4b66cb1b92b9afb42c2c402dfe8b9b51"
+checksum = "7dfcb32a163d341e53eedc34a7e319139731821bb268dc9d278ce60a527c4bd2"
 dependencies = [
  "ctutils",
  "hybrid-array",
  "num-traits",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "serdect",
  "subtle",
  "zeroize",
@@ -230,7 +230,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c7722afd27468475c9b6063dc03a57ef2ca833816981619f8ebe64d38d207eef"
 dependencies = [
  "hybrid-array",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
 ]
 
 [[package]]
@@ -354,12 +354,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b0f6cc67cc39a00bce2c6f8f8aced0e8c0a06eb1a30f9dd2a9c9f4618bdf3b4"
 dependencies = [
  "base16ct",
- "crypto-bigint 0.7.0-rc.22",
+ "crypto-bigint 0.7.0-rc.23",
  "crypto-common 0.2.0-rc.13",
  "digest 0.11.0-rc.9",
  "hybrid-array",
  "pkcs8",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "rustcrypto-ff",
  "rustcrypto-group",
  "sec1",
@@ -705,9 +705,9 @@ checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 
 [[package]]
 name = "rand_core"
-version = "0.10.0-rc-6"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70765ff7112b0fb2d272d24d9a2f907fc206211304328fe58b2db15a5649ef28"
+checksum = "0c8d0fd677905edcbeedbf2edb6494d676f0e98d54d5cf9bda0b061cb8fb8aba"
 
 [[package]]
 name = "regex-automata"
@@ -815,7 +815,7 @@ version = "0.14.0-pre.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36fdf8f956089df8343b9479045c026932f9eb004d0f32d8497b4d133b316a66"
 dependencies = [
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "subtle",
 ]
 
@@ -825,7 +825,7 @@ version = "0.14.0-pre.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df76d08c12814c794ffe95ac788b48081cccb607fade4ed746825d29791ce538"
 dependencies = [
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "rustcrypto-ff",
  "subtle",
 ]
@@ -1028,7 +1028,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ad0ce3b3f8efd7406f22e2ca5d02be21cdf3b3d1d53ab141f784de8965c7c7e"
 dependencies = [
  "digest 0.11.0-rc.9",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
 ]
 
 [[package]]
@@ -1527,7 +1527,7 @@ dependencies = [
  "base64",
  "bincode",
  "bs58",
- "crypto-bigint 0.7.0-rc.22",
+ "crypto-bigint 0.7.0-rc.23",
  "ed25519-dalek",
  "hmac 0.13.0-rc.4",
  "k256",
