@@ -207,7 +207,7 @@ dependencies = [
  "ctutils",
  "hybrid-array",
  "num-traits",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "serdect",
  "subtle",
  "zeroize",
@@ -230,7 +230,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c7722afd27468475c9b6063dc03a57ef2ca833816981619f8ebe64d38d207eef"
 dependencies = [
  "hybrid-array",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
 ]
 
 [[package]]
@@ -359,7 +359,7 @@ dependencies = [
  "digest 0.11.0-rc.9",
  "hybrid-array",
  "pkcs8",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "rustcrypto-ff",
  "rustcrypto-group",
  "sec1",
@@ -705,9 +705,9 @@ checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 
 [[package]]
 name = "rand_core"
-version = "0.10.0-rc-6"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70765ff7112b0fb2d272d24d9a2f907fc206211304328fe58b2db15a5649ef28"
+checksum = "0c8d0fd677905edcbeedbf2edb6494d676f0e98d54d5cf9bda0b061cb8fb8aba"
 
 [[package]]
 name = "regex-automata"
@@ -815,7 +815,7 @@ version = "0.14.0-pre.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36fdf8f956089df8343b9479045c026932f9eb004d0f32d8497b4d133b316a66"
 dependencies = [
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "subtle",
 ]
 
@@ -825,7 +825,7 @@ version = "0.14.0-pre.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df76d08c12814c794ffe95ac788b48081cccb607fade4ed746825d29791ce538"
 dependencies = [
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
  "rustcrypto-ff",
  "subtle",
 ]
@@ -1023,12 +1023,12 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "signature"
-version = "3.0.0-rc.9"
+version = "3.0.0-rc.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ad0ce3b3f8efd7406f22e2ca5d02be21cdf3b3d1d53ab141f784de8965c7c7e"
+checksum = "7f1880df446116126965eeec169136b2e0251dba37c6223bcc819569550edea3"
 dependencies = [
  "digest 0.11.0-rc.9",
- "rand_core 0.10.0-rc-6",
+ "rand_core 0.10.0",
 ]
 
 [[package]]
