@@ -1,7 +1,7 @@
 use crate::{
   exchange::aster::{
-    Aster, OrderGetReqParams, OrderPostReqParams, OrderSide, OrderType, PkgsAux,
-    TESTNET_SPOT_HTTP_URI, TESTNET_SPOT_WS_URI, sign_params::CexSignParams,
+    Aster, OrderPostReqParams, OrderReqParams, OrderSide, OrderType, PkgsAux,
+    TESTNET_SPOT_HTTP_URI, TESTNET_SPOT_WS_URI, UserTradesReqParams,
   },
   tests::_VARS,
 };
@@ -98,10 +98,10 @@ create_http_test!(
   |pkgs_aux, trans| async {
     let pkg = &mut pkgs_aux
       .order_get()
-      .data(&OrderGetReqParams {
+      .data(&OrderReqParams {
         order_id: Some(262221260),
         orig_client_order_id: None,
-        sign_params: CexSignParams { recv_window: None },
+        sign_params: None,
         symbol: "ASTERUSDT".try_into().unwrap(),
       })
       .unwrap()
@@ -147,6 +147,34 @@ create_http_test!(
     };
     fun(OrderSide::Buy).await;
     fun(OrderSide::Sell).await;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
+  user_trades,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux
+      .user_trades()
+      .data(&UserTradesReqParams {
+        symbol: None,
+        order_id: Some(262221260),
+        start_time: None,
+        end_time: None,
+        from_id: None,
+        limit: None,
+        cex_sign_params: None
+      })
+      .unwrap()
+      .build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
   }
 );
 
