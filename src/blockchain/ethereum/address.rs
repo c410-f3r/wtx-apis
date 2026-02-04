@@ -1,5 +1,9 @@
 use crate::blockchain::ethereum::{SolTy, Word};
-use wtx::collection::Vector;
+use core::fmt::{Formatter, LowerHex};
+use wtx::{
+  collection::Vector,
+  de::{HexEncMode, decode_hex, encode_hex},
+};
 
 /// Address
 #[derive(Debug, Default, serde::Serialize)]
@@ -10,6 +14,13 @@ pub struct Address(
 );
 
 impl Address {
+  /// From hex string
+  pub fn from_hex(hex: &str) -> crate::Result<Self> {
+    let mut array = [0; 20];
+    let _ = decode_hex(hex.as_bytes(), &mut array)?;
+    Ok(Self(array))
+  }
+
   pub(crate) const fn from_word(word: Word) -> Self {
     let [.., a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t] = word.0;
     Self([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t])
@@ -57,5 +68,17 @@ impl<'de> SolTy<'de> for Address {
 
   fn valid_token(token: &Self::Token<'_>) -> bool {
     &token.0[..12] == &[0; 12]
+  }
+}
+
+impl LowerHex for Address {
+  #[inline]
+  fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    let mut buffer = [0; 42];
+    let Ok(hex) = encode_hex(&self.0, Some(HexEncMode::Eip55), &mut buffer) else {
+      return Ok(());
+    };
+    f.write_str(hex.get(2..).unwrap_or_default())?;
+    Ok(())
   }
 }

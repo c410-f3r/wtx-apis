@@ -5,27 +5,18 @@ use wtx::{
 };
 
 /// ABI encoder.
-#[derive(Clone, Debug, Default)]
-pub struct Encoder {
-  buffer: Vector<u8>,
+#[derive(Debug)]
+pub struct Encoder<'buffer> {
+  buffer: &'buffer mut Vector<u8>,
   last_tail_idx: usize,
   tail_idxs: ArrayVectorU8<usize, 4>,
 }
 
-impl Encoder {
-  //pub(crate) fn from_buffer(mut buffer: Vector<u8>) -> Self {
-  //  buffer.clear();
-  //  Self { buffer, last_tail_idx: 0, tail_idxs: ArrayVectorU8::new() }
-  //}
-
-  #[cfg(test)]
-  pub(crate) const fn new() -> Self {
-    Self { buffer: Vector::new(), last_tail_idx: 0, tail_idxs: ArrayVectorU8::new() }
+impl<'buffer> Encoder<'buffer> {
+  pub(crate) fn from_buffer(buffer: &'buffer mut Vector<u8>) -> Self {
+    buffer.clear();
+    Self { buffer, last_tail_idx: 0, tail_idxs: ArrayVectorU8::new() }
   }
-
-  //pub(crate) const fn buffer_mut(&mut self) -> &mut Vector<u8> {
-  //  &mut self.buffer
-  //}
 
   pub(crate) fn bump_tail_idx(&mut self, words: usize) {
     if let Some(last) = self.tail_idxs.last_mut() {
@@ -77,11 +68,14 @@ impl Encoder {
 
 #[cfg(test)]
 mod tests {
+  use wtx::collection::Vector;
+
   use crate::blockchain::ethereum::{Word, encoder::Encoder};
 
   #[test]
   fn push_packed_sequence() {
-    let mut encoder = Encoder::new();
+    let mut buffer = Vector::new();
+    let mut encoder = Encoder::from_buffer(&mut buffer);
     encoder.push_packed_sequence(&[3; 37]).unwrap();
     assert_eq!(
       &*encoder.buffer,
@@ -96,14 +90,16 @@ mod tests {
 
   #[test]
   fn push_packed_sequence_with_empty_bytes() {
-    let mut encoder = Encoder::new();
+    let mut buffer = Vector::new();
+    let mut encoder = Encoder::from_buffer(&mut buffer);
     encoder.push_packed_sequence(&[]).unwrap();
     assert_eq!(&*encoder.buffer, &[0u8; 32]);
   }
 
   #[test]
   fn push_word() {
-    let mut encoder = Encoder::new();
+    let mut buffer = Vector::new();
+    let mut encoder = Encoder::from_buffer(&mut buffer);
     encoder.push_words([Word([1; 32]), Word([2; 32])]).unwrap();
     assert_eq!(
       &*encoder.buffer,

@@ -1,15 +1,10 @@
 use crate::{
-  blockchain::ethereum::{Address, Eip712, Eip712Domain, Encoder, SolTy},
+  blockchain::ethereum::{Address, Eip712, Eip712Domain, Signature, misc::sign_payload},
   exchange::hyperliquid::{
     Hyperliquid, PkgsAux, action::Action, agent::Agent, payload::ExchangePayload,
-    signature::Signature,
   },
 };
-use core::{
-  fmt::LowerHex,
-  mem,
-  sync::atomic::{AtomicU64, Ordering},
-};
+use core::sync::atomic::{AtomicU64, Ordering};
 use serde::{Serialize, Serializer, ser::SerializeStruct};
 use wtx::{
   calendar::Instant,
@@ -19,20 +14,6 @@ use wtx::{
 };
 
 static CURR_NONCE: AtomicU64 = AtomicU64::new(0);
-
-pub(crate) fn abi_encode_from_buffer<'st, T>(
-  buffer: &mut Vector<u8>,
-  st: &'st T,
-) -> crate::Result<()>
-where
-  T: SolTy<'st>,
-{
-  let mut enc = Encoder::from_buffer(mem::take(buffer));
-  let rslt = st.abi_encode(&mut enc);
-  mem::swap(buffer, enc.buffer_mut());
-  rslt?;
-  Ok(())
-}
 
 pub(crate) fn eip_712_domain(chain_id: u64) -> Eip712Domain<'static> {
   Eip712Domain::new(
@@ -85,7 +66,7 @@ where
   T: Eip712 + Into<Action<'pl>> + 'pl,
   TP: TransportParams,
 {
-  let signature = sign_typed_data(&mut pa.bytes_buffer, &payload, wallet)?;
+  let signature = sign_payload(&mut pa.bytes_buffer, &payload, wallet)?;
   let action = payload.into();
   let exchange_payload = ExchangePayload { action, signature, nonce, vault_address: None };
   serde_json::to_writer(&mut pa.bytes_buffer, &exchange_payload)?;
@@ -101,14 +82,6 @@ pub(crate) fn next_nonce() -> crate::Result<u64> {
     return Ok(now_ms);
   }
   Ok(nonce)
-}
-
-pub(crate) fn serialize_hex<S, T>(val: T, s: S) -> Result<S::Ok, S::Error>
-where
-  T: LowerHex,
-  S: Serializer,
-{
-  s.collect_str(&format_args!("0x{val:x}"))
 }
 
 pub(crate) fn serialize_sig<S>(sig: &Signature, s: S) -> Result<S::Ok, S::Error>
@@ -130,18 +103,7 @@ pub(crate) fn sign_l1_action(
 ) -> crate::Result<Signature> {
   let source = if is_mainnet { b"a" } else { b"b" };
   let payload = Agent { source, connection_id: ArrayWrapper(connection_id) };
-  sign_typed_data(buffer, &payload, wallet)
-}
-
-pub(crate) fn sign_typed_data<T>(
-  buffer: &mut Vector<u8>,
-  payload: &T,
-  wallet: &k256::ecdsa::SigningKey,
-) -> crate::Result<Signature>
-where
-  T: Eip712,
-{
-  Ok(wallet.sign_prehash_recoverable(&payload.eip712_signing_hash(buffer)?)?.into())
+  sign_payload(buffer, &payload, wallet)
 }
 
 #[cfg(test)]

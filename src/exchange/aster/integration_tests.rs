@@ -1,7 +1,7 @@
 use crate::{
   exchange::aster::{
-    Aster, OrderGetReqParams, OrderPostReqParams, OrderSide, OrderType, PROD_SPOT_HTTP_URI,
-    PROD_SPOT_WS_URI, PkgsAux, sign_params::SignParams,
+    Aster, OrderGetReqParams, OrderPostReqParams, OrderSide, OrderType, PkgsAux,
+    TESTNET_SPOT_HTTP_URI, TESTNET_SPOT_WS_URI, sign_params::CexSignParams,
   },
   tests::_VARS,
 };
@@ -15,20 +15,23 @@ use wtx::{
   },
   de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::{Secret, SensitiveBytes, timestamp_millis_str},
+  misc::{Secret, SensitiveBytes},
   rng::{ChaCha20, SeedableRng},
 };
 
 static ASTER: LazyLock<Mutex<Aster>> = LazyLock::new(|| {
-  let mut secret_key = _VARS.aster_secret_key.clone().into_bytes();
+  let mut secret = [0; 32];
+  let _ = wtx::de::decode_hex(_VARS.aster_secret.as_bytes(), &mut secret).unwrap();
   Mutex::new(Aster::new(
-    _VARS.aster_api_key.clone(),
+    true,
     RequestCounter::new(RequestLimit::unlimited()),
     Secret::new(
-      SensitiveBytes::new_locked(secret_key.as_mut_slice()).unwrap(),
+      SensitiveBytes::new_locked(secret.as_mut_slice()).unwrap(),
       &mut ChaCha20::from_std_random().unwrap(),
     )
     .unwrap(),
+    _VARS.aster_signer.clone(),
+    _VARS.aster_user.clone(),
   ))
 });
 static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
@@ -38,13 +41,12 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
-  v1_account,
+  account,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let (now, _) = timestamp_millis_str().unwrap();
     let pkg = &mut pkgs_aux
-      .v1_account()
-      .data(&SignParams { recv_window: None, timestamp: now })
+      .account()
+      .data(None)
       .unwrap()
       .build();
     let _rslt = trans
@@ -59,10 +61,10 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
-  v1_exchange_info,
+  exchange_info,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let pkg = &mut pkgs_aux.v1_exchange_info().build();
+    let pkg = &mut pkgs_aux.exchange_info().build();
     let _rslt = trans
       .send_pkg_recv_decode_contained(pkg, pkgs_aux)
       .await
@@ -75,17 +77,32 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
-  v1_order_get,
+  listen_key,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let (now, _) = timestamp_millis_str().unwrap();
+    let pkg = &mut pkgs_aux.listen_key().data(None).unwrap().build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
+  order_get,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
     let pkg = &mut pkgs_aux
-      .v1_order_get()
+      .order_get()
       .data(&OrderGetReqParams {
-        order_id: Some(290307),
+        order_id: Some(262221260),
         orig_client_order_id: None,
-        sign_params: SignParams { timestamp: now, recv_window: None },
-        symbol: "USDCUSDT".try_into().unwrap(),
+        sign_params: CexSignParams { recv_window: None },
+        symbol: "ASTERUSDT".try_into().unwrap(),
       })
       .unwrap()
       .build();
@@ -102,52 +119,55 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
-  v1_order_post,
+  order_post,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let (now, _) = timestamp_millis_str().unwrap();
-    let pkg = &mut pkgs_aux
-      .v1_order_post()
-      .data(&OrderPostReqParams {
-        new_client_order_id: None,
-        price: None,
-        quantity: Some(Decimal::from_parts(5, 0, 0, false, 0)),
-        quote_order_qty: None,
-        side: OrderSide::Sell,
-        sign_params: SignParams { timestamp: now, recv_window: None },
-        stop_price: None,
-        symbol: "USDCUSDT".try_into().unwrap(),
-        time_in_force: None,
-        ty: OrderType::Market,
-      })
-      .unwrap()
-      .build();
-    let _rslt = trans
-      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
-      .await
-      .unwrap()
-      .data;
+    let mut fun = async |side| {
+      let pkg = &mut pkgs_aux
+        .order_post()
+        .data(&OrderPostReqParams {
+          new_client_order_id: None,
+          price: None,
+          quantity: Some(Decimal::from_parts(30, 0, 0, false, 0)),
+          quote_order_qty: None,
+          side,
+          cex_sign_params: None,
+          stop_price: None,
+          symbol: "ASTERUSDT".try_into().unwrap(),
+          time_in_force: None,
+          ty: OrderType::Market,
+        })
+        .unwrap()
+        .build();
+      let _rslt = trans
+        .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+        .await
+        .unwrap()
+        .data;
+    };
+    fun(OrderSide::Buy).await;
+    fun(OrderSide::Sell).await;
   }
 );
 
 create_ws_test!(
   #[],
-  PROD_SPOT_WS_URI,
+  TESTNET_SPOT_WS_URI,
   &mut *ASTER.lock().await,
   ws(),
   book_ticker,
   |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux.ws().data(1, "SUBSCRIBE", ["btcusdt@bookTicker"]).build();
+    pkgs_aux.log_body();
     [trans
-      .send_pkg_recv_decode_contained(&mut pkgs_aux.subscribe().data(["btcusdt@bookTicker"]).build(), pkgs_aux)
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
       .await
-      .unwrap()
-      .result
       .unwrap()]
   }
 );
 
 fn http() -> (SerdeJson, HttpParams) {
-  (SerdeJson, HttpParams::from_uri(PROD_SPOT_HTTP_URI.into()))
+  (SerdeJson, HttpParams::from_uri(TESTNET_SPOT_HTTP_URI.into()))
 }
 
 fn ws() -> (SerdeJson, WsParams) {

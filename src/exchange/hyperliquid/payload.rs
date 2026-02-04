@@ -1,4 +1,4 @@
-use crate::exchange::hyperliquid::{misc::serialize_sig, signature::Signature};
+use crate::{blockchain::ethereum::Signature, exchange::hyperliquid::misc::serialize_sig};
 use alloc::string::String;
 use core::marker::PhantomData;
 use serde::{

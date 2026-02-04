@@ -1,9 +1,9 @@
 use crate::{
-  blockchain::ethereum::{Eip712, Eip712Domain, SolInt, misc::keccak256},
-  exchange::hyperliquid::{
-    Chain,
-    misc::{abi_encode_from_buffer, eip_712_domain},
+  blockchain::ethereum::{
+    Eip712, Eip712Domain, SolInt,
+    misc::{abi_encode_from_buffer, keccak256},
   },
+  exchange::hyperliquid::{Chain, misc::eip_712_domain},
 };
 use alloc::string::ToString;
 use rust_decimal::Decimal;
@@ -12,7 +12,7 @@ use wtx::collection::{ArrayWrapper, Vector};
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SpotSend<'any> {
-  #[serde(serialize_with = "crate::exchange::hyperliquid::misc::serialize_hex")]
+  #[serde(serialize_with = "crate::misc::serialize_hex")]
   pub signature_chain_id: u64,
   pub hyperliquid_chain: Chain,
   pub destination: &'any str,

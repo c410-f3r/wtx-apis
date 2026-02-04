@@ -2,15 +2,15 @@ use k256::U256;
 
 /// An Ethereum ECDSA signature.
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub(crate) struct Signature {
-  pub(crate) y_parity: bool,
+pub struct Signature {
   pub(crate) r: U256,
   pub(crate) s: U256,
+  pub(crate) y_parity: bool,
 }
 
 impl Signature {
-  #[cfg(test)]
-  pub(crate) fn all_bytes(&self) -> [u8; 65] {
+  /// Raw opaque bytes in rsv order
+  pub fn all_bytes(&self) -> [u8; 65] {
     let mut rslt = [0; 65];
     rslt[..32].copy_from_slice(&self.r.to_be_bytes());
     rslt[32..64].copy_from_slice(&self.s.to_be_bytes());
@@ -18,7 +18,8 @@ impl Signature {
     rslt
   }
 
-  pub(crate) fn v(&self) -> u8 {
+  /// Returns the legacy Ethereum recovery ID for public key recovery.
+  pub fn v(&self) -> u8 {
     27u8.wrapping_add(self.y_parity.into())
   }
 }

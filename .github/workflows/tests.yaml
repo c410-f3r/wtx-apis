@@ -41,8 +41,9 @@ jobs:
 
       - run: .scripts/integration-tests.sh
         env:
-          ASTER_API_KEY: ${{ secrets.ASTER_API_KEY }}
-          ASTER_SECRET_KEY: ${{ secrets.ASTER_SECRET_KEY }}
+          ASTER_SECRET: ${{ secrets.ASTER_SECRET }}
+          ASTER_SIGNER: ${{ secrets.ASTER_SIGNER }}
+          ASTER_USER: ${{ secrets.ASTER_USER }}
 
           HYPERLIQUID_SK: ${{ secrets.HYPERLIQUID_SK }}
 

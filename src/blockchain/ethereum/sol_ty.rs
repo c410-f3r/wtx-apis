@@ -22,7 +22,7 @@ pub trait SolTy<'de>: Sized {
   type DeToken<'any>;
 
   /// Encodes itself into a standard byte array.
-  fn abi_encode(&self, enc: &mut Encoder) -> crate::Result<()> {
+  fn abi_encode(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
     let token = self.tokenize()?;
     (token,).encode_sequence(enc)?;
     Ok(())
@@ -155,10 +155,8 @@ impl<'de> SolTy<'de> for &'de [u8] {
     Ok(token.0)
   }
 
-  fn eip712_data_word(&self, buffer: &mut Vector<u8>) -> crate::Result<Word> {
-    self.abi_encode_packed(buffer)?;
-    let array = keccak256([buffer]);
-    Ok(Word(array))
+  fn eip712_data_word(&self, _: &mut Vector<u8>) -> crate::Result<Word> {
+    Ok(Word(keccak256([self])))
   }
 
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
