@@ -24,7 +24,7 @@ macro_rules! impl_tuples {
             }
           }
 
-          fn head_push(&self, enc: &mut Encoder) -> crate::Result<()> {
+          fn head_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
             if Self::IS_DYN_TOKEN {
               enc.push_last_tail_idx()?;
             } else {
@@ -43,7 +43,7 @@ macro_rules! impl_tuples {
             }
           }
 
-          fn tail_push(&self, enc: &mut Encoder) -> crate::Result<()> {
+          fn tail_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
             if Self::IS_DYN_TOKEN {
               self.encode_sequence(enc)?;
             }
@@ -75,7 +75,7 @@ macro_rules! impl_tuples {
             )*))
           }
 
-          fn encode_sequence(&self, enc: &mut Encoder) -> crate::Result<()> {
+          fn encode_sequence(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
             let ($($T,)*) = self;
             enc.push_tail_idx_by_words(0usize $( .wrapping_add($T.head_words()) )*)?;
             $(

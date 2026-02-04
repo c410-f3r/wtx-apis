@@ -9,13 +9,13 @@ pub trait SolToken<'de>: Sized {
   fn decode_from(dec: &mut Decoder<'de>) -> crate::Result<Self>;
 
   /// Pushes static elements
-  fn head_push(&self, enc: &mut Encoder) -> crate::Result<()>;
+  fn head_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()>;
 
   /// The amount of static elements
   fn head_words(&self) -> usize;
 
   /// Pushes dynamic elements
-  fn tail_push(&self, enc: &mut Encoder) -> crate::Result<()>;
+  fn tail_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()>;
 
   /// The amount of dynamic elements
   fn tail_words(&self) -> usize;

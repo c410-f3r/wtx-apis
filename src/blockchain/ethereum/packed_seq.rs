@@ -21,7 +21,7 @@ where
     Ok(Self(child.tail_bytes(len)?))
   }
 
-  fn head_push(&self, enc: &mut Encoder) -> crate::Result<()> {
+  fn head_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
     enc.push_last_tail_idx()?;
     Ok(())
   }
@@ -30,7 +30,7 @@ where
     1
   }
 
-  fn tail_push(&self, enc: &mut Encoder) -> crate::Result<()> {
+  fn tail_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
     enc.push_packed_sequence(&self.0)
   }
 

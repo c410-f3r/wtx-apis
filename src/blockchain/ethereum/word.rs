@@ -22,7 +22,7 @@ impl<'de> SolToken<'de> for Word {
     dec.take_word()
   }
 
-  fn head_push(&self, enc: &mut Encoder) -> crate::Result<()> {
+  fn head_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
     enc.push_words([*self])
   }
 
@@ -30,7 +30,7 @@ impl<'de> SolToken<'de> for Word {
     1
   }
 
-  fn tail_push(&self, _: &mut Encoder) -> crate::Result<()> {
+  fn tail_push(&self, _: &mut Encoder<'_>) -> crate::Result<()> {
     Ok(())
   }
 

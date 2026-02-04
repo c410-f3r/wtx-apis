@@ -118,7 +118,7 @@ where
 }
 
 #[cfg(all(feature = "hyperliquid", feature = "serde"))]
-pub(crate) fn serialize_hex<S, T>(val: T, s: S) -> Result<S::Ok, S::Error>
+pub(crate) fn _serialize_hex<S, T>(val: T, s: S) -> Result<S::Ok, S::Error>
 where
   T: core::fmt::LowerHex,
   S: Serializer,
@@ -132,6 +132,6 @@ where
 pub fn timestamp_str(
   cb: impl FnOnce(core::time::Duration) -> u128,
 ) -> wtx::Result<(u64, wtx::de::U64String)> {
-  let number = wtx::calendar::Instant::now_timestamp(0).map(|el| cb(el))?.try_into()?;
+  let number = wtx::calendar::Instant::now_timestamp(0).map(cb)?.try_into()?;
   Ok((number, wtx::de::u64_string(number)))
 }

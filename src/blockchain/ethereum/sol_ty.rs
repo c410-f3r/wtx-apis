@@ -22,7 +22,7 @@ pub trait SolTy<'de>: Sized {
   type DeToken<'any>;
 
   /// Encodes itself into a standard byte array.
-  fn abi_encode(&self, enc: &mut Encoder) -> crate::Result<()> {
+  fn abi_encode(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
     let token = self.tokenize()?;
     (token,).encode_sequence(enc)?;
     Ok(())

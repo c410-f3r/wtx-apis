@@ -9,5 +9,5 @@ pub trait SolTokenSeq<'de>: SolToken<'de> {
   fn decode_sequence(dec: &mut Decoder<'de>) -> crate::Result<Self>;
 
   /// Encodes itself into bytes.
-  fn encode_sequence(&self, enc: &mut Encoder) -> crate::Result<()>;
+  fn encode_sequence(&self, enc: &mut Encoder<'_>) -> crate::Result<()>;
 }

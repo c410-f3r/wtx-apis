@@ -35,7 +35,7 @@ use wtx::{
   misc::Secret,
 };
 
-const EIP712_DOMAIN: Eip712Domain = Eip712Domain::new(
+const EIP712_DOMAIN: Eip712Domain<'_> = Eip712Domain::new(
   Some("AsterSignTransaction"),
   Some("1"),
   Some(U256::from_u16(714)),
@@ -109,7 +109,7 @@ impl Aster {
       } else {
         timestamp_str(|el| el.as_micros())?.1
       };
-      bytes_buffer.extend_from_copyable_slices([
+      let _ = bytes_buffer.extend_from_copyable_slices([
         init_char,
         b"nonce=",
         timestamp_string.as_bytes(),
@@ -136,7 +136,7 @@ impl Aster {
       } else {
         timestamp_str(|el| el.as_millis())?.1
       };
-      bytes_buffer.extend_from_copyable_slices([
+      let _ = bytes_buffer.extend_from_copyable_slices([
         init_char,
         "timestamp=".as_bytes(),
         timestamp_string.as_bytes(),
