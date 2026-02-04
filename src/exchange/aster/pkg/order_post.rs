@@ -1,22 +1,22 @@
 use crate::{
   PairName,
   exchange::aster::{
-    ClientOrderIdTy, OrderSide, OrderStatus, OrderType, TimeInForce, sign_params::SignParams,
+    CexSignParams, ClientOrderIdTy, OrderSide, OrderStatus, OrderType, TimeInForce,
   },
 };
 use rust_decimal::Decimal;
 
 /// Structure sent when creating orders
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OrderPostReqParams {
   /// Trading pair symbol.
   pub symbol: PairName,
-  /// Order side (buy or sell).
-  pub side: OrderSide,
   /// See [`OrderType`].
   #[serde(rename = "type")]
   pub ty: OrderType,
+  /// Order side (buy or sell).
+  pub side: OrderSide,
   /// See [`TimeInForce`].
   #[serde(skip_serializing_if = "Option::is_none")]
   pub time_in_force: Option<TimeInForce>,
@@ -35,9 +35,10 @@ pub struct OrderPostReqParams {
   /// Stop price for STOP/STOP_MARKET or TAKE_PROFIT/TAKE_PROFIT_MARKET orders.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub stop_price: Option<Decimal>,
-  /// See [`SignParams`].
+  /// See [`CentralizedSignParams`].
   #[serde(flatten)]
-  pub sign_params: SignParams,
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub cex_sign_params: Option<CexSignParams>,
 }
 
 /// Structure returned when creating orders
@@ -91,21 +92,26 @@ pub(crate) mod pkg {
     A: LeaseMut<Aster>,
   {
     #[pkg::aux_data]
-    fn v1_order_post_data(&mut self, params: &OrderPostReqParams) -> crate::Result<()> {
+    fn order_post_data(&mut self, params: &OrderPostReqParams) -> crate::Result<()> {
       let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
-      api.lease_mut().auth_req::<true, _>(
+      api.lease().auth_req::<true, _>(
         bytes_buffer,
-        params,
-        format_args!("/api/v1/order"),
+        Some(params),
+        if api.lease().is_dex {
+          format_args!("/api/v3/order")
+        } else {
+          format_args!("/api/v1/order")
+        },
         send_bytes_buffer,
+        None,
         tp,
       )
     }
   }
 
   #[pkg::req_data]
-  pub type V1OrderPostReq = ();
+  pub type OrderPostReq = ();
 
   #[pkg::res_data]
-  pub type V1OrderPostRes = OrderPostResParams;
+  pub type OrderPostRes = OrderPostResParams;
 }

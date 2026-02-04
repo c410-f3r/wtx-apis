@@ -8,12 +8,12 @@ pub(crate) static _VARS: LazyLock<_Vars> =
 
 #[derive(Debug, wtx::FromVars)]
 pub(crate) struct _Vars {
-  #[allow(unused, reason = "testnet key")]
   #[cfg(feature = "aster")]
-  pub(crate) aster_api_key: alloc::string::String,
-  #[allow(unused, reason = "testnet key")]
+  pub(crate) aster_secret: alloc::string::String,
   #[cfg(feature = "aster")]
-  pub(crate) aster_secret_key: alloc::string::String,
+  pub(crate) aster_signer: alloc::string::String,
+  #[cfg(feature = "aster")]
+  pub(crate) aster_user: alloc::string::String,
 
   #[allow(unused, reason = "implementation is almost finished")]
   #[cfg(feature = "hyperliquid")]

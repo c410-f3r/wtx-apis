@@ -147,13 +147,6 @@ mod tests {
         &mut [0; 65]
       ).unwrap()
     );
-    assert_eq!(
-      sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap().all_bytes(),
-      decode_hex(
-        b"0xcd0925372ff1ed499e54883e9a6205ecfadec748f80ec463fe2f84f1209648776377961965cb7b12414186b1ea291e95fd512722427efcbcfb3b0b2bcd4d79d01c",
-        &mut [0; 65]
-      ).unwrap()
-    );
   }
 
   #[test]

@@ -26,7 +26,7 @@ impl<'any> Eip712Domain<'any> {
   pub(crate) const NAME: &'static str = "EIP712Domain";
 
   /// Shortcut
-  pub fn new(
+  pub const fn new(
     name: Option<&'any str>,
     version: Option<&'any str>,
     chain_id: Option<U256>,
@@ -36,25 +36,25 @@ impl<'any> Eip712Domain<'any> {
     Self { name, version, chain_id, verifying_contract, salt }
   }
 
-  pub(crate) fn encode_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
-    buffer.clear();
+  pub(crate) fn encode_data(&self) -> crate::Result<ArrayVectorU8<u8, { 32 * 5 }>> {
     let Self { name, version, chain_id, verifying_contract, salt } = self;
+    let mut rslt = ArrayVectorU8::new();
     if let Some(elem) = name {
-      buffer.extend_from_copyable_slice(&keccak256([&elem.as_bytes().tokenize()?.0]))?;
+      rslt.extend_from_copyable_slice(&keccak256([&elem.as_bytes().tokenize()?.0]))?;
     }
     if let Some(elem) = version {
-      buffer.extend_from_copyable_slice(&keccak256([&elem.as_bytes().tokenize()?.0]))?;
+      rslt.extend_from_copyable_slice(&keccak256([&elem.as_bytes().tokenize()?.0]))?;
     }
     if let Some(elem) = *chain_id {
-      buffer.extend_from_copyable_slice(&SolInt(elem).tokenize()?.0)?;
+      rslt.extend_from_copyable_slice(&SolInt(elem).tokenize()?.0)?;
     }
     if let Some(elem) = verifying_contract {
-      buffer.extend_from_copyable_slice(&elem.tokenize()?.0)?;
+      rslt.extend_from_copyable_slice(&elem.tokenize()?.0)?;
     }
     if let Some(elem) = *salt {
-      buffer.extend_from_copyable_slice(&ArrayWrapper(elem).tokenize()?.0)?;
+      rslt.extend_from_copyable_slice(&ArrayWrapper(elem).tokenize()?.0)?;
     }
-    Ok(())
+    Ok(rslt)
   }
 
   pub(crate) fn encode_type(&self) -> ArrayVectorU8<u8, 98> {
@@ -83,10 +83,8 @@ impl<'any> Eip712Domain<'any> {
     buffer
   }
 
-  pub(crate) fn hash_struct(&self, buffer: &mut Vector<u8>) -> crate::Result<[u8; 32]> {
-    self.encode_data(buffer)?;
-    let rslt = keccak256([&self.type_hash()?, buffer]);
-    Ok(rslt)
+  pub(crate) fn struct_hash(&self) -> crate::Result<[u8; 32]> {
+    Ok(keccak256([&self.type_hash()?, &self.encode_data()?]))
   }
 
   pub(crate) fn type_hash(&self) -> crate::Result<[u8; 32]> {
@@ -99,10 +97,9 @@ pub trait Eip712 {
   /// Domain
   fn domain(&self) -> Eip712Domain<'_>;
 
-  /// Signing hash
-  fn eip712_signing_hash(&self, buffer: &mut Vector<u8>) -> crate::Result<[u8; 32]> {
+  /// Signing
+  fn eip712_signing(&self, buffer: &mut Vector<u8>) -> crate::Result<[u8; 66]> {
     let mut rslt = [0u8; 2 + 32 + 32];
-    let mut vector = Vector::new();
     #[rustfmt::skip]
     let [
       a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18,
@@ -112,19 +109,25 @@ pub trait Eip712 {
     ] = &mut rslt;
     *a0 = 0b0001_1001;
     *a1 = 0b0000_0001;
-    for (from, to) in self.domain().hash_struct(buffer)?.into_iter().zip([
+    for (from, to) in self.domain().struct_hash()?.into_iter().zip([
       a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, a21,
       a22, a23, a24, a25, a26, a27, a28, a29, a30, a31, a32, a33,
     ]) {
       *to = from
     }
-    for (from, to) in self.struct_hash(&mut vector)?.into_iter().zip([
+    buffer.clear();
+    for (from, to) in self.struct_hash(buffer)?.into_iter().zip([
       a34, a35, a36, a37, a38, a39, a40, a41, a42, a43, a44, a45, a46, a47, a48, a49, a50, a51,
       a52, a53, a54, a55, a56, a57, a58, a59, a60, a61, a62, a63, a64, a65,
     ]) {
       *to = from
     }
-    Ok(keccak256([&rslt]))
+    Ok(rslt)
+  }
+
+  /// Signing hash
+  fn eip712_signing_hash(&self, buffer: &mut Vector<u8>) -> crate::Result<[u8; 32]> {
+    Ok(keccak256([&self.eip712_signing(buffer)?]))
   }
 
   /// Struct hash

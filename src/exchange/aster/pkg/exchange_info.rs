@@ -203,21 +203,25 @@ pub struct Symbol {
 
 #[wtx::pkg(data_format(json), id(crate::exchange::aster::AsterId), transport(http))]
 pub(crate) mod pkg {
-  use crate::exchange::aster::{ExchangeInfo, HttpPkgsAux};
+  use crate::exchange::aster::{Aster, ExchangeInfo, HttpPkgsAux};
   use wtx::client_api_framework::network::{HttpParams, transport::TransportParams};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
 
   #[pkg::before_sending]
-  async fn before_sending(trans_params: &mut HttpParams) -> crate::Result<()> {
-    trans_params.ext_req_params_mut().rrb.uri.push_path(format_args!("/api/v1/exchangeInfo"))?;
+  async fn before_sending(api: &mut Aster, trans_params: &mut HttpParams) -> crate::Result<()> {
+    trans_params.ext_req_params_mut().rrb.uri.push_path(if api.is_dex {
+      format_args!("/api/v3/exchangeInfo")
+    } else {
+      format_args!("/api/v1/exchangeInfo")
+    })?;
     Ok(())
   }
 
   #[pkg::req_data]
-  pub type V1ExchangeInfoReq = ();
+  pub type ExchangeInfoReq = ();
 
   #[pkg::res_data]
-  pub type V1ExchangeInfoRes = ExchangeInfo;
+  pub type ExchangeInfoRes = ExchangeInfo;
 }

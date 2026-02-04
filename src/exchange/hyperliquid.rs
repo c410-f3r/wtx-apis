@@ -11,7 +11,6 @@ mod order;
 mod order_info;
 mod payload;
 mod pkg;
-mod signature;
 mod spot_send;
 mod spot_user;
 mod usd_send;

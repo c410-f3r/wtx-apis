@@ -1,7 +1,7 @@
 use crate::{
   PairName,
   exchange::aster::{
-    ClientOrderIdTy, OrderSide, OrderStatus, OrderType, TimeInForce, sign_params::SignParams,
+    CexSignParams, ClientOrderIdTy, OrderSide, OrderStatus, OrderType, TimeInForce,
   },
 };
 use rust_decimal::Decimal;
@@ -20,7 +20,7 @@ pub struct OrderGetReqParams {
   pub orig_client_order_id: Option<ClientOrderIdTy>,
   /// See [`SignParams`].
   #[serde(flatten)]
-  pub sign_params: SignParams,
+  pub sign_params: CexSignParams,
 }
 
 /// Structure returned when querying orders
@@ -74,21 +74,26 @@ pub(crate) mod pkg {
     A: LeaseMut<Aster>,
   {
     #[pkg::aux_data]
-    fn v1_order_get_data(&mut self, params: &OrderGetReqParams) -> crate::Result<()> {
+    fn order_get_data(&mut self, params: &OrderGetReqParams) -> crate::Result<()> {
       let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
-      api.lease_mut().auth_req::<false, _>(
+      api.lease().auth_req::<false, _>(
         bytes_buffer,
-        params,
-        format_args!("/api/v1/order"),
+        Some(params),
+        if api.lease().is_dex {
+          format_args!("/api/v3/order")
+        } else {
+          format_args!("/api/v1/order")
+        },
         send_bytes_buffer,
+        None,
         tp,
       )
     }
   }
 
   #[pkg::req_data]
-  pub type V1OrderGetReq = ();
+  pub type OrderGetReq = ();
 
   #[pkg::res_data]
-  pub type V1OrderGetRes = OrderGetResParams;
+  pub type OrderGetRes = OrderGetResParams;
 }

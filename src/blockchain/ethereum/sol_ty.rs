@@ -155,10 +155,8 @@ impl<'de> SolTy<'de> for &'de [u8] {
     Ok(token.0)
   }
 
-  fn eip712_data_word(&self, buffer: &mut Vector<u8>) -> crate::Result<Word> {
-    self.abi_encode_packed(buffer)?;
-    let array = keccak256([buffer]);
-    Ok(Word(array))
+  fn eip712_data_word(&self, _: &mut Vector<u8>) -> crate::Result<Word> {
+    Ok(Word(keccak256([self])))
   }
 
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
