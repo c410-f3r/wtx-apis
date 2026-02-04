@@ -9,9 +9,9 @@ use rust_decimal::Decimal;
 /// Structure sent when creating orders
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct OrderPostReqParams {
+pub struct OrderPostReqParams<'any> {
   /// Trading pair symbol.
-  pub symbol: PairName,
+  pub symbol: &'any str,
   /// See [`OrderType`].
   #[serde(rename = "type")]
   pub ty: OrderType,

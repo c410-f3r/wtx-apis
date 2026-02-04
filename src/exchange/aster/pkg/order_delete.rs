@@ -1,7 +1,11 @@
-#[wtx::pkg(data_format(json), id(crate::exchange::aster::AsterId), transport(http))]
+#[wtx::pkg(data_format(verbatim), id(crate::exchange::aster::AsterId), transport(http))]
 pub(crate) mod pkg {
   use crate::exchange::aster::{Aster, HttpPkgsAux, OrderReqParams, OrderResParams};
-  use wtx::{client_api_framework::pkg::PkgsAux, misc::LeaseMut};
+  use wtx::{
+    client_api_framework::{network::transport::TransportParams, pkg::PkgsAux},
+    http::Method,
+    misc::LeaseMut,
+  };
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR>
@@ -9,7 +13,7 @@ pub(crate) mod pkg {
     A: LeaseMut<Aster>,
   {
     #[pkg::aux_data]
-    fn order_get_data(&mut self, params: &OrderReqParams) -> crate::Result<()> {
+    fn order_delete_data(&mut self, params: &OrderReqParams) -> crate::Result<()> {
       let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
       api.lease().auth_req::<false, _>(
         bytes_buffer,
@@ -22,13 +26,15 @@ pub(crate) mod pkg {
         send_bytes_buffer,
         None,
         tp,
-      )
+      )?;
+      self.tp.ext_req_params_mut().method = Method::Delete;
+      Ok(())
     }
   }
 
   #[pkg::req_data]
-  pub type OrderGetReq = ();
+  pub type OrderDeleteReq = ();
 
   #[pkg::res_data]
-  pub type OrderGetRes = OrderResParams;
+  pub type OrderDeleteRes = OrderResParams;
 }
