@@ -9,7 +9,7 @@ pub(crate) mod pkg {
     A: LeaseMut<Aster>,
   {
     #[pkg::aux_data]
-    fn order_get_data(&mut self, params: &OrderReqParams) -> crate::Result<()> {
+    fn order_get_data(&mut self, params: &OrderReqParams<'_>) -> crate::Result<()> {
       let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
       api.lease().auth_req::<false, _>(
         bytes_buffer,

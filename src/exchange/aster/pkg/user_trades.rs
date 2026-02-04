@@ -76,9 +76,9 @@ pub(crate) mod pkg {
     A: LeaseMut<Aster>,
   {
     #[pkg::aux_data]
-    fn user_trades_data(&mut self, params: &UserTradesReqParams) -> crate::Result<()> {
+    fn user_trades_data(&mut self, params: &UserTradesReqParams<'_>) -> crate::Result<()> {
       let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
-      api.lease().auth_req::<true, _>(
+      api.lease().auth_req::<false, _>(
         bytes_buffer,
         Some(params),
         if api.lease().is_dex {
