@@ -1,6 +1,8 @@
 mod account;
+mod depth;
 mod exchange_info;
 mod listen_key;
+mod open_orders;
 mod order_delete;
 mod order_get;
 mod order_post;
@@ -8,8 +10,10 @@ mod user_trades;
 mod ws;
 
 pub use account::{pkg::*, *};
+pub use depth::{pkg::*, *};
 pub use exchange_info::{pkg::*, *};
 pub use listen_key::pkg::*;
+pub use open_orders::{pkg::*, *};
 pub use order_delete::pkg::*;
 pub use order_get::pkg::*;
 pub use order_post::{pkg::*, *};
