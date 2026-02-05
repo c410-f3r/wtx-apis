@@ -56,6 +56,3 @@ version = "0.1.0"
 
 [package.metadata.docs.rs]
 all-features = true
-
-[patch.crates-io]
-curve25519-dalek = { git = "https://github.com/dalek-cryptography/curve25519-dalek" }

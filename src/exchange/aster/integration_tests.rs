@@ -1,7 +1,7 @@
 use crate::{
   exchange::aster::{
-    Aster, OrderPostReqParams, OrderReqParams, OrderSide, OrderType, PkgsAux,
-    TESTNET_SPOT_HTTP_URI, TESTNET_SPOT_WS_URI, UserTradesReqParams,
+    Aster, DepthReqParams, OpenOrdersReqParams, OrderPostReqParams, OrderReqParams, OrderSide,
+    OrderType, PkgsAux, TESTNET_SPOT_HTTP_URI, TESTNET_SPOT_WS_URI, UserTradesReqParams,
   },
   tests::_VARS,
 };
@@ -61,6 +61,25 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
+  depth,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux.depth().data(&DepthReqParams {
+      symbol: "ASTERUSDT",
+      limit: None
+    }).unwrap().build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
   exchange_info,
   &*CLIENT,
   |pkgs_aux, trans| async {
@@ -93,6 +112,25 @@ create_http_test!(
   #[],
   &mut *ASTER.lock().await,
   http(),
+  open_orders,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux.open_orders().data(&OpenOrdersReqParams {
+      symbol: "ASTERUSDT",
+      sign_params: None
+    }).unwrap().build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
   order_get,
   &*CLIENT,
   |pkgs_aux, trans| async {
@@ -102,7 +140,7 @@ create_http_test!(
         order_id: Some(262221260),
         orig_client_order_id: None,
         sign_params: None,
-        symbol: "ASTERUSDT".try_into().unwrap(),
+        symbol: "ASTERUSDT",
       })
       .unwrap()
       .build();
@@ -133,7 +171,7 @@ create_http_test!(
           side,
           cex_sign_params: None,
           stop_price: None,
-          symbol: "ASTERUSDT".try_into().unwrap(),
+          symbol: "ASTERUSDT",
           time_in_force: None,
           ty: OrderType::Market,
         })
