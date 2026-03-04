@@ -21,7 +21,7 @@ signature = { default-features = false, optional = true, version = "3.0.0-rc.10"
 
 [dev-dependencies]
 rust_decimal_macros = { default-features = false, version = "1.0" }
-tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
+tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.50" }
 wtx = { default-features = false, features = ["client-api-framework", "http-client-pool", "nightly", "serde_json", "tokio", "tokio-rustls", "_tracing-tree", "webpki-roots", "web-socket-handshake"], version = "0.42" }
 
 [features]
