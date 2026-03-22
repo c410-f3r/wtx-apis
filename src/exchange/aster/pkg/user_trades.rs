@@ -1,7 +1,7 @@
 use rust_decimal::Decimal;
 
 use crate::{
-  AssetName, PairName,
+  AssetString, PairString,
   exchange::aster::{CexSignParams, OrderSide},
 };
 
@@ -36,11 +36,11 @@ pub struct UserTradesReqParams<'any> {
 #[serde(rename_all = "camelCase")]
 pub struct UserTradeResParams {
   /// Trading pair symbol
-  pub symbol: PairName,
+  pub symbol: PairString,
   /// Unique trade ID
-  pub id: i64,
+  pub id: u64,
   /// Associated order ID
-  pub order_id: i64,
+  pub order_id: u64,
   /// Trade side (BUY or SELL)
   pub side: OrderSide,
   /// Trade execution price
@@ -52,11 +52,11 @@ pub struct UserTradeResParams {
   /// Commission amount charged
   pub commission: Decimal,
   /// Asset used for commission payment
-  pub commission_asset: AssetName,
+  pub commission_asset: AssetString,
   /// Trade execution timestamp in milliseconds
-  pub time: i64,
+  pub time: u64,
   /// Counterparty account ID
-  pub counterparty_id: i64,
+  pub counterparty_id: u64,
   /// Create/update identifier (can be null)
   pub create_update_id: Option<i64>,
   /// Whether this account was the maker in the trade
@@ -77,16 +77,16 @@ pub(crate) mod pkg {
   {
     #[pkg::aux_data]
     fn user_trades_data(&mut self, params: &UserTradesReqParams<'_>) -> crate::Result<()> {
-      let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
+      let PkgsAux { api, bytes_buffer, encode_data, tp, .. } = &mut self.0;
       api.lease().auth_req::<false, _>(
         bytes_buffer,
+        encode_data,
         Some(params),
         if api.lease().is_dex {
           format_args!("/api/v3/userTrades")
         } else {
           format_args!("/api/v1/userTrades")
         },
-        send_bytes_buffer,
         None,
         tp,
       )

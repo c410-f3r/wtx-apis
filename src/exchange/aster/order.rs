@@ -1,12 +1,12 @@
 use rust_decimal::Decimal;
 
 use crate::{
-  PairName,
+  PairString,
   exchange::aster::{CexSignParams, ClientOrderIdTy},
 };
 
 /// Response type for new order requests.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum V1OrderPostResponseTy {
   /// Acknowledgement response with minimal info.
@@ -16,7 +16,7 @@ pub enum V1OrderPostResponseTy {
 }
 
 /// Order side indicating buy or sell direction.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OrderSide {
   /// Buy order.
@@ -26,7 +26,7 @@ pub enum OrderSide {
 }
 
 /// Current status of an order in its lifecycle.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OrderStatus {
   /// Order was canceled.
@@ -44,7 +44,7 @@ pub enum OrderStatus {
 }
 
 /// Type of order determining execution behavior.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum OrderType {
   /// Limit order with specified price.
@@ -64,7 +64,7 @@ pub enum OrderType {
 }
 
 /// Position side for hedge mode trading.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum PositionSide {
   /// One-way mode position.
@@ -76,7 +76,7 @@ pub enum PositionSide {
 }
 
 /// Time in force policy determining order validity duration.
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TimeInForce {
   /// Fill or Kill - execute immediately and completely or cancel.
@@ -125,7 +125,7 @@ pub struct OrderResParams {
   /// Exchange-assigned order identifier.
   pub order_id: u64,
   /// Trading pair symbol.
-  pub symbol: PairName,
+  pub symbol: PairString,
   /// See [`OrderStatus`].
   pub status: OrderStatus,
   /// Client-specified order identifier.

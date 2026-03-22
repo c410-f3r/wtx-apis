@@ -12,8 +12,8 @@ pub(crate) mod pkg {
       HttpParams,
       transport::{SendingReceivingTransport, TransportParams},
     },
+    codec::format::SerdeJson,
     collection::Vector,
-    de::format::SerdeJson,
     misc::LeaseMut,
   };
 

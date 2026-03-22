@@ -8,7 +8,7 @@ use tokio::sync::Mutex;
 use wtx::{
   calendar::{Date, Duration, Instant},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  de::format::SerdeJson,
+  codec::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 

@@ -21,7 +21,7 @@ use wtx::{
     network::{HttpParams, WsParams, transport::SendingReceivingTransport},
   },
   collection::Vector,
-  de::format::SerdeJson,
+  codec::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 
@@ -29,7 +29,6 @@ const HTTP_URI: &str = "https://api.devnet.solana.com";
 const TO_NORMAL_ACCOUNT: &str = "9fpynsTdxijRFifMx8HsBijF73kksrGddzAac3aFNjVx";
 const TO_SOL_TOKEN_ACCOUNT: &str = "8oPiFowg2iDT1a9nsPfyEyfLuM1iKXFjpGrzfqEzRbXH";
 const TO_SOL_TOKEN_MINT: &str = "So11111111111111111111111111111111111111112";
-const TOKEN_PROGRAM: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const WS_URI: &str = "wss://api.devnet.solana.com";
 
 static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =

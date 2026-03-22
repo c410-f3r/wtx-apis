@@ -5,7 +5,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, de::format::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, codec::format::SerdeJson};
 //! use wtx_apis::payment_gateway::mercado_pago::{MercadoPago, PkgsAux};
 //!
 //! let mercado_pago = MercadoPago::new("CLIENT_ID".into(), "CLIENT_SECRET".into(), 60, true);

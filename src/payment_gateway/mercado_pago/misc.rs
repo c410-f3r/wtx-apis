@@ -7,12 +7,11 @@ use wtx::{
     HttpParams,
     transport::{SendingReceivingTransport, TransportParams},
   },
-  collection::Vector,
-  de::{
-    DecodeSeq, Encode,
-    format::De,
+  codec::{
+    DecodeSeq, Encode, GenericCodec,
     protocol::{VerbatimDecoder, VerbatimEncoder},
   },
+  collection::Vector,
   http::ReqBuilder,
 };
 
@@ -21,9 +20,9 @@ pub(crate) async fn manage_before_sending<DRSR, T>(
   buffer: &mut Vector<u8>,
 ) -> crate::Result<()>
 where
-  for<'any> VerbatimEncoder<OauthReq<'any>>: Encode<De<&'any mut DRSR>>,
+  for<'any> VerbatimEncoder<OauthReq<'any>>: Encode<GenericCodec<&'any mut DRSR>>,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'de> VerbatimDecoder<OauthResponse<&'de str>>: DecodeSeq<'de, De<DRSR>>,
+  for<'de> VerbatimDecoder<OauthResponse<&'de str>>: DecodeSeq<'de, GenericCodec<DRSR>>,
 {
   trans_params.ext_req_params_mut().rrb.uri.push_path(format_args!("/oauth/token"))?;
   let is_test = api.is_test;

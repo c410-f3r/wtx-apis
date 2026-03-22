@@ -39,10 +39,9 @@ impl TransactionInput {
 
   /// Checks if all signatures are actually signed.
   pub fn check_signatures(&self) -> crate::Result<()> {
-    let default = [0; 64];
     let mut filled: usize = 0;
     let all_are_signed = self.signatures.iter().all(|signature| {
-      let is_signed = signature.as_slice() != &default;
+      let is_signed = signature.as_slice() != [0; 64];
       if is_signed {
         filled = filled.wrapping_add(1);
       }

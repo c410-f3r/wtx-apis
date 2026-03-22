@@ -10,8 +10,8 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
+  codec::format::SerdeJson,
   collection::{ArrayVectorU8, Vector},
-  de::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 

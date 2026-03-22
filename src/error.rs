@@ -8,6 +8,8 @@ use wtx::http::StatusCode;
 pub enum Error {
   // External
   //
+  /// `bs58` error
+  Bs58Error,
   /// See [bincode::Error].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
@@ -48,6 +50,10 @@ pub enum Error {
   //
   /// An submitted transaction could not be confirmed by an external actor.
   CouldNotConfirmTransaction,
+  /// Could not convert `U256` into another primitive.
+  InvalidU256Conversion,
+  /// Iterator can not yield more elements
+  IteratorIsExhausted,
   /// Request was expecting a different HTTP status code.
   IncompatibleStatusCode(StatusCode, StatusCode),
 
@@ -93,6 +99,32 @@ pub enum Error {
   #[cfg(feature = "solana")]
   /// Transaction error
   SolanaTxError(crate::blockchain::solana::TransactionError),
+  /// The provided index for the address lookup table is out of bounds.
+  SolanaAddressLookupInvalidLookupIndex,
+  /// The address lookup table account was not found on-chain.
+  SolanaAddressLookupLookupTableAccountNotFound,
+  /// The account owner does not match the expected program ID.
+  SolanaIllegalOwner,
+  /// The account data could not be deserialized or is malformed.
+  SolanaInvalidAccountData,
+  /// The specified curve type is not supported or recognized.
+  SolanaInvalidCurveType,
+  /// The provided seeds are invalid for PDA derivation.
+  SolanaInvalidSeeds,
+  /// A seed exceeds the maximum allowed length of 32 bytes.
+  SolanaMaxSeedLengthExceeded,
+  /// No valid seed was found to derive a program-derived address.
+  SolanaNoSeedFound,
+  /// An error occurred during program-derived address computation.
+  SolanaPdaError,
+  /// The slot leaders list must contain at least one element.
+  SolanaSlotLeadersMustHaveAtLeastOneElement,
+  /// The account has not been initialized yet.
+  SolanaUninitializedAccount,
+  /// The provided liquidity amount must be greater than zero.
+  SolanaLiquidityMustBeGreaterThanZero,
+  /// Wallet address is not within the elliptic curve
+  SolanaTokenOwnerOffCurveError,
 
   // SuperFrete
   //

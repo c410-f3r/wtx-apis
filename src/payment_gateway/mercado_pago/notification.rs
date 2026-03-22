@@ -1,6 +1,6 @@
 use wtx::{
   calendar::{DateTime, DynTz},
-  de::U64String,
+  codec::U64String,
 };
 
 /// WebHook notification

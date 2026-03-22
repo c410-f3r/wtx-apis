@@ -45,7 +45,7 @@ where
       {
         let mut rslt = Vector::new();
         while let Some(key) = map.next_key()? {
-          rslt.push((key, map.next_value()?)).map_err(|el| M::Error::custom(el))?;
+          rslt.push((key, map.next_value()?)).map_err(M::Error::custom)?;
         }
         Ok(PairVector(rslt))
       }

@@ -1,4 +1,4 @@
-use crate::AssetName;
+use crate::AssetString;
 use rust_decimal::Decimal;
 use wtx::collection::Vector;
 
@@ -26,7 +26,7 @@ pub struct Account {
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct BalanceHttp {
   /// Asset symbol (e.g., "BTC", "LTC")
-  pub asset: AssetName,
+  pub asset: AssetString,
   /// Available balance for trading/withdrawal
   pub free: Decimal,
   /// Balance locked in open orders
@@ -45,16 +45,16 @@ pub(crate) mod pkg {
   {
     #[pkg::aux_data]
     fn account_data(&mut self, params: Option<&CexSignParams>) -> crate::Result<()> {
-      let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
+      let PkgsAux { api, bytes_buffer, encode_data, tp, .. } = &mut self.0;
       api.lease().auth_req::<false, _>(
         bytes_buffer,
+        encode_data,
         params,
         if api.lease().is_dex {
           format_args!("/api/v3/account")
         } else {
           format_args!("/api/v1/account")
         },
-        send_bytes_buffer,
         None,
         tp,
       )

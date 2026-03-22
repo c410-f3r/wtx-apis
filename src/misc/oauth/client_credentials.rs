@@ -15,8 +15,8 @@ use wtx::{
       transport::{SendingReceivingTransport, TransportParams},
     },
   },
+  codec::{Decode, GenericCodec, protocol::VerbatimDecoder},
   collection::Vector,
-  de::{Decode, format::De, protocol::VerbatimDecoder},
   misc::LeaseMut,
 };
 
@@ -59,7 +59,7 @@ pub(crate) async fn _manage_client_credentials<A, DRSR, T>(
 where
   A: Api<Error = crate::Error> + LeaseMut<OauthClientCredentials>,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, GenericCodec<DRSR>>,
 {
   if api.lease_mut().timer.elapsed()?.as_secs() < api.lease_mut().token_ttl.into() {
     return Ok(());

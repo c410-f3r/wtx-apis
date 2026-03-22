@@ -14,16 +14,16 @@ pub(crate) mod pkg {
   {
     #[pkg::aux_data]
     fn order_delete_data(&mut self, params: &OrderReqParams<'_>) -> crate::Result<()> {
-      let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
+      let PkgsAux { api, bytes_buffer, encode_data, tp, .. } = &mut self.0;
       api.lease().auth_req::<false, _>(
         bytes_buffer,
+        encode_data,
         Some(params),
         if api.lease().is_dex {
           format_args!("/api/v3/order")
         } else {
           format_args!("/api/v1/order")
         },
-        send_bytes_buffer,
         None,
         tp,
       )?;

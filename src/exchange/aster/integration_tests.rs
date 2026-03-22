@@ -1,7 +1,8 @@
 use crate::{
   exchange::aster::{
-    Aster, DepthReqParams, OpenOrdersReqParams, OrderPostReqParams, OrderReqParams, OrderSide,
-    OrderType, PkgsAux, TESTNET_SPOT_HTTP_URI, TESTNET_SPOT_WS_URI, UserTradesReqParams,
+    Aster, DepositAssetsReqParams, DepthReqParams, MarketReqParams, OrderPostReqParams,
+    OrderReqParams, OrderSide, OrderType, PkgsAux, TESTNET_CHAIN_ID, TESTNET_SPOT_HTTP_URI,
+    TESTNET_SPOT_WS_URI, UserTradesReqParams, WalletTransferReqParams, WalletTransferTy,
   },
   tests::_VARS,
 };
@@ -9,27 +10,27 @@ use rust_decimal::Decimal;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
+  calendar::timestamp_str,
   client_api_framework::{
     misc::{RequestCounter, RequestLimit},
     network::{HttpParams, WsParams, transport::SendingReceivingTransport},
   },
-  de::format::SerdeJson,
+  codec::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
-  misc::{Secret, SensitiveBytes},
-  rng::{ChaCha20, SeedableRng},
+  misc::{Secret, SecretContext},
+  rng::{ChaCha20, CryptoSeedableRng},
 };
 
 static ASTER: LazyLock<Mutex<Aster>> = LazyLock::new(|| {
   let mut secret = [0; 32];
-  let _ = wtx::de::decode_hex(_VARS.aster_secret.as_bytes(), &mut secret).unwrap();
+  let _ = wtx::codec::decode_hex(_VARS.aster_secret.as_bytes(), &mut secret).unwrap();
+  let mut rng = ChaCha20::from_std_random().unwrap();
+  let secret_context = SecretContext::new(&mut rng).unwrap();
   Mutex::new(Aster::new(
+    TESTNET_CHAIN_ID,
     true,
     RequestCounter::new(RequestLimit::unlimited()),
-    Secret::new(
-      SensitiveBytes::new_locked(secret.as_mut_slice()).unwrap(),
-      &mut ChaCha20::from_std_random().unwrap(),
-    )
-    .unwrap(),
+    Secret::new(secret.as_mut_slice(), &mut rng, secret_context).unwrap(),
     _VARS.aster_signer.clone(),
     _VARS.aster_user.clone(),
   ))
@@ -54,6 +55,45 @@ create_http_test!(
       .await
       .unwrap()
       .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
+  commission_rate,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let pkg = &mut pkgs_aux
+      .commission_rate()
+      .data(&MarketReqParams {
+          symbol: "ASTERUSDT",
+          sign_params: None
+        }).unwrap()
+      .build();
+    let _rslt = trans
+      .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+      .await
+      .unwrap()
+      .data;
+  }
+);
+
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
+  deposit_assets,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let local_pkgs_aux = &mut **pkgs_aux;
+    let _res = crate::exchange::aster::deposit_assets(
+      &DepositAssetsReqParams { chain_ids: "56", networks: None, account_type: "spot" },
+      (&mut local_pkgs_aux.api, &mut local_pkgs_aux.drsr, &mut *trans, &mut local_pkgs_aux.tp)
+    )
+    .await
+    .unwrap();
   }
 );
 
@@ -115,7 +155,7 @@ create_http_test!(
   open_orders,
   &*CLIENT,
   |pkgs_aux, trans| async {
-    let pkg = &mut pkgs_aux.open_orders().data(&OpenOrdersReqParams {
+    let pkg = &mut pkgs_aux.open_orders().data(&MarketReqParams {
       symbol: "ASTERUSDT",
       sign_params: None
     }).unwrap().build();
@@ -144,7 +184,6 @@ create_http_test!(
       })
       .unwrap()
       .build();
-    pkgs_aux.log_body();
     let _rslt = trans
       .send_pkg_recv_decode_contained(pkg, pkgs_aux)
       .await
@@ -216,6 +255,35 @@ create_http_test!(
   }
 );
 
+create_http_test!(
+  #[],
+  &mut *ASTER.lock().await,
+  http(),
+  wallet_transfer,
+  &*CLIENT,
+  |pkgs_aux, trans| async {
+    let mut fun = async |kind_type| {
+      let pkg = &mut pkgs_aux
+        .wallet_transfer()
+        .data(&WalletTransferReqParams {
+          amount: Decimal::ONE,
+          asset: "ASTER",
+          client_tran_id: timestamp_str(|el| el.as_nanos()).unwrap().1.as_str(),
+          kind_type
+        })
+        .unwrap()
+        .build();
+      let _rslt = trans
+        .send_pkg_recv_decode_contained(pkg, pkgs_aux)
+        .await
+        .unwrap()
+        .data;
+    };
+    fun(WalletTransferTy::FutureSpot).await;
+    fun(WalletTransferTy::SpotFuture).await;
+  }
+);
+
 create_ws_test!(
   #[],
   TESTNET_SPOT_WS_URI,
@@ -224,7 +292,6 @@ create_ws_test!(
   book_ticker,
   |pkgs_aux, trans| async {
     let pkg = &mut pkgs_aux.ws().data(1, "SUBSCRIBE", ["btcusdt@bookTicker"]).build();
-    pkgs_aux.log_body();
     [trans
       .send_pkg_recv_decode_contained(pkg, pkgs_aux)
       .await

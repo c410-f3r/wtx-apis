@@ -49,16 +49,16 @@ pub(crate) mod pkg {
   {
     #[pkg::aux_data]
     fn depth_data(&mut self, params: &DepthReqParams<'_>) -> crate::Result<()> {
-      let PkgsAux { api, bytes_buffer, send_bytes_buffer, tp, .. } = &mut self.0;
+      let PkgsAux { api, bytes_buffer, encode_data, tp, .. } = &mut self.0;
       api.lease().auth_req::<false, _>(
         bytes_buffer,
+        encode_data,
         Some(params),
         if api.lease().is_dex {
           format_args!("/api/v3/depth")
         } else {
           format_args!("/api/v1/depth")
         },
-        send_bytes_buffer,
         None,
         tp,
       )

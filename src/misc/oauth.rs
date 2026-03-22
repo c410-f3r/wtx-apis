@@ -2,7 +2,7 @@ mod client_credentials;
 mod refresh_token;
 
 pub use client_credentials::*;
-use core::{fmt::Debug, mem};
+use core::fmt::Debug;
 pub use refresh_token::*;
 use wtx::{
   client_api_framework::{
@@ -13,12 +13,8 @@ use wtx::{
     },
     pkg::PkgsAux,
   },
+  codec::{Decode, GenericCodec, GenericDecodeWrapper, protocol::VerbatimDecoder},
   collection::{ArrayStringU16, Vector},
-  de::{
-    Decode,
-    format::{De, DecodeWrapper},
-    protocol::VerbatimDecoder,
-  },
   http::{Method, Mime},
 };
 
@@ -126,18 +122,14 @@ pub async fn send_oauth_req<'de, A, DRSR, T>(
 where
   A: Api,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, GenericCodec<DRSR>>,
 {
   trans_params.ext_req_params_mut().rrb.headers.clear();
   trans_params.ext_req_params_mut().method = Method::Post;
   trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
-  mem::swap(&mut pkgs_aux.bytes_buffer, bytes);
-  pkgs_aux.send_bytes_buffer = true;
-  let rslt = trans.send_bytes_recv(&[], &mut pkgs_aux).await;
-  mem::swap(&mut pkgs_aux.bytes_buffer, bytes);
-  rslt?;
-  let dw = &mut DecodeWrapper::new(bytes);
+  trans.send_bytes_recv(Some(bytes), &mut pkgs_aux).await?;
+  let dw = &mut GenericDecodeWrapper::new(bytes);
   let res = VerbatimDecoder::<OauthResponse<&str>>::decode(dw)?;
   Ok(res.data)
 }

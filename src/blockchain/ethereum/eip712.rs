@@ -40,10 +40,10 @@ impl<'any> Eip712Domain<'any> {
     let Self { name, version, chain_id, verifying_contract, salt } = self;
     let mut rslt = ArrayVectorU8::new();
     if let Some(elem) = name {
-      rslt.extend_from_copyable_slice(&keccak256([&elem.as_bytes().tokenize()?.0]))?;
+      rslt.extend_from_copyable_slice(&keccak256([elem.as_bytes().tokenize()?.0]))?;
     }
     if let Some(elem) = version {
-      rslt.extend_from_copyable_slice(&keccak256([&elem.as_bytes().tokenize()?.0]))?;
+      rslt.extend_from_copyable_slice(&keccak256([elem.as_bytes().tokenize()?.0]))?;
     }
     if let Some(elem) = *chain_id {
       rslt.extend_from_copyable_slice(&SolInt(elem).tokenize()?.0)?;
@@ -60,20 +60,20 @@ impl<'any> Eip712Domain<'any> {
   pub(crate) fn encode_type(&self) -> ArrayVectorU8<u8, 98> {
     let Self { name, version, chain_id, verifying_contract, salt } = self;
     let mut buffer = ArrayVectorU8::new();
-    let _rslt = buffer.extend_from_copyable_slices([Self::NAME.as_bytes(), &[b'(']]);
-    if let Some(_) = name {
+    let _rslt = buffer.extend_from_copyable_slices([Self::NAME.as_bytes(), b"("]);
+    if name.is_some() {
       let _rslt = buffer.extend_from_copyable_slice(b"string name,");
     }
-    if let Some(_) = version {
+    if version.is_some() {
       let _rslt = buffer.extend_from_copyable_slice(b"string version,");
     }
-    if let Some(_) = chain_id {
+    if chain_id.is_some() {
       let _rslt = buffer.extend_from_copyable_slice(b"uint256 chainId,");
     }
-    if let Some(_) = verifying_contract {
+    if verifying_contract.is_some() {
       let _rslt = buffer.extend_from_copyable_slice(b"address verifyingContract,");
     }
-    if let Some(_) = salt {
+    if salt.is_some() {
       let _rslt = buffer.extend_from_copyable_slice(b"bytes32 salt");
     }
     if buffer.last().copied() == Some(b',') {

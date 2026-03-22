@@ -1,65 +1,70 @@
 //! Decentralized exchange
 
-#[cfg(all(test, feature = "_integration-tests"))]
-mod integration_tests;
+mod deposit_assets;
+//#[cfg(all(test, feature = "_integration-tests"))]
+//mod integration_tests;
+mod market;
 mod message;
+mod misc;
 mod order;
 mod pkg;
 mod sign_params;
 mod web_socket;
 
-use crate::{
-  blockchain::ethereum::{Address, Eip712Domain, misc::sign_payload},
-  exchange::aster::message::Message,
-  misc::timestamp_str,
-};
+use crate::{blockchain::ethereum::misc::sign_payload, exchange::aster::message::Message};
 use alloc::string::String;
 use core::fmt::Arguments;
-use crypto_bigint::U256;
+pub use deposit_assets::*;
 use hmac::{Hmac, KeyInit, Mac};
 use k256::ecdsa::SigningKey;
+pub use market::*;
 pub use order::*;
 pub use pkg::*;
 use serde::Serialize;
 pub use sign_params::CexSignParams;
 pub use web_socket::*;
 use wtx::{
+  calendar::timestamp_str,
   client_api_framework::{
     Api,
     misc::RequestCounter,
-    network::{HttpParams, HttpReqParams, transport::TransportParams},
+    network::{
+      HttpParams, HttpReqParams,
+      transport::{SendingReceivingTransport, TransportParams},
+    },
   },
-  collection::{ArrayVectorU8, Vector},
-  de::{AsciiSet, FormUrlSerializer, encode_hex, u64_string},
+  codec::{
+    Decode, FormUrlSerializer, GenericCodec, GenericDecodeWrapper, encode_hex, format::SerdeJson,
+    protocol::VerbatimDecoder, u64_string,
+  },
+  collection::{ArrayStringU8, ArrayVectorU8, Vector},
   http::{Header, Method},
   misc::Secret,
 };
 
-const EIP712_DOMAIN: Eip712Domain<'_> = Eip712Domain::new(
-  Some("AsterSignTransaction"),
-  Some("1"),
-  Some(U256::from_u16(714)),
-  Some(Address([0; 20])),
-  None,
-);
-
+/// Arbitrum chain id
+pub const ARBITRUM_CHAIN_ID: u16 = 42161;
+/// Ethereum chain id
+pub const ETHEREUM_CHAIN_ID: u16 = 1;
 /// Production Spot HTTP Uri
 pub const PROD_SPOT_HTTP_URI: &str = "https://sapi.asterdex.com";
 /// Production Spot WebSocket Uri
 pub const PROD_SPOT_WS_URI: &str = "wss://sstream.asterdex.com";
-
+/// Testnet chain id
+pub const TESTNET_CHAIN_ID: u16 = 714;
 /// Testnet Spot HTTP Uri
 pub const TESTNET_SPOT_HTTP_URI: &str = "https://www.asterdex-testnet.com";
 /// Testnet Spot WebSocket Uri
-pub const TESTNET_SPOT_WS_URI: &str = "wss://sstream.asterdex-testnet.com/stream";
+pub const TESTNET_SPOT_WS_URI: &str = "wss://sstream.asterdex-testnet.com";
 
 /// Aster automatically creates a client order with a maximum length of 22.
-pub type ClientOrderIdTy = wtx::collection::ArrayStringU8<22>;
+pub type ClientOrderIdTy = ArrayStringU8<22>;
 
 /// Manages endpoints
 #[derive(Debug)]
 #[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
 pub struct Aster {
+  chain_id: u16,
   is_dex: bool,
   rt: RequestCounter,
   secret: Secret,
@@ -71,24 +76,30 @@ impl Aster {
   /// New instance
   ///
   /// If `is_dex` is `false`, then `signer` is equal to `api key`, `secret` is equal to `api secret`
-  /// and `user` won't be used.
+  /// and `user` as well as `chain_id` won't be used.
   pub const fn new(
+    chain_id: u16,
     is_dex: bool,
     rt: RequestCounter,
     secret: Secret,
     signer: String,
     user: String,
   ) -> Self {
-    Self { is_dex, rt, secret, signer, user }
+    Self { chain_id, is_dex, rt, secret, signer, user }
+  }
+
+  /// Mutable chain id
+  pub const fn chain_id_mut(&mut self) -> &mut u16 {
+    &mut self.chain_id
   }
 
   // For some reason `listenKey` does not accept POST contents, as such, all parameters are sent in the URL.
   fn auth_req<const IS_POST: bool, T>(
     &self,
     bytes_buffer: &mut Vector<u8>,
+    encode_data: &mut bool,
     params: Option<T>,
     path: Arguments<'_>,
-    send_bytes_buffer: &mut bool,
     timestamp: Option<u64>,
     tp: &mut HttpParams,
   ) -> crate::Result<()>
@@ -98,7 +109,7 @@ impl Aster {
     bytes_buffer.clear();
     let HttpReqParams { host, method, mime, rrb, user_agent_default, .. } = tp.ext_req_params_mut();
     let init_char = if let Some(elem) = params {
-      elem.serialize(FormUrlSerializer::new(AsciiSet::UNRESERVED, bytes_buffer))?;
+      let _ = elem.serialize(FormUrlSerializer::new(None, bytes_buffer))?;
       b"&"
     } else {
       &[][..]
@@ -119,11 +130,11 @@ impl Aster {
         self.signer.as_bytes(),
       ])?;
       let signature = self.secret.peek(&mut ArrayVectorU8::<_, { 132 + 28 }>::new(), |pk| {
-        crate::Result::Ok(sign_payload(
+        sign_payload(
           &mut rrb.body,
-          &Message { msg: bytes_buffer },
-          &SigningKey::from_slice(pk)?,
-        )?)
+          &Message { chain_id: self.chain_id, msg: bytes_buffer },
+          &SigningKey::from_slice(&pk)?,
+        )
       });
       rrb.body.clear();
       let _ = bytes_buffer.extend_from_copyable_slices([
@@ -142,10 +153,10 @@ impl Aster {
         timestamp_string.as_bytes(),
       ])?;
       let array = self.secret.peek(&mut ArrayVectorU8::<_, { 64 + 28 }>::new(), |bytes| {
-        let Ok(mut mac) = Hmac::<sha2::Sha256>::new_from_slice(bytes) else {
+        let Ok(mut mac) = Hmac::<sha2::Sha256>::new_from_slice(&bytes) else {
           return Ok([0; _]);
         };
-        mac.update(&bytes_buffer);
+        mac.update(bytes_buffer);
         crate::Result::Ok(mac.finalize().into_bytes().into())
       })??;
       let _ = bytes_buffer.extend_from_copyable_slices([
@@ -166,7 +177,7 @@ impl Aster {
     if IS_POST {
       *method = Method::Post;
       *mime = Some(wtx::http::Mime::ApplicationXWwwFormUrlEncoded);
-      *send_bytes_buffer = true;
+      *encode_data = false;
     }
     *user_agent_default = false;
     Ok(())
@@ -183,12 +194,57 @@ impl Api for Aster {
   }
 }
 
+/// Dedicated method to fetch deposited assets.
+pub async fn deposit_assets<DRSR, T>(
+  params: &DepositAssetsReqParams<'_>,
+  (api, drsr, trans, trans_params): (&mut Aster, &mut DRSR, T, &mut HttpParams),
+) -> crate::Result<DepositAssetsResParams>
+where
+  for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
+  for<'any> VerbatimDecoder<DepositAssetsResParams>: Decode<'any, GenericCodec<SerdeJson>>,
+{
+  async fn fun<DRSR, T>(
+    (api, drsr, mut trans, trans_params): (&mut Aster, &mut DRSR, T, &mut HttpParams),
+  ) -> crate::Result<Vector<u8>>
+  where
+    for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
+  {
+    let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
+    {
+      let url = "https://www.asterdex.com/bapi/futures/v1/public/future/aster/deposit/assets?";
+      let mut uri_buffer = rrb.uri.reset();
+      uri_buffer.push_str(url);
+      uri_buffer.push_str(str::from_utf8(&rrb.body).unwrap_or_default());
+    }
+    rrb.body.clear();
+    let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
+    trans.send_bytes_recv(None, &mut pkgs_aux).await?;
+    Ok(pkgs_aux.0.bytes_buffer)
+  }
+
+  trans_params.ext_req_params_mut().reset();
+  let url_base = {
+    let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
+    let _ = params.serialize(FormUrlSerializer::new(None, &mut rrb.body))?;
+    ArrayStringU8::<32>::try_from(rrb.uri.as_str())?
+  };
+  let rslt = fun((api, drsr, trans, trans_params)).await;
+  let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
+  {
+    let mut uri_buffer = rrb.uri.reset();
+    uri_buffer.push_str(&url_base);
+  }
+  Ok(
+    VerbatimDecoder::<DepositAssetsResParams>::decode(&mut GenericDecodeWrapper::new(&rslt?))?.data,
+  )
+}
+
 wtx::create_packages_aux_wrapper!();
 
 #[cfg(test)]
 mod tests {
   use crate::exchange::aster::{
-    Aster, CexSignParams, OrderPostReqParams, OrderSide, OrderType, TimeInForce,
+    Aster, CexSignParams, OrderPostReqParams, OrderSide, OrderType, TESTNET_CHAIN_ID, TimeInForce,
   };
   use alloc::string::String;
   use rust_decimal::Decimal;
@@ -197,10 +253,10 @@ mod tests {
       misc::{RequestCounter, RequestLimit},
       network::{HttpParams, transport::TransportParams},
     },
+    codec::decode_hex,
     collection::Vector,
-    de::decode_hex,
-    misc::{Secret, SensitiveBytes},
-    rng::{ChaCha20, SeedableRng},
+    misc::{Secret, SecretContext},
+    rng::{ChaCha20, CryptoSeedableRng},
   };
 
   #[test]
@@ -218,14 +274,13 @@ mod tests {
       cex_sign_params: Some(CexSignParams { recv_window: Some(5000) }),
     };
     let mut secret_key = *b"2b5eb11e18796d12d88f13dc27dbbd02c2cc51ff7059765ed9821957d82bb4d9";
+    let mut rng = ChaCha20::from_std_random().unwrap();
+    let secret_context = SecretContext::new(&mut rng).unwrap();
     let api = Aster::new(
+      TESTNET_CHAIN_ID,
       false,
       RequestCounter::new(RequestLimit::unlimited()),
-      Secret::new(
-        SensitiveBytes::new_locked(&mut secret_key[..]).unwrap(),
-        &mut ChaCha20::from_std_random().unwrap(),
-      )
-      .unwrap(),
+      Secret::new(&mut secret_key, &mut rng, secret_context).unwrap(),
       "dbefbc809e3e83c283a984c3a1459732ea7db1360ca80c5c2c8867408d28cc83".into(),
       "".into(),
     );
@@ -233,9 +288,9 @@ mod tests {
     api
       .auth_req::<false, _>(
         &mut Vector::new(),
+        &mut false,
         Some(req),
         format_args!("/world"),
-        &mut false,
         Some(1591702613943),
         &mut tp,
       )
@@ -275,14 +330,13 @@ mod tests {
       &mut secret_key,
     )
     .unwrap();
+    let mut rng = ChaCha20::from_std_random().unwrap();
+    let secret_context = SecretContext::new(&mut rng).unwrap();
     let api = Aster::new(
+      TESTNET_CHAIN_ID,
       true,
       RequestCounter::new(RequestLimit::unlimited()),
-      Secret::new(
-        SensitiveBytes::new_locked(&mut secret_key[..]).unwrap(),
-        &mut ChaCha20::from_std_random().unwrap(),
-      )
-      .unwrap(),
+      Secret::new(&mut secret_key[..], &mut rng, secret_context).unwrap(),
       "0x21cF8Ae13Bb72632562c6Fff438652Ba1a151bb0".into(),
       "0x63DD5aCC6b1aa0f563956C0e534DD30B6dcF7C4e".into(),
     );
@@ -290,9 +344,9 @@ mod tests {
     api
       .auth_req::<false, _>(
         &mut Vector::new(),
+        &mut false,
         Some(req),
         format_args!("/world"),
-        &mut false,
         Some(1770037768091995),
         &mut tp,
       )

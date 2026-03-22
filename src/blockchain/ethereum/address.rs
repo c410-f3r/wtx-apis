@@ -1,8 +1,8 @@
 use crate::blockchain::ethereum::{SolTy, Word};
 use core::fmt::{Formatter, LowerHex};
 use wtx::{
+  codec::{HexEncMode, decode_hex, encode_hex},
   collection::Vector,
-  de::{HexEncMode, decode_hex, encode_hex},
 };
 
 /// Address
@@ -67,7 +67,7 @@ impl<'de> SolTy<'de> for Address {
   }
 
   fn valid_token(token: &Self::Token<'_>) -> bool {
-    &token.0[..12] == &[0; 12]
+    token.0[..12] == [0; 12]
   }
 }
 
