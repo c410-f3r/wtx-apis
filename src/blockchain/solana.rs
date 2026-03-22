@@ -4,7 +4,7 @@
 //!
 //! ```rust,no_run
 //! # async fn fun() -> wtx_apis::Result<()> {
-//! use wtx::{client_api_framework::network::HttpParams, de::format::SerdeJson};
+//! use wtx::{client_api_framework::network::HttpParams, codec::format::SerdeJson};
 //! use wtx_apis::blockchain::solana::{PkgsAux, Solana};
 //!
 //! let mut pkgs_aux =
@@ -20,6 +20,7 @@ mod account;
 mod address_lookup_table_account;
 mod block;
 mod filter;
+mod misc;
 //#[cfg(all(test, feature = "_integration-tests", feature = "std"))]
 //mod integration_tests;
 mod notification;
@@ -35,6 +36,7 @@ pub use account::*;
 pub use address_lookup_table_account::*;
 pub use block::*;
 pub use filter::*;
+pub use misc::{create_with_seed, find_program_address};
 pub use notification::*;
 pub use pkg::*;
 pub use reward::*;
@@ -47,12 +49,12 @@ use wtx::{
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
+  codec::protocol::{JsonRpcDecoder, JsonRpcEncoder},
   collection::{ArrayStringU8, ArrayWrapper},
-  de::protocol::{JsonRpcDecoder, JsonRpcEncoder},
   misc::FnMutFut,
 };
 
-pub(crate) type Epoch = u64;
+pub(crate) type Epoch = u128;
 pub(crate) type SolanaProgramName = ArrayStringU8<32>;
 
 _create_blockchain_constants!(
@@ -224,7 +226,7 @@ where
   let pkg =
     &mut pair.pkgs_aux.get_signature_statuses().data(ArrayWrapper(signatures), None).build();
   cb(pair);
-  let res = pair.trans.send_pkg_recv_decode_contained(pkg, &mut pair.pkgs_aux).await?;
+  let res = pair.trans.send_pkg_recv_decode_contained(pkg, pair.pkgs_aux).await?;
   for (res_elem, rslt_elem) in res.result?.value.into_iter().zip(&mut rslt) {
     if let Some(statuses) = res_elem
       && statuses.confirmation_status == commitment
@@ -278,7 +280,7 @@ where
     }
     ConfirmTransactionOptions::TriesWithInterval { interval, number } => {
       let mut iter = 0..number;
-      if let Some(_) = iter.next() {
+      if iter.next().is_some() {
         let array = check_signatures(commitment, pair, signatures, &mut cb).await?;
         if should_stop(&array) {
           return Ok(array);

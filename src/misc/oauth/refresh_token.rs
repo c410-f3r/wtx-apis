@@ -14,8 +14,8 @@ use core::{
 use wtx::{
   calendar::{DateTime, Duration, Instant, Utc},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
+  codec::{Decode, GenericCodec, protocol::VerbatimDecoder},
   collection::{ArrayString, Vector},
-  de::{Decode, format::De, protocol::VerbatimDecoder},
   misc::into_rslt,
   sync::{Arc, AtomicCell, AtomicWaker},
 };
@@ -108,7 +108,7 @@ impl OauthRefreshTokenSync {
   ) -> crate::Result<()>
   where
     for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-    for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, De<DRSR>>,
+    for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, GenericCodec<DRSR>>,
   {
     encode_oauth_req(
       bytes,

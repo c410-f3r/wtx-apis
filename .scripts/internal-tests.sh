@@ -11,7 +11,7 @@ export RUST_BACKTRACE=1
 export RUSTFLAGS="$($rt rust-flags -Amissing_debug_implementations,-Asingle_use_lifetimes,-Aunsafe-code "")"
 
 $rt rustfmt
-$rt clippy -Aclippy::arbitrary_source_item_ordering
+$rt clippy -Aclippy::arbitrary_source_item_ordering,-Aclippy::doc_paragraphs_missing_punctuation
 
 $rt check-generic .
 $rt check-with-features . base64

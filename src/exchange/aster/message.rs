@@ -3,13 +3,15 @@ use crate::{
     Eip712, Eip712Domain,
     misc::{abi_encode_from_buffer, keccak256},
   },
-  exchange::aster::EIP712_DOMAIN,
+  exchange::aster::misc::eip712_domain,
 };
 use wtx::collection::{ArrayWrapper, Vector};
 
 /// Used to encode a decentralized message
 #[derive(Debug)]
 pub(crate) struct Message<'any> {
+  /// Chain id
+  pub(crate) chain_id: u16,
   /// Set of grouped order parameters
   pub(crate) msg: &'any [u8],
 }
@@ -17,7 +19,7 @@ pub(crate) struct Message<'any> {
 impl Eip712 for Message<'_> {
   #[inline]
   fn domain(&self) -> Eip712Domain<'_> {
-    EIP712_DOMAIN
+    eip712_domain(self.chain_id)
   }
 
   #[inline]

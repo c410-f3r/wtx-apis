@@ -6,7 +6,7 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
-  de::format::SerdeJson,
+  codec::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };
 

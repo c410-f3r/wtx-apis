@@ -1,5 +1,5 @@
 use crate::{
-  AssetName, PairName,
+  AssetString, PairString,
   exchange::aster::{OrderType, TimeInForce},
 };
 use rust_decimal::Decimal;
@@ -134,7 +134,7 @@ pub enum SymbolStatus {
 #[serde(rename_all = "camelCase")]
 pub struct Asset {
   /// Asset ticker symbol
-  pub asset: AssetName,
+  pub asset: AssetString,
 }
 
 /// Root response from the exchange info endpoint
@@ -174,9 +174,9 @@ pub struct Symbol {
   /// See [`SymbolStatus`].
   pub status: SymbolStatus,
   /// Base asset of the trading pair
-  pub base_asset: AssetName,
+  pub base_asset: AssetString,
   /// Quote asset of the trading pair
-  pub quote_asset: AssetName,
+  pub quote_asset: AssetString,
   /// Decimal precision for price
   pub price_precision: u8,
   /// Decimal precision for quantity
@@ -196,7 +196,7 @@ pub struct Symbol {
   /// Allowed time-in-force options
   pub time_in_force: ArrayVectorU8<TimeInForce, 8>,
   /// Combined symbol name (e.g., "BTCUSDT")
-  pub symbol: PairName,
+  pub symbol: PairString,
   /// Whether OCO orders are allowed
   pub oco_allowed: bool,
 }

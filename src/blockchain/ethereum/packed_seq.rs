@@ -31,10 +31,10 @@ where
   }
 
   fn tail_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
-    enc.push_packed_sequence(&self.0)
+    enc.push_packed_sequence(self.0)
   }
 
   fn tail_words(&self) -> usize {
-    words_for(&self.0).wrapping_add(1)
+    words_for(self.0).wrapping_add(1)
   }
 }
