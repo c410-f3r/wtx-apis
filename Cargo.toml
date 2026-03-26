@@ -11,7 +11,7 @@ starknet-types-core = { default-features = false, features = ["alloc", "hash"], 
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
 wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], version = "0.43" }
 
-crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "0.7.0-rc.25" }
+crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "0.7.3" }
 curve25519-dalek = { default-features = false, optional = true, version = "5.0.0-pre.6" }
 ed25519-dalek = { default-features = false, optional = true, version = "3.0.0-pre.6" }
 hmac = { default-features = false, optional = true, version = "0.13.0-rc.5" }
