@@ -14,7 +14,7 @@ wtx = { default-features = false, features = ["client-api-framework", "macros", 
 crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "0.7.0-rc.25" }
 curve25519-dalek = { default-features = false, optional = true, version = "5.0.0-pre.6" }
 ed25519-dalek = { default-features = false, optional = true, version = "3.0.0-pre.6" }
-hmac = { default-features = false, optional = true, version = "0.13.0-rc.5" }
+hmac = { default-features = false, optional = true, version = "0.13.0" }
 k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "0.14.0-rc.6" }
 sha2 = { default-features = false, optional = true, version = "0.11.0-rc.5" }
 sha3 = { default-features = false, optional = true, version = "0.11.0-rc.7" }
