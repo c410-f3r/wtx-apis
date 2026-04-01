@@ -25,5 +25,5 @@ pub(crate) mod pkg {
   }
 
   #[pkg::res_data]
-  pub type CancelOrderRes<'any> = SuperFreteResponse<&'any str, CancelOrderResGeneric<&'any str>>;
+  pub type CancelOrderRes<'res> = SuperFreteResponse<&'res str, CancelOrderResGeneric<&'res str>>;
 }

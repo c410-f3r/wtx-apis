@@ -22,8 +22,8 @@ pub(crate) mod pkg {
   pub type QuoteFreightReq<'any, P> = QuoteFreightReqGeneric<P, &'any str>;
 
   #[pkg::res_data]
-  pub type QuoteFreightRes<'any> = SuperFreteResponse<
-    &'any str,
-    Vector<QuoteFreightResGeneric<Vector<QuoteFreightResPackage>, &'any str>>,
+  pub type QuoteFreightRes<'res> = SuperFreteResponse<
+    &'res str,
+    Vector<QuoteFreightResGeneric<Vector<QuoteFreightResPackage>, &'res str>>,
   >;
 }

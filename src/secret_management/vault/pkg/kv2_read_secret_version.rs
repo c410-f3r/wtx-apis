@@ -45,7 +45,7 @@ pub(crate) mod pkg {
   pub struct Kv2ReadSecretVersionReq;
 
   #[pkg::res_data]
-  pub type Kv2ReadSecretVersionRes<'any> = VaultResponse<Kv2ReadSecretVersionResponse<&'any str>>;
+  pub type Kv2ReadSecretVersionRes<'res> = VaultResponse<Kv2ReadSecretVersionResponse<&'res str>>;
 
   /// Response
   #[derive(Debug, serde::Deserialize)]

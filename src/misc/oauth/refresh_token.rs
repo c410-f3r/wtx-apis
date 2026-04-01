@@ -108,7 +108,8 @@ impl OauthRefreshTokenSync {
   ) -> crate::Result<()>
   where
     for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-    for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, GenericCodec<DRSR>>,
+    for<'de, 'drsr> VerbatimDecoder<OauthResponse<&'de str>>:
+      Decode<'de, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
   {
     encode_oauth_req(
       bytes,
