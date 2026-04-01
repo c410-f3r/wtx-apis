@@ -31,5 +31,5 @@ pub(crate) mod pkg {
   pub struct GetOrderReq;
 
   #[pkg::res_data]
-  pub type GetOrderRes<'any> = OlistResult<OrderGet<String>, String>;
+  pub type GetOrderRes = OlistResult<OrderGet<String>, String>;
 }

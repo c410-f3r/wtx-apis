@@ -34,7 +34,7 @@ use wtx::{
     },
   },
   codec::{
-    Decode, FormUrlSerializer, GenericCodec, GenericDecodeWrapper, encode_hex, format::SerdeJson,
+    Decode, FormUrlSerializer, GenericCodec, GenericDecodeWrapper, encode_hex,
     protocol::VerbatimDecoder, u64_string,
   },
   collection::{ArrayStringU8, ArrayVectorU8, Vector},
@@ -201,7 +201,8 @@ pub async fn deposit_assets<DRSR, T>(
 ) -> crate::Result<DepositAssetsResParams>
 where
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimDecoder<DepositAssetsResParams>: Decode<'any, GenericCodec<SerdeJson>>,
+  for<'de, 'drsr> VerbatimDecoder<DepositAssetsResParams>:
+    Decode<'de, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
 {
   async fn fun<DRSR, T>(
     (api, drsr, mut trans, trans_params): (&mut Aster, &mut DRSR, T, &mut HttpParams),
@@ -228,14 +229,17 @@ where
     let _ = params.serialize(FormUrlSerializer::new(None, &mut rrb.body))?;
     ArrayStringU8::<32>::try_from(rrb.uri.as_str())?
   };
-  let rslt = fun((api, drsr, trans, trans_params)).await;
+  let rslt = fun((api, &mut *drsr, trans, trans_params)).await;
   let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
   {
     let mut uri_buffer = rrb.uri.reset();
     uri_buffer.push_str(&url_base);
   }
   Ok(
-    VerbatimDecoder::<DepositAssetsResParams>::decode(&mut GenericDecodeWrapper::new(&rslt?))?.data,
+    VerbatimDecoder::<DepositAssetsResParams>::decode(&mut GenericDecodeWrapper::new(
+      &rslt?, drsr,
+    ))?
+    .data,
   )
 }
 

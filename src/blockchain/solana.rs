@@ -49,8 +49,11 @@ use wtx::{
     network::{HttpParams, transport::SendingReceivingTransport},
     pkg::Package,
   },
-  codec::protocol::{JsonRpcDecoder, JsonRpcEncoder},
-  collection::{ArrayStringU8, ArrayWrapper},
+  codec::{
+    DecodeSeq, GenericCodec,
+    protocol::{JsonRpcDecoder, JsonRpcEncoder},
+  },
+  collection::{ArrayStringU8, ArrayVectorU8, ArrayWrapper},
   misc::FnMutFut,
 };
 
@@ -125,13 +128,15 @@ impl Solana {
     API: Api<Error = crate::Error>,
     E: From<crate::Error>,
     T: SendingReceivingTransport<HttpParams>,
-    GetLatestBlockhashPkg<JsonRpcEncoder<GetLatestBlockhashReq>>: for<'de> Package<
+    for<'de> GetLatestBlockhashPkg<JsonRpcEncoder<GetLatestBlockhashReq>>: Package<
         API,
         DRSR,
         T::Inner,
         HttpParams,
         ExternalResponseContent<'de> = JsonRpcDecoder<GetLatestBlockhashRes>,
       >,
+    for<'de, 'drsr> JsonRpcDecoder<JsonRpcResponseResultWithContext<GetLatestBlockhash>>:
+      DecodeSeq<'de, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
   {
     macro_rules! local_blockhash {
       ($local_pair:expr) => {
@@ -210,14 +215,16 @@ pub async fn check_signatures<'th, A, DRSR, T, const N: usize>(
 where
   A: Api<Error = crate::Error>,
   T: SendingReceivingTransport<HttpParams>,
-  GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
-    for<'de> Package<
+  for<'de> GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
+    Package<
         A,
         DRSR,
         T::Inner,
         HttpParams,
         ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
       >,
+  for<'de, 'drsr> JsonRpcDecoder<JsonRpcResponseResultWithContext<ArrayVectorU8<Option<GetSignatureStatuses>, 8>>>:
+    DecodeSeq<'de, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
 {
   const {
     assert!(N <= 8);
@@ -249,14 +256,16 @@ pub async fn confirm_signatures<'th, A, DRSR, T, const N: usize>(
 where
   A: Api<Error = crate::Error>,
   T: SendingReceivingTransport<HttpParams>,
-  GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
-    for<'de> Package<
+  for<'de> GetSignatureStatusesPkg<JsonRpcEncoder<GetSignatureStatusesReq<ArrayWrapper<&'th str, N>>>>:
+    Package<
         A,
         DRSR,
         T::Inner,
         HttpParams,
         ExternalResponseContent<'de> = JsonRpcDecoder<GetSignatureStatusesRes>,
       >,
+  for<'de, 'drsr> JsonRpcDecoder<JsonRpcResponseResultWithContext<ArrayVectorU8<Option<GetSignatureStatuses>, 8>>>:
+    DecodeSeq<'de, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
 {
   fn should_stop<const N: usize>(slice: &[Result<bool, TransactionError>; N]) -> bool {
     let mut should_stop = true;

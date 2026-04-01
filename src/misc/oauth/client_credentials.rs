@@ -59,7 +59,8 @@ pub(crate) async fn _manage_client_credentials<A, DRSR, T>(
 where
   A: Api<Error = crate::Error> + LeaseMut<OauthClientCredentials>,
   for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
-  for<'any> VerbatimDecoder<OauthResponse<&'any str>>: Decode<'any, GenericCodec<DRSR>>,
+  for<'de, 'drsr> VerbatimDecoder<OauthResponse<&'de str>>:
+    Decode<'de, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
 {
   if api.lease_mut().timer.elapsed()?.as_secs() < api.lease_mut().token_ttl.into() {
     return Ok(());
