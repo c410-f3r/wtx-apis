@@ -367,7 +367,6 @@ dependencies = [
  "crypto-bigint 0.7.3",
  "crypto-common 0.2.1",
  "digest 0.11.2",
- "hkdf",
  "hybrid-array",
  "pkcs8",
  "rand_core 0.10.0",
@@ -436,15 +435,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
 dependencies = [
  "foldhash",
-]
-
-[[package]]
-name = "hkdf"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4aaa26c720c68b866f2c96ef5c1264b3e6f473fe5d4ce61cd44bbe913e553018"
-dependencies = [
- "hmac 0.13.0",
 ]
 
 [[package]]
@@ -646,29 +636,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 
 [[package]]
-name = "p256"
-version = "0.14.0-rc.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44f0a10fe314869359cb2901342b045f4e5a962ef9febc006f03d2a8c848fe4c"
-dependencies = [
- "elliptic-curve",
- "primefield",
- "primeorder",
-]
-
-[[package]]
-name = "p384"
-version = "0.14.0-rc.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b079e66810c55ab3d6ba424e056dc4aefcdb8046c8c3f3816142edbdd7af7721"
-dependencies = [
- "elliptic-curve",
- "fiat-crypto",
- "primefield",
- "primeorder",
-]
-
-[[package]]
 name = "pin-project-lite"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -702,29 +669,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9"
 dependencies = [
  "zerocopy",
-]
-
-[[package]]
-name = "primefield"
-version = "0.14.0-rc.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6543f5eec854fbf74ba5ef651fbdc9408919b47c3e1526623687135c16d12e9"
-dependencies = [
- "crypto-bigint 0.7.3",
- "crypto-common 0.2.1",
- "rand_core 0.10.0",
- "rustcrypto-ff",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "primeorder"
-version = "0.14.0-rc.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "569d9ad6ef822bb0322c7e7d84e5e286244050bd5246cac4c013535ae91c2c90"
-dependencies = [
- "elliptic-curve",
 ]
 
 [[package]]
@@ -1489,7 +1433,7 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 [[package]]
 name = "wtx"
 version = "0.43.1"
-source = "git+https://github.com/c410-f3r/wtx?branch=misc#970bba5b4e43ce92f2d9cee8094babf1e3f8ef9f"
+source = "git+https://github.com/c410-f3r/wtx?branch=misc#bb41ea5f22c285d3d6596534ebe87b46cc0cdf70"
 dependencies = [
  "aead",
  "aes-gcm",
@@ -1498,8 +1442,6 @@ dependencies = [
  "hashbrown",
  "httparse",
  "libc",
- "p256",
- "p384",
  "ring",
  "rustls",
  "rustls-pemfile",
@@ -1548,7 +1490,7 @@ dependencies = [
 [[package]]
 name = "wtx-macros"
 version = "0.6.4"
-source = "git+https://github.com/c410-f3r/wtx?branch=misc#970bba5b4e43ce92f2d9cee8094babf1e3f8ef9f"
+source = "git+https://github.com/c410-f3r/wtx?branch=misc#bb41ea5f22c285d3d6596534ebe87b46cc0cdf70"
 dependencies = [
  "proc-macro2",
  "quote",
