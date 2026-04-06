@@ -22,7 +22,7 @@ signature = { default-features = false, optional = true, version = "3.0.0-rc.10"
 
 [dev-dependencies]
 rust_decimal_macros = { default-features = false, version = "1.0" }
-tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
+tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.51" }
 wtx = { default-features = false, features = ["client-api-framework", "crypto", "http-client-pool", "nightly", "serde_json", "tokio", "tokio-rustls", "_tracing-tree", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx", branch = "misc" }
 
 [features]
