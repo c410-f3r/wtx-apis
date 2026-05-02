@@ -120,7 +120,7 @@ mod tests {
     BulkOrder, OrderGrouping, OrderLimitParams, OrderReq, OrderTif, OrderTpsl, OrderTriggerParams,
     OrderTy, action::Action, misc::sign_l1_action,
   };
-  use wtx::{collection::Vector, de::decode_hex};
+  use wtx::{collection::Vector, de::hex_decode};
 
   #[test]
   fn sign_order_limit() {
@@ -142,7 +142,7 @@ mod tests {
     let connection_id = action.hash(&mut buffer, 1583838, None).unwrap();
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap().all_bytes(),
-      decode_hex(
+      hex_decode(
         b"0x77957e58e70f43b6b68581f2dc42011fc384538a2e5b7bf42d5b936f19fbb67360721a8598727230f67080efee48c812a6a4442013fd3b0eed509171bef9f23f1c",
         &mut [0; 65]
       ).unwrap()
@@ -169,14 +169,14 @@ mod tests {
     let connection_id = action.hash(&mut buffer, 1583838, None).unwrap();
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap().all_bytes(),
-      decode_hex(
+      hex_decode(
         b"0xd3e894092eb27098077145714630a77bbe3836120ee29df7d935d8510b03a08f456de5ec1be82aa65fc6ecda9ef928b0445e212517a98858cfaa251c4cd7552b1c",
         &mut [0; 65]
       ).unwrap()
     );
     assert_eq!(
       sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap().all_bytes(),
-      decode_hex(
+      hex_decode(
         b"0x3768349dbb22a7fd770fc9fc50c7b5124a7da342ea579b309f58002ceae49b4357badc7909770919c45d850aabb08474ff2b7b3204ae5b66d9f7375582981f111c",
         &mut [0; 65]
       ).unwrap()
@@ -221,11 +221,11 @@ mod tests {
       let connection_id = action.hash(&mut buffer, 1583838, None).unwrap();
       assert_eq!(
         sign_l1_action(&mut buffer, connection_id, true, &wallet).unwrap().all_bytes(),
-        decode_hex(mainnet, &mut [0; 65]).unwrap()
+        hex_decode(mainnet, &mut [0; 65]).unwrap()
       );
       assert_eq!(
         sign_l1_action(&mut buffer, connection_id, false, &wallet).unwrap().all_bytes(),
-        decode_hex(testnet, &mut [0; 65]).unwrap()
+        hex_decode(testnet, &mut [0; 65]).unwrap()
       );
     }
   }

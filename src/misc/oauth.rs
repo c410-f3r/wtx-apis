@@ -13,7 +13,7 @@ use wtx::{
     },
     pkg::PkgsAux,
   },
-  codec::{Decode, GenericCodec, GenericDecodeWrapper, protocol::VerbatimDecoder},
+  codec::{Decode, DecodeWrapper, GenericCodec, protocol::VerbatimDecoder},
   collection::{ArrayStringU16, Vector},
   http::{Method, Mime},
 };
@@ -130,7 +130,7 @@ where
   trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, &mut *drsr, &mut *trans_params);
   trans.send_bytes_recv(Some(bytes), &mut pkgs_aux).await?;
-  let dw = &mut GenericDecodeWrapper::new(bytes, drsr);
+  let dw = &mut DecodeWrapper::new(bytes, drsr);
   let res = VerbatimDecoder::<OauthResponse<&str>>::decode(dw)?;
   Ok(res.data)
 }

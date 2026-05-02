@@ -23,7 +23,7 @@ use wtx::{
 
 static ASTER: LazyLock<Mutex<Aster>> = LazyLock::new(|| {
   let mut secret = [0; 32];
-  let _ = wtx::codec::decode_hex(_VARS.aster_secret.as_bytes(), &mut secret).unwrap();
+  let _ = wtx::codec::hex_decode(_VARS.aster_secret.as_bytes(), &mut secret).unwrap();
   let mut rng = ChaCha20::from_std_random().unwrap();
   let secret_context = SecretContext::new(&mut rng).unwrap();
   Mutex::new(Aster::new(

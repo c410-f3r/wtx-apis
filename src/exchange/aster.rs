@@ -15,7 +15,6 @@ use crate::{blockchain::ethereum::misc::sign_payload, exchange::aster::message::
 use alloc::string::String;
 use core::fmt::Arguments;
 pub use deposit_assets::*;
-use hmac::{Hmac, KeyInit, Mac};
 use k256::ecdsa::SigningKey;
 pub use market::*;
 pub use order::*;
@@ -34,10 +33,11 @@ use wtx::{
     },
   },
   codec::{
-    Decode, FormUrlSerializer, GenericCodec, GenericDecodeWrapper, encode_hex,
-    protocol::VerbatimDecoder, u64_string,
+    Decode, DecodeWrapper, FormUrlSerializer, GenericCodec, hex_encode, protocol::VerbatimDecoder,
+    u64_string,
   },
   collection::{ArrayStringU8, ArrayVectorU8, Vector},
+  crypto::{Hmac, HmacSha256Global},
   http::{Header, Method},
   misc::Secret,
 };
@@ -139,7 +139,7 @@ impl Aster {
       rrb.body.clear();
       let _ = bytes_buffer.extend_from_copyable_slices([
         b"&signature=",
-        encode_hex(&signature??.all_bytes(), None, &mut [0; 130])?.as_bytes(),
+        hex_encode(&signature??.all_bytes(), None, &mut [0; 130])?.as_bytes(),
       ])?;
     } else {
       let timestamp_string = if let Some(elem) = timestamp {
@@ -153,15 +153,13 @@ impl Aster {
         timestamp_string.as_bytes(),
       ])?;
       let array = self.secret.peek(&mut ArrayVectorU8::<_, { 64 + 28 }>::new(), |bytes| {
-        let Ok(mut mac) = Hmac::<sha2::Sha256>::new_from_slice(&bytes) else {
-          return Ok([0; _]);
-        };
+        let mut mac = HmacSha256Global::from_key(&bytes)?;
         mac.update(bytes_buffer);
-        crate::Result::Ok(mac.finalize().into_bytes().into())
+        crate::Result::Ok(mac.digest())
       })??;
       let _ = bytes_buffer.extend_from_copyable_slices([
         b"&signature=",
-        encode_hex(&array, None, &mut [0; 64])?.as_bytes(),
+        hex_encode(&array, None, &mut [0; 64])?.as_bytes(),
       ])?;
     }
     // SAFETY: URL encoding is ASCII
@@ -235,12 +233,7 @@ where
     let mut uri_buffer = rrb.uri.reset();
     uri_buffer.push_str(&url_base);
   }
-  Ok(
-    VerbatimDecoder::<DepositAssetsResParams>::decode(&mut GenericDecodeWrapper::new(
-      &rslt?, drsr,
-    ))?
-    .data,
-  )
+  Ok(VerbatimDecoder::<DepositAssetsResParams>::decode(&mut DecodeWrapper::new(&rslt?, drsr))?.data)
 }
 
 wtx::create_packages_aux_wrapper!();
@@ -257,7 +250,7 @@ mod tests {
       misc::{RequestCounter, RequestLimit},
       network::{HttpParams, transport::TransportParams},
     },
-    codec::decode_hex,
+    codec::hex_decode,
     collection::Vector,
     misc::{Secret, SecretContext},
     rng::{ChaCha20, CryptoSeedableRng},
@@ -329,7 +322,7 @@ mod tests {
       cex_sign_params: None,
     };
     let mut secret_key = [0; 32];
-    let _ = decode_hex(
+    let _ = hex_decode(
       b"0x4fd0a42218f3eae43a6ce26d22544e986139a01e5b34a62db53757ffca81bae1",
       &mut secret_key,
     )

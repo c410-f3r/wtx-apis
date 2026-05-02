@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{WsParams, transport::SendingReceivingTransport},
-  de::{HexDecMode, decode_hex_to_slice, format::SerdeJson},
+  de::{HexDecMode, hex_decode_to_slice, format::SerdeJson},
 };
 
 static HYPERLIQUID: LazyLock<Mutex<Hyperliquid>> =

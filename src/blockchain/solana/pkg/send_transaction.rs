@@ -7,8 +7,12 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, SendTransactionEncoding, SolanaTransactionHashStr, TransactionInput,
   };
-  use alloc::string::String;
-  use base64::Engine;
+  use wtx::{
+    client_api_framework::network::transport::TransportParams,
+    codec::{
+      Base64Alphabet, Encode, EncodeWrapper, GenericCodec, base64_encode, protocol::VerbatimEncoder,
+    },
+  };
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {
@@ -17,32 +21,42 @@ pub(crate) mod pkg {
       &mut self,
       config: Option<SendTransactionConfig>,
       tx: &TransactionInput,
-    ) -> crate::Result<SendTransactionReq> {
-      self.bytes_buffer.clear();
-      bincode::serialize_into(&mut self.bytes_buffer, tx)?;
+    ) -> crate::Result<SendTransactionReq>
+    where
+      for<'any, 'drsr> VerbatimEncoder<SendTransactionReqInner<'any>>:
+        Encode<GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
+    {
+      let this = &mut **self;
+      this.bytes_buffer.clear();
+      bincode::serialize_into(&mut this.bytes_buffer, tx)?;
       let encoded = if let Some(SendTransactionConfig {
         encoding: Some(SendTransactionEncoding::Base64),
         ..
       }) = config
       {
-        base64::engine::general_purpose::STANDARD.encode(&self.bytes_buffer)
+        base64_encode(
+          Base64Alphabet::Standard,
+          &this.bytes_buffer,
+          &mut this.tp.ext_req_params_mut().rrb.body,
+        )?
+        .as_bytes()
       } else {
-        bs58::encode(&self.bytes_buffer).into_string()
+        let idx = bs58::encode(&this.bytes_buffer)
+          .onto(&mut *this.tp.ext_req_params_mut().rrb.body)
+          .map_err(|_err| crate::Error::Bs58Error)?;
+        this.tp.ext_req_params_mut().rrb.body.get(..idx).unwrap_or_default()
       };
-      self.bytes_buffer.clear();
-      Ok(SendTransactionReq(encoded, config))
+      this.bytes_buffer.clear();
+      VerbatimEncoder::new(SendTransactionReqInner(encoded, config))
+        .encode(&mut EncodeWrapper::new(&mut this.bytes_buffer, &mut this.drsr))?;
+      this.tp.ext_req_params_mut().rrb.body.clear();
+      this.encode_data = true;
+      Ok(())
     }
   }
 
-  #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
-  pub struct SendTransactionReq(
-    /// Encoded tx
-    pub String,
-    /// Configuration
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub Option<SendTransactionConfig>,
-  );
+  pub type SendTransactionReq = ();
 
   #[derive(Debug, serde::Serialize)]
   #[doc = generic_config_doc!()]
@@ -68,4 +82,13 @@ pub(crate) mod pkg {
 
   #[pkg::res_data]
   pub type SendTransactionRes = SolanaTransactionHashStr;
+
+  #[derive(Debug, serde::Serialize)]
+  struct SendTransactionReqInner<'any>(
+    /// Encoded tx
+    pub &'any [u8],
+    /// Configuration
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub Option<SendTransactionConfig>,
+  );
 }
