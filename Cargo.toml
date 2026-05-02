@@ -50,7 +50,7 @@ license = "Apache-2.0"
 name = "wtx-apis"
 readme = "README.md"
 repository = "https://github.com/c410-f3r/wtx-apis"
-version = "0.2.0"
+version = "0.2.1"
 
 [package.metadata.docs.rs]
 all-features = true
