@@ -1,5 +1,4 @@
 [dependencies]
-base64 = { default-features = false, features = ["alloc"], optional = true, version = "0.22" }
 bincode = { default-features = false, optional = true, version = "1.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
 rmp-serde = { default-features = false, optional = true, version = "1.0" }
@@ -9,32 +8,30 @@ serde_json = { default-features = false, features = ["alloc"], optional = true, 
 starknet-crypto = { default-features = false, optional = true, version = "0.8" }
 starknet-types-core = { default-features = false, features = ["alloc", "hash"], optional = true, version = "0.2" }
 tokio-rustls = { default-features = false, optional = true, version = "0.26" }
-wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], git = "https://github.com/c410-f3r/wtx", branch = "misc" }
+wtx = { default-features = false, features = ["client-api-framework", "macros", "serde", "web-socket"], version = "0.45" }
 
-crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "0.7.0-rc.25" }
+crypto-bigint = { default-features = false, optional = true, features = ["serde"], version = "0.7" }
 curve25519-dalek = { default-features = false, optional = true, version = "5.0.0-pre.6" }
 ed25519-dalek = { default-features = false, optional = true, version = "3.0.0-pre.6" }
-hmac = { default-features = false, optional = true, version = "0.13.0-rc.5" }
 k256 = { default-features = false, features = ["ecdsa", "serde"], optional = true, version = "0.14.0-rc.6" }
-sha2 = { default-features = false, optional = true, version = "0.11.0-rc.5" }
-sha3 = { default-features = false, optional = true, version = "0.11.0-rc.7" }
+sha3 = { default-features = false, optional = true, version = "0.11" }
 signature = { default-features = false, optional = true, version = "3.0.0-rc.10" }
 
 [dev-dependencies]
 rust_decimal_macros = { default-features = false, version = "1.0" }
 tokio = { default-features = false, features = ["macros", "rt-multi-thread"], version = "1.0" }
-wtx = { default-features = false, features = ["client-api-framework", "crypto", "http-client-pool", "nightly", "serde_json", "tokio", "tokio-rustls", "_tracing-tree", "webpki-roots", "web-socket-handshake"], git = "https://github.com/c410-f3r/wtx", branch = "misc" }
+wtx = { default-features = false, features = ["http-client-pool", "nightly", "serde_json", "tokio", "tokio-rustls", "_tracing-tree", "webpki-roots", "web-socket-handshake"], version = "0.45" }
 
 [features]
-aster = ["ethereum", "hmac", "k256", "rust_decimal/serde", "sha2", "wtx/secret"]
+aster = ["ethereum", "k256", "rust_decimal/serde", "wtx/secret"]
 default = []
 ethereum = ["crypto-bigint", "serde", "signature", "sha3", "wtx/sha3"]
 extended = ["rust_decimal/serde", "serde", "sha3", "starknet-crypto", "starknet-types-core", "wtx/secret"]
 hyperliquid = ["ethereum", "k256", "rmp-serde", "rust_decimal/serde", "serde_json/std", "wtx/std"]
 mercado-pago = ["serde", "serde_json", "rust_decimal/serde-with-float", "rust_decimal/serde-with-str", "wtx/serde_json"]
 olist = ["rust_decimal/serde-with-str"]
-pagar-me = ["base64", "wtx/base64", "wtx/serde"]
-solana = ["base64", "bincode", "bs58", "curve25519-dalek", "ed25519-dalek", "sha2", "serde", "signature", "wtx/base64", "wtx/std"]
+pagar-me = ["wtx/serde"]
+solana = ["bincode", "bs58", "curve25519-dalek", "ed25519-dalek", "serde", "signature", "wtx/std"]
 std = []
 super-frete = ["rust_decimal/serde-with-float", "rust_decimal/serde-with-str"]
 vault = []

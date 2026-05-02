@@ -11,8 +11,6 @@ pub(crate) mod yyyy_mm_dd;
 #[cfg(feature = "olist")]
 pub(crate) mod yyyy_mm_dd_opt;
 
-#[cfg(feature = "base64")]
-use base64::{Engine as _, engine::general_purpose::STANDARD};
 pub use concat_array_str::ConcatArrayStr;
 use core::str;
 pub use hash::*;
@@ -23,6 +21,9 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer, de::IntoDeserializ
 pub use slice_by_commas::SliceByCommas;
 pub use u256::U256;
 use wtx::{
+  codec::{
+    Base64Alphabet, base64_decode, base64_decoded_len_ub, base64_encode, base64_encoded_len,
+  },
   collection::{ArrayStringU8, CapacityUpperBound, LinearStorageLen, Truncate, TryExtend},
   misc::{Lease as _, LeaseMut},
 };
@@ -52,6 +53,7 @@ _create_blockchain_constants!(
 
 /// Decodes to Base58
 #[cfg(feature = "bs58")]
+#[inline]
 pub fn decode_base58<'buffer, B, L>(
   buffer: &'buffer mut B,
   bytes: &[u8],
@@ -67,7 +69,7 @@ where
 }
 
 /// Decodes to Base64
-#[cfg(feature = "base64")]
+#[inline]
 pub fn decode_base64<'buffer, B, L>(
   buffer: &'buffer mut B,
   bytes: &[u8],
@@ -76,15 +78,15 @@ where
   B: CapacityUpperBound + LeaseMut<[u8]> + Truncate<L> + TryExtend<(u8, usize)>,
   L: LinearStorageLen,
 {
-  let max_decoded_len = base64::decoded_len_estimate(bytes.len());
+  let max_decoded_len = base64_decoded_len_ub(bytes.len());
   decode_into_buffer(buffer, max_decoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    STANDARD.decode_slice(bytes, slice).map_err(|err| wtx::Error::from(err).into())
+    Ok(base64_decode(Base64Alphabet::Standard, bytes, slice)?.len())
   })
 }
 
 /// Decodes to Hex
 #[inline]
-pub fn decode_hex<'buffer, B, L>(
+pub fn hex_decode<'buffer, B, L>(
   buffer: &'buffer mut B,
   bytes: &[u8],
 ) -> crate::Result<&'buffer mut [u8]>
@@ -94,7 +96,7 @@ where
 {
   let max_decoded_len = bytes.len() / 2;
   decode_into_buffer(buffer, max_decoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    Ok(wtx::codec::decode_hex(bytes, slice)?.len())
+    Ok(wtx::codec::hex_decode(bytes, slice)?.len())
   })
 }
 
@@ -181,7 +183,7 @@ where
 }
 
 /// Encodes to Base64
-#[cfg(feature = "base64")]
+#[inline]
 pub fn encode_base64<'buffer, B, L>(
   buffer: &'buffer mut B,
   bytes: &[u8],
@@ -190,15 +192,15 @@ where
   B: CapacityUpperBound + LeaseMut<[u8]> + Truncate<L> + TryExtend<(u8, usize)>,
   L: LinearStorageLen,
 {
-  let max_encoded_len = base64::encoded_len(bytes.len(), true).unwrap_or_default();
+  let max_encoded_len = base64_encoded_len(bytes.len(), true).unwrap_or_default();
   encode_into_buffer(buffer, max_encoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    Ok(STANDARD.encode_slice(bytes, slice).map_err(wtx::Error::from)?)
+    Ok(base64_encode(Base64Alphabet::Standard, bytes, slice)?.len())
   })
 }
 
 /// Encodes to Hex
 #[inline]
-pub fn encode_hex<'buffer, B, L>(
+pub fn hex_encode<'buffer, B, L>(
   buffer: &'buffer mut B,
   bytes: &[u8],
 ) -> crate::Result<&'buffer str>
@@ -208,7 +210,7 @@ where
 {
   let max_encoded_len = bytes.len().checked_mul(2).unwrap_or_default();
   encode_into_buffer(buffer, max_encoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    Ok(wtx::codec::encode_hex(bytes, None, slice)?.len())
+    Ok(wtx::codec::hex_encode(bytes, None, slice)?.len())
   })
 }
 

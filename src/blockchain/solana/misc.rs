@@ -1,10 +1,12 @@
 mod pack;
-mod sha256_hasher;
 
 use crate::blockchain::solana::SolanaAddressHash;
 use core::slice::SliceIndex;
 pub(crate) use pack::*;
-use wtx::misc::Lease;
+use wtx::{
+  crypto::{Hash, Sha256DigestGlobal},
+  misc::Lease,
+};
 
 const MAX_SEED_LEN: usize = 32;
 const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
@@ -24,9 +26,7 @@ pub fn create_with_seed(
   {
     return Err(crate::Error::SolanaIllegalOwner);
   }
-  let mut hasher = sha256_hasher::Sha256Hasher::default();
-  hasher.hashv(&[from.lease(), seed.lease(), owner]);
-  hasher.result()
+  Ok(Sha256DigestGlobal::digest([from.lease(), seed.lease(), owner]))
 }
 
 /// Finds a valid program-derived address and its bump seed.
@@ -86,13 +86,8 @@ fn create_program_address(
     }
   }
 
-  let mut hasher = sha256_hasher::Sha256Hasher::default();
-  for seed in seeds.iter().copied().chain([bump_seed]) {
-    hasher.hash(seed);
-  }
-  hasher.hashv(&[program_id, PDA_MARKER]);
-
-  let hash = hasher.result()?;
+  let hash =
+    Sha256DigestGlobal::digest(seeds.iter().copied().chain([bump_seed, program_id, PDA_MARKER]));
   if is_on_curve(&hash)? {
     return Err(crate::Error::SolanaInvalidSeeds);
   }
@@ -105,8 +100,7 @@ fn create_program_address(
 fn _anchor_discriminator(namespace: &str, name: &str) -> crate::Result<[u8; 8]> {
   let preimage = alloc::format!("{namespace}:{name}");
   let mut sighash = [0u8; 8];
-  let mut hasher = sha256_hasher::Sha256Hasher::default();
-  hasher.hash(preimage.as_bytes());
-  sighash.copy_from_slice(&hasher.result()?[..8]);
+  let hash = Sha256DigestGlobal::digest([preimage.as_bytes()]);
+  sighash.copy_from_slice(&hash[..8]);
   Ok(sighash)
 }

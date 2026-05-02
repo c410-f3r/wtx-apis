@@ -14,7 +14,6 @@ $rt rustfmt
 $rt clippy -Aclippy::arbitrary_source_item_ordering,-Aclippy::doc_paragraphs_missing_punctuation
 
 $rt check-generic .
-$rt check-with-features . base64
 $rt check-with-features . bincode
 $rt check-with-features . bs58
 $rt check-with-features . default

@@ -108,7 +108,6 @@ where
   }
 
   /// Constructs an instance by base64-encoding the given bytes.
-  #[cfg(feature = "base64")]
   #[inline]
   pub fn from_base64_bytes(bytes: B) -> crate::Result<Self> {
     let str = Hash::from_base64_bytes_ref(bytes.lease())?.str;
@@ -139,7 +138,6 @@ where
   }
 
   /// Constructs an instance by base64-decoding the given string.
-  #[cfg(feature = "base64")]
   #[inline]
   pub fn from_base64_str(str: S) -> crate::Result<Self> {
     let bytes = Hash::from_base64_str_ref(str.lease())?.bytes;
@@ -175,7 +173,6 @@ impl<const B: usize> Hash<[u8; B], ()> {
   }
 
   /// Decodes a base64 string reference into a bytes-only instance.
-  #[cfg(feature = "base64")]
   #[inline]
   pub fn from_base64_str_ref(str: &str) -> crate::Result<Self> {
     let mut buffer = ArrayVectorU8::new();
@@ -187,7 +184,7 @@ impl<const B: usize> Hash<[u8; B], ()> {
   #[inline]
   pub fn from_hex_str_ref(str: &str) -> crate::Result<Self> {
     let mut buffer = ArrayVectorU8::new();
-    let _ = crate::misc::decode_hex(&mut buffer, str.as_bytes())?;
+    let _ = crate::misc::hex_decode(&mut buffer, str.as_bytes())?;
     Ok(Self { bytes: buffer.into_inner()?, str: () })
   }
 
@@ -201,7 +198,6 @@ impl<const B: usize> Hash<[u8; B], ()> {
   }
 
   /// Encodes the inner bytes as a base64 string.
-  #[cfg(feature = "base64")]
   #[inline]
   pub fn to_base64_str<const N: usize>(&self) -> crate::Result<ArrayStringU8<N>> {
     let mut buffer = ArrayVectorU8::<u8, N>::default();
@@ -232,7 +228,6 @@ impl<const S: usize> Hash<(), ArrayStringU8<S>> {
   }
 
   /// Encodes the given byte slice as a base64 string-only instance.
-  #[cfg(feature = "base64")]
   #[inline]
   pub fn from_base64_bytes_ref(bytes: &[u8]) -> crate::Result<Self> {
     let mut buffer = ArrayVectorU8::<u8, S>::default();

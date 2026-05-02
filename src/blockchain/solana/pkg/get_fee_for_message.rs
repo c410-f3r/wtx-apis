@@ -7,8 +7,12 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, MessageInput,
   };
-  use alloc::string::String;
-  use base64::Engine;
+  use wtx::{
+    client_api_framework::network::transport::TransportParams,
+    codec::{
+      Base64Alphabet, Encode, EncodeWrapper, GenericCodec, base64_encode, protocol::VerbatimEncoder,
+    },
+  };
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {
@@ -17,18 +21,30 @@ pub(crate) mod pkg {
       &mut self,
       config: Option<GetFeeForMessageConfig>,
       message: &MessageInput,
-    ) -> crate::Result<GetFeeForMessageReq> {
-      self.bytes_buffer.clear();
-      bincode::serialize_into(&mut self.bytes_buffer, message)?;
-      let string = base64::engine::general_purpose::STANDARD.encode(&self.bytes_buffer);
-      self.bytes_buffer.clear();
-      Ok(GetFeeForMessageReq(string, config))
+    ) -> crate::Result<GetFeeForMessageReq>
+    where
+      for<'any, 'drsr> VerbatimEncoder<GetFeeForMessageReqInner<'any>>:
+        Encode<GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
+    {
+      let this = &mut **self;
+      this.bytes_buffer.clear();
+      bincode::serialize_into(&mut this.bytes_buffer, message)?;
+      let string = base64_encode(
+        Base64Alphabet::Standard,
+        &this.bytes_buffer,
+        &mut this.tp.ext_req_params_mut().rrb.body,
+      )?;
+      this.bytes_buffer.clear();
+      VerbatimEncoder::new(GetFeeForMessageReqInner(string, config))
+        .encode(&mut EncodeWrapper::new(&mut this.bytes_buffer, &mut this.drsr))?;
+      this.tp.ext_req_params_mut().rrb.body.clear();
+      this.encode_data = true;
+      Ok(())
     }
   }
 
-  #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]
-  pub struct GetFeeForMessageReq(String, Option<GetFeeForMessageConfig>);
+  pub type GetFeeForMessageReq = ();
 
   #[pkg::res_data]
   pub type GetFeeForMessageRes = JsonRpcResponseResultWithContext<Option<u64>>;
@@ -44,4 +60,7 @@ pub(crate) mod pkg {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_context_slot: Option<u64>,
   }
+
+  #[derive(Debug, serde::Serialize)]
+  struct GetFeeForMessageReqInner<'any>(&'any str, Option<GetFeeForMessageConfig>);
 }
