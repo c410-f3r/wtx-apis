@@ -96,7 +96,7 @@ where
 {
   let max_decoded_len = bytes.len() / 2;
   decode_into_buffer(buffer, max_decoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    Ok(wtx::codec::hex_decode(bytes, slice)?.len())
+    Ok(wtx::codec::hex_decode(bytes, slice).map_err(wtx::Error::from)?.len())
   })
 }
 
@@ -210,7 +210,7 @@ where
 {
   let max_encoded_len = bytes.len().checked_mul(2).unwrap_or_default();
   encode_into_buffer(buffer, max_encoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    Ok(wtx::codec::hex_encode(bytes, None, slice)?.len())
+    Ok(wtx::codec::hex_encode(bytes, None, slice).map_err(wtx::Error::from)?.len())
   })
 }
 

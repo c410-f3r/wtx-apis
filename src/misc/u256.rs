@@ -113,11 +113,11 @@ impl U256 {
       shift = shift.wrapping_sub(1);
     }
 
-    let [a, b] = ret;
-    Some((U256(a, b), sub_copy))
+    let [b0, b1] = ret;
+    Some((U256(b0, b1), sub_copy))
   }
 
-  fn fmt_decimal(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+  fn fmt_decimal(&self, fmt: &mut Formatter<'_>) -> core::fmt::Result {
     const DIGITS: usize = 78;
     const TEN: U256 = U256(0, 10);
 
@@ -142,9 +142,9 @@ impl U256 {
       let slice = buf.get(idx..).unwrap_or_default();
       // SAFETY: Numbers are ASCII
       let str = unsafe { str::from_utf8_unchecked(slice) };
-      f.pad_integral(true, "", str)
+      fmt.pad_integral(true, "", str)
     } else {
-      f.write_str("N/A")
+      fmt.write_str("N/A")
     }
   }
 
@@ -164,9 +164,9 @@ impl U256 {
       *word = u128_lsb(n);
       carry = u128_msb(n).into();
     }
-    let [a, b, c, d] = split_le;
-    let low = u128::from(a) | (u128::from(b) << 64);
-    let high = u128::from(c) | (u128::from(d) << 64);
+    let [b0, b1, b2, b3] = split_le;
+    let low = u128::from(b0) | (u128::from(b1) << 64);
+    let high = u128::from(b2) | (u128::from(b3) << 64);
     (Self(high, low), carry != 0)
   }
 
