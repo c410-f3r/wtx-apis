@@ -944,6 +944,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "sha3"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc9bad02c26382724b2d2692c6f179285e4b54eeecd7968f52a50059c3c11759"
+dependencies = [
+ "digest 0.11.3",
+ "keccak 0.2.0",
+ "sponge-cursor",
+]
+
+[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -993,6 +1004,12 @@ dependencies = [
  "base64ct",
  "der",
 ]
+
+[[package]]
+name = "sponge-cursor"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a0219bd7d979d58245a4f41f695e1ac9f8befdffadd7f61f1bae9e39abc6620"
 
 [[package]]
 name = "starknet-crypto"
@@ -1353,9 +1370,9 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "wtx"
-version = "0.46.0"
+version = "0.47.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad56ff7255a3ab20bf97c5860075316a348988b821fc41533b6ecd90074bd33d"
+checksum = "7cdeaae3a86fe6584dfb8979df358cf4fe323ccea83e71160b73c73dfef17f58"
 dependencies = [
  "foldhash",
  "hashbrown",
@@ -1367,7 +1384,7 @@ dependencies = [
  "rustls-pki-types",
  "serde",
  "serde_json",
- "sha3 0.11.0",
+ "sha3 0.12.0",
  "tokio",
  "tokio-rustls",
  "tracing",
@@ -1403,9 +1420,9 @@ dependencies = [
 
 [[package]]
 name = "wtx-macros"
-version = "0.8.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa08f9b42ab99b369c690e4df4ce83d35c6e1b6092c2abd3d4874a0db3e95b8b"
+checksum = "73ca25e0f53b21bf1c49d6301428b8448ed09d3a30d00a672e1a600701e20519"
 dependencies = [
  "proc-macro2",
  "quote",
