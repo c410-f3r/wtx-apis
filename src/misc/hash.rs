@@ -194,7 +194,7 @@ impl<const B: usize> Hash<[u8; B], ()> {
   pub fn to_base58_str<const N: usize>(&self) -> crate::Result<ArrayStringU8<N>> {
     let mut buffer = ArrayVectorU8::<u8, N>::default();
     let len = crate::misc::encode_base58(&mut buffer, &self.bytes)?.len();
-    Ok(ArrayStringU8::from_parts(buffer.into_inner()?, len.try_into().unwrap_or_default())?)
+    Ok(ArrayStringU8::from_parts(buffer.into_inner()?, Some(len.try_into().unwrap_or_default()))?)
   }
 
   /// Encodes the inner bytes as a base64 string.
@@ -202,7 +202,7 @@ impl<const B: usize> Hash<[u8; B], ()> {
   pub fn to_base64_str<const N: usize>(&self) -> crate::Result<ArrayStringU8<N>> {
     let mut buffer = ArrayVectorU8::<u8, N>::default();
     let len = crate::misc::encode_base64(&mut buffer, &self.bytes)?.len();
-    Ok(ArrayStringU8::from_parts(buffer.into_inner()?, len.try_into().unwrap_or_default())?)
+    Ok(ArrayStringU8::from_parts(buffer.into_inner()?, Some(len.try_into().unwrap_or_default()))?)
   }
 }
 
@@ -223,7 +223,8 @@ impl<const S: usize> Hash<(), ArrayStringU8<S>> {
   pub fn from_base58_bytes_ref(bytes: &[u8]) -> crate::Result<Self> {
     let mut buffer = ArrayVectorU8::<u8, S>::default();
     let len = crate::misc::encode_base58(&mut buffer, bytes)?.len();
-    let str = ArrayStringU8::from_parts(buffer.into_inner()?, len.try_into().unwrap_or_default())?;
+    let str =
+      ArrayStringU8::from_parts(buffer.into_inner()?, Some(len.try_into().unwrap_or_default()))?;
     Ok(Self { bytes: (), str })
   }
 
@@ -232,7 +233,8 @@ impl<const S: usize> Hash<(), ArrayStringU8<S>> {
   pub fn from_base64_bytes_ref(bytes: &[u8]) -> crate::Result<Self> {
     let mut buffer = ArrayVectorU8::<u8, S>::default();
     let len = crate::misc::encode_base64(&mut buffer, bytes)?.len();
-    let str = ArrayStringU8::from_parts(buffer.into_inner()?, len.try_into().unwrap_or_default())?;
+    let str =
+      ArrayStringU8::from_parts(buffer.into_inner()?, Some(len.try_into().unwrap_or_default()))?;
     Ok(Self { bytes: (), str })
   }
 }

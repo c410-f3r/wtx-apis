@@ -1,7 +1,7 @@
 use crate::blockchain::ethereum::{SolTy, Word};
 use core::fmt::{Formatter, LowerHex};
 use wtx::{
-  codec::{HexEncMode, hex_decode, hex_encode},
+  codec::{eip55_encode, hex_decode},
   collection::Vector,
 };
 
@@ -17,7 +17,7 @@ impl Address {
   /// From hex string
   pub fn from_hex(hex: &str) -> crate::Result<Self> {
     let mut array = [0; 20];
-    let _ = hex_decode(hex.as_bytes(), &mut array)?;
+    let _ = hex_decode(hex.as_bytes(), &mut array).map_err(wtx::Error::from)?;
     Ok(Self(array))
   }
 
@@ -75,7 +75,7 @@ impl LowerHex for Address {
   #[inline]
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     let mut buffer = [0; 42];
-    let Ok(hex) = hex_encode(&self.0, Some(HexEncMode::Eip55), &mut buffer) else {
+    let Ok(hex) = eip55_encode(&self.0, &mut buffer) else {
       return Ok(());
     };
     f.write_str(hex.get(2..).unwrap_or_default())?;

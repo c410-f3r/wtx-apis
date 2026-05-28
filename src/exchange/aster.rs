@@ -139,7 +139,9 @@ impl Aster {
       rrb.body.clear();
       let _ = bytes_buffer.extend_from_copyable_slices([
         b"&signature=",
-        hex_encode(&signature??.all_bytes(), None, &mut [0; 130])?.as_bytes(),
+        hex_encode(&signature??.all_bytes(), None, &mut [0; 130])
+          .map_err(wtx::Error::from)?
+          .as_bytes(),
       ])?;
     } else {
       let timestamp_string = if let Some(elem) = timestamp {
@@ -159,7 +161,7 @@ impl Aster {
       })??;
       let _ = bytes_buffer.extend_from_copyable_slices([
         b"&signature=",
-        hex_encode(&array, None, &mut [0; 64])?.as_bytes(),
+        hex_encode(&array, None, &mut [0; 64]).map_err(wtx::Error::from)?.as_bytes(),
       ])?;
     }
     // SAFETY: URL encoding is ASCII
