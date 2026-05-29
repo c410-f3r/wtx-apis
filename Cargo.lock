@@ -1360,9 +1360,9 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "wtx"
-version = "0.47.0"
+version = "0.47.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cdeaae3a86fe6584dfb8979df358cf4fe323ccea83e71160b73c73dfef17f58"
+checksum = "f0687d724e02d3e7196a7651643da4a510e6654f5ba5a31466630b08ee0955bd"
 dependencies = [
  "foldhash",
  "hashbrown",
