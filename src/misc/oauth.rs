@@ -125,9 +125,9 @@ where
   for<'any, 'drsr> VerbatimDecoder<OauthResponse<&'any str>>:
     Decode<'any, GenericCodec<&'drsr mut DRSR, &'drsr mut DRSR>>,
 {
-  trans_params.ext_req_params_mut().rrb.headers.clear();
   trans_params.ext_req_params_mut().method = Method::Post;
   trans_params.ext_req_params_mut().mime = Some(Mime::ApplicationXWwwFormUrlEncoded);
+  trans_params.ext_req_params_mut().msg_buffer.headers.clear();
   let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, &mut *drsr, &mut *trans_params);
   trans.send_bytes_recv(Some(bytes), &mut pkgs_aux).await?;
   let dw = &mut DecodeWrapper::new(bytes, drsr);

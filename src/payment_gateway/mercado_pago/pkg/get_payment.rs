@@ -38,7 +38,7 @@ pub(crate) mod pkg {
     trans_params.ext_req_params_mut().method = Method::Get;
     trans_params
       .ext_req_params_mut()
-      .rrb
+      .msg_buffer
       .uri
       .push_path(format_args!("/v1/payments/{}", *params))?;
     Ok(())

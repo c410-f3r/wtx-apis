@@ -39,19 +39,19 @@ pub(crate) mod pkg {
         base64_encode(
           Base64Alphabet::Standard,
           &this.bytes_buffer,
-          &mut this.tp.ext_req_params_mut().rrb.body,
+          &mut this.tp.ext_req_params_mut().msg_buffer.body,
         )?
         .as_bytes()
       } else {
         let idx = bs58::encode(&this.bytes_buffer)
-          .onto(&mut *this.tp.ext_req_params_mut().rrb.body)
+          .onto(&mut *this.tp.ext_req_params_mut().msg_buffer.body)
           .map_err(|_err| crate::Error::Bs58Error)?;
-        this.tp.ext_req_params_mut().rrb.body.get(..idx).unwrap_or_default()
+        this.tp.ext_req_params_mut().msg_buffer.body.get(..idx).unwrap_or_default()
       };
       this.bytes_buffer.clear();
       VerbatimEncoder::new(SimulateTransactionReqInner(encoded, config))
         .encode(&mut EncodeWrapper::new(&mut this.bytes_buffer, &mut this.drsr))?;
-      this.tp.ext_req_params_mut().rrb.body.clear();
+      this.tp.ext_req_params_mut().msg_buffer.body.clear();
       this.encode_data = true;
       Ok(())
     }

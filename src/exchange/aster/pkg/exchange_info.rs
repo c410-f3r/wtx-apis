@@ -211,7 +211,7 @@ pub(crate) mod pkg {
 
   #[pkg::before_sending]
   async fn before_sending(api: &mut Aster, trans_params: &mut HttpParams) -> crate::Result<()> {
-    trans_params.ext_req_params_mut().rrb.uri.push_path(if api.is_dex {
+    trans_params.ext_req_params_mut().msg_buffer.uri.push_path(if api.is_dex {
       format_args!("/api/v3/exchangeInfo")
     } else {
       format_args!("/api/v1/exchangeInfo")

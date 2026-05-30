@@ -32,12 +32,12 @@ pub(crate) mod pkg {
       let string = base64_encode(
         Base64Alphabet::Standard,
         &this.bytes_buffer,
-        &mut this.tp.ext_req_params_mut().rrb.body,
+        &mut this.tp.ext_req_params_mut().msg_buffer.body,
       )?;
       this.bytes_buffer.clear();
       VerbatimEncoder::new(GetFeeForMessageReqInner(string, config))
         .encode(&mut EncodeWrapper::new(&mut this.bytes_buffer, &mut this.drsr))?;
-      this.tp.ext_req_params_mut().rrb.body.clear();
+      this.tp.ext_req_params_mut().msg_buffer.body.clear();
       this.encode_data = true;
       Ok(())
     }
