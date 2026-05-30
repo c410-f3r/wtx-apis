@@ -1,5 +1,5 @@
 [dependencies]
-bincode = { default-features = false, optional = true, version = "1.0" }
+bincode = { default-features = false, optional = true, version = "3.0" }
 bs58 = { default-features = false, features = ["alloc"], optional = true, version = "0.5" }
 rmp-serde = { default-features = false, optional = true, version = "1.0" }
 rust_decimal = { default-features = false, features = ["maths"], optional = true, version = "1.0" }
