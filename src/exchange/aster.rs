@@ -107,7 +107,8 @@ impl Aster {
     T: Serialize,
   {
     bytes_buffer.clear();
-    let HttpReqParams { host, method, mime, rrb, user_agent_default, .. } = tp.ext_req_params_mut();
+    let HttpReqParams { host, method, mime, msg_buffer, user_agent_default, .. } =
+      tp.ext_req_params_mut();
     let init_char = if let Some(elem) = params {
       let _ = elem.serialize(FormUrlSerializer::new(None, bytes_buffer))?;
       b"&"
@@ -131,12 +132,12 @@ impl Aster {
       ])?;
       let signature = self.secret.peek(&mut ArrayVectorU8::<_, { 132 + 28 }>::new(), |pk| {
         sign_payload(
-          &mut rrb.body,
+          &mut msg_buffer.body,
           &Message { chain_id: self.chain_id, msg: bytes_buffer },
           &SigningKey::from_slice(&pk)?,
         )
       });
-      rrb.body.clear();
+      msg_buffer.body.clear();
       let _ = bytes_buffer.extend_from_copyable_slices([
         b"&signature=",
         hex_encode(&signature??.all_bytes(), None, &mut [0; 130])
@@ -166,10 +167,10 @@ impl Aster {
     }
     // SAFETY: URL encoding is ASCII
     let query = unsafe { core::str::from_utf8_unchecked(bytes_buffer) };
-    let rslt = rrb.uri.push_path(format_args!("{path}?{query}"));
+    let rslt = msg_buffer.uri.push_path(format_args!("{path}?{query}"));
     bytes_buffer.clear();
     rslt?;
-    rrb.headers.push_from_iter_many([Header::from_name_and_value(
+    msg_buffer.headers.push_from_iter_many([Header::from_name_and_value(
       "x-mbx-apikey",
       [self.signer.as_str()].into_iter(),
     )])?;
@@ -210,14 +211,14 @@ where
   where
     for<'any> T: SendingReceivingTransport<&'any mut HttpParams>,
   {
-    let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
+    let HttpReqParams { msg_buffer, .. } = trans_params.ext_req_params_mut();
     {
       let url = "https://www.asterdex.com/bapi/futures/v1/public/future/aster/deposit/assets?";
-      let mut uri_buffer = rrb.uri.reset();
+      let mut uri_buffer = msg_buffer.uri.reset();
       uri_buffer.push_str(url);
-      uri_buffer.push_str(str::from_utf8(&rrb.body).unwrap_or_default());
+      uri_buffer.push_str(str::from_utf8(&msg_buffer.body).unwrap_or_default());
     }
-    rrb.body.clear();
+    msg_buffer.body.clear();
     let mut pkgs_aux = PkgsAux::from_minimum(&mut *api, drsr, &mut *trans_params);
     trans.send_bytes_recv(None, &mut pkgs_aux).await?;
     Ok(pkgs_aux.0.bytes_buffer)
@@ -225,14 +226,14 @@ where
 
   trans_params.ext_req_params_mut().reset();
   let url_base = {
-    let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
-    let _ = params.serialize(FormUrlSerializer::new(None, &mut rrb.body))?;
-    ArrayStringU8::<32>::try_from(rrb.uri.as_str())?
+    let HttpReqParams { msg_buffer, .. } = trans_params.ext_req_params_mut();
+    let _ = params.serialize(FormUrlSerializer::new(None, &mut msg_buffer.body))?;
+    ArrayStringU8::<32>::try_from(msg_buffer.uri.as_str())?
   };
   let rslt = fun((api, &mut *drsr, trans, trans_params)).await;
-  let HttpReqParams { rrb, .. } = trans_params.ext_req_params_mut();
+  let HttpReqParams { msg_buffer, .. } = trans_params.ext_req_params_mut();
   {
-    let mut uri_buffer = rrb.uri.reset();
+    let mut uri_buffer = msg_buffer.uri.reset();
     uri_buffer.push_str(&url_base);
   }
   Ok(VerbatimDecoder::<DepositAssetsResParams>::decode(&mut DecodeWrapper::new(&rslt?, drsr))?.data)
@@ -295,7 +296,7 @@ mod tests {
       )
       .unwrap();
     assert_eq!(
-      tp.ext_params().0.rrb.uri.as_str(),
+      tp.ext_params().0.msg_buffer.uri.as_str(),
       "hello/world\
       ?symbol=BTCUSDT\
       &type=LIMIT\
@@ -351,7 +352,7 @@ mod tests {
       )
       .unwrap();
     assert_eq!(
-      tp.ext_params().0.rrb.uri.as_str(),
+      tp.ext_params().0.msg_buffer.uri.as_str(),
       "hello/world\
       ?symbol=ASTERUSDT\
       &type=LIMIT\
