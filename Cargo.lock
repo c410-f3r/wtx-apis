@@ -1360,9 +1360,9 @@ checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
 
 [[package]]
 name = "wtx"
-version = "0.47.3"
+version = "0.47.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29862a88fdc2c5477d36337544bf4e855aea8f752485744352c373344aabf210"
+checksum = "058059db60e3186c453dc17c81dc1e359ccd4baa9f9fa6e84e95959ffccdb76a"
 dependencies = [
  "foldhash",
  "hashbrown",
@@ -1410,9 +1410,9 @@ dependencies = [
 
 [[package]]
 name = "wtx-macros"
-version = "0.8.1"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73ca25e0f53b21bf1c49d6301428b8448ed09d3a30d00a672e1a600701e20519"
+checksum = "d5c1e7897187f23097a7d1aadf7a76b834051471e8ce6d226513943c137c3acb"
 dependencies = [
  "proc-macro2",
  "quote",
