@@ -12,10 +12,10 @@ use core::{
   task::Poll,
 };
 use wtx::{
-  calendar::{DateTime, Duration, Instant, Utc},
+  calendar::{DateTime, Instant, SigDuration, Utc},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   codec::{Decode, GenericCodec, protocol::VerbatimDecoder},
-  collection::{ArrayString, Vector},
+  collections::{ArrayString, Vector},
   misc::into_rslt,
   sync::{Arc, AtomicCell, AtomicWaker},
 };
@@ -86,7 +86,7 @@ impl OauthRefreshTokenSync {
   /// Returns `true` if the access token expired.
   #[inline]
   pub fn needs_refresh(&self) -> crate::Result<bool> {
-    let needs_refresh = Instant::now_date_time(0)? >= self.token_ttl.load();
+    let needs_refresh = Instant::now_date_time()? >= self.token_ttl.load();
     if needs_refresh {
       self.needs_access_token_update.store(true, Ordering::Relaxed);
     }
@@ -128,8 +128,8 @@ impl OauthRefreshTokenSync {
     self.do_update_params(
       res.access_token,
       into_rslt(res.refresh_token)?,
-      Instant::now_date_time(0)?
-        .add(Duration::from_seconds(res.expires_in.into()).map_err(wtx::Error::from)?)
+      Instant::now_date_time()?
+        .add(SigDuration::from_seconds(res.expires_in.into()).map_err(wtx::Error::from)?)
         .map_err(wtx::Error::from)?,
     )?;
     Ok(())
@@ -144,6 +144,7 @@ impl OauthRefreshTokenSync {
   /// Should be called when the parameters were retrieved throught other means.
   ///
   /// The nanoseconds of `token_ttl` are stripped away.
+  #[inline]
   pub fn update_params(
     &self,
     access_token: &str,
@@ -161,7 +162,7 @@ impl OauthRefreshTokenSync {
   ) -> crate::Result<()> {
     self.token_ttl.store(
       token_ttl
-        .sub(Duration::from_seconds(self.token_ttl_slack.into()).map_err(wtx::Error::from)?)
+        .sub(SigDuration::from_seconds(self.token_ttl_slack.into()).map_err(wtx::Error::from)?)
         .map_err(wtx::Error::from)?
         .trunc_to_sec(),
     );

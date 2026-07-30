@@ -120,7 +120,7 @@ mod tests {
     BulkOrder, OrderGrouping, OrderLimitParams, OrderReq, OrderTif, OrderTpsl, OrderTriggerParams,
     OrderTy, action::Action, misc::sign_l1_action,
   };
-  use wtx::{collection::Vector, de::hex_decode};
+  use wtx::{collections::Vector, de::hex_decode};
 
   #[test]
   fn sign_order_limit() {

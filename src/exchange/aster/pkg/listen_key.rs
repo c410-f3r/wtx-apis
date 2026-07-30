@@ -1,7 +1,7 @@
 #[wtx::pkg(data_format(json), id(crate::exchange::aster::AsterId), transport(http))]
 pub(crate) mod pkg {
   use crate::exchange::aster::{Aster, CexSignParams, HttpPkgsAux};
-  use wtx::{client_api_framework::pkg::PkgsAux, collection::ArrayStringU8, misc::LeaseMut};
+  use wtx::{client_api_framework::pkg::PkgsAux, collections::ArrayStringU8, misc::LeaseMut};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR>

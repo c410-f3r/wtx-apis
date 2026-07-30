@@ -1,9 +1,9 @@
 use core::marker::PhantomData;
 use serde::{
   Deserialize,
-  de::{Deserializer, Error, MapAccess, Visitor},
+  de::{Deserializer, Error as _, MapAccess, Visitor},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// A vector where each element is a key and a value.
 #[derive(Debug)]

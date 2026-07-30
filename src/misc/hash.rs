@@ -1,6 +1,6 @@
 use core::{borrow::Borrow, cmp::Ordering, hash::Hasher};
 use wtx::{
-  collection::{ArrayStringU8, ArrayVectorU8},
+  collections::{ArrayStringU8, ArrayVectorU8},
   misc::Lease,
 };
 

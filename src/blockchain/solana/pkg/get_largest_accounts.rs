@@ -8,7 +8,7 @@ pub(crate) mod pkg {
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, SolanaAddressHashStr,
   };
   use serde::Serialize;
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

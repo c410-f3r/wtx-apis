@@ -1,6 +1,6 @@
 use crate::AssetString;
 use rust_decimal::Decimal;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Account information response from the exchange API
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

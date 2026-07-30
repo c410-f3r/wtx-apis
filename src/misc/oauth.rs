@@ -14,7 +14,7 @@ use wtx::{
     pkg::PkgsAux,
   },
   codec::{Decode, DecodeWrapper, GenericCodec, protocol::VerbatimDecoder},
-  collection::{ArrayStringU16, Vector},
+  collections::{ArrayStringU16, Vector},
   http::{Method, Mime},
 };
 

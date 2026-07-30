@@ -4,8 +4,8 @@ use crate::blockchain::solana::SolanaAddressHash;
 use core::slice::SliceIndex;
 pub(crate) use pack::*;
 use wtx::{
-  crypto::{Hash, Sha256DigestGlobal},
-  misc::Lease,
+  crypto::{Hash as _, Sha256Global},
+  misc::Lease as _,
 };
 
 const MAX_SEED_LEN: usize = 32;
@@ -13,6 +13,7 @@ const PDA_MARKER: &[u8; 21] = b"ProgramDerivedAddress";
 const MAX_SEEDS: usize = 16;
 
 /// Derives a public key from a base key, a seed, and an owner program ID.
+#[inline]
 pub fn create_with_seed(
   from: &&[u8],
   seed: &str,
@@ -26,10 +27,11 @@ pub fn create_with_seed(
   {
     return Err(crate::Error::SolanaIllegalOwner);
   }
-  Ok(Sha256DigestGlobal::digest([from.lease(), seed.lease(), owner]))
+  Ok(Sha256Global::digest([from.lease(), seed.lease(), owner]))
 }
 
 /// Finds a valid program-derived address and its bump seed.
+#[inline]
 pub fn find_program_address(
   seeds: &[&[u8]],
   program_id: &SolanaAddressHash,
@@ -86,8 +88,7 @@ fn create_program_address(
     }
   }
 
-  let hash =
-    Sha256DigestGlobal::digest(seeds.iter().copied().chain([bump_seed, program_id, PDA_MARKER]));
+  let hash = Sha256Global::digest(seeds.iter().copied().chain([bump_seed, program_id, PDA_MARKER]));
   if is_on_curve(&hash)? {
     return Err(crate::Error::SolanaInvalidSeeds);
   }
@@ -97,10 +98,10 @@ fn create_program_address(
 
 /// `namespace` is usually named "global".
 /// `name` is usually the struct's name in snake case.
-fn _anchor_discriminator(namespace: &str, name: &str) -> crate::Result<[u8; 8]> {
+fn _anchor_discriminator(namespace: &str, name: &str) -> [u8; 8] {
   let preimage = alloc::format!("{namespace}:{name}");
   let mut sighash = [0u8; 8];
-  let hash = Sha256DigestGlobal::digest([preimage.as_bytes()]);
+  let hash = Sha256Global::digest([preimage.as_bytes()]);
   sighash.copy_from_slice(&hash[..8]);
-  Ok(sighash)
+  sighash
 }

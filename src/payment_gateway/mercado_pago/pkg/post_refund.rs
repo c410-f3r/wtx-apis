@@ -11,10 +11,10 @@ pub(crate) mod pkg {
   use wtx::{
     client_api_framework::network::{
       HttpParams,
-      transport::{SendingReceivingTransport, TransportParams},
+      transport::{SendingReceivingTransport, TransportParams as _},
     },
     codec::format::SerdeJson,
-    collection::Vector,
+    collections::Vector,
     http::Header,
     misc::LeaseMut,
   };

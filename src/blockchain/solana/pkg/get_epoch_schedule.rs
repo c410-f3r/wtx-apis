@@ -23,9 +23,9 @@ pub(crate) mod pkg {
     pub leader_schedule_slot_offset: u64,
     /// Whether epochs start short and grow.
     pub warmup: bool,
-    /// First normal-length epoch, log2(slotsPerEpoch) - log2(MINIMUM_SLOTS_PER_EPOCH).
+    /// First normal epoch
     pub first_normal_epoch: u64,
-    /// MINIMUM_SLOTS_PER_EPOCH * (2.pow(firstNormalEpoch) - 1)
+    /// First normal slot
     pub first_normal_slot: u64,
   }
 }

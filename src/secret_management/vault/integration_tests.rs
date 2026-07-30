@@ -7,11 +7,16 @@ use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   codec::format::SerdeJson,
-  http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
+  executor::TokioExecutor,
+  http::http2_client_pool::{Http2ClientPool, Http2ClientPoolBuilder},
+  tls::{TlsConfig, TlsModeVerified},
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
-  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
+static CLIENT: LazyLock<Http2ClientPool<TokioExecutor, TlsModeVerified>> = LazyLock::new(|| {
+  Http2ClientPoolBuilder::tokio(1, TlsConfig::from_ccadb(TlsModeVerified::new()).unwrap())
+    .unwrap()
+    .build()
+});
 static VAULT: LazyLock<Mutex<Vault>> =
   LazyLock::new(|| Mutex::new(Vault::new(_VARS.vault_token.clone())));
 

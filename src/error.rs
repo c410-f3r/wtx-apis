@@ -10,7 +10,7 @@ pub enum Error {
   //
   /// `bs58` error
   Bs58Error,
-  /// See [bincode::Error].
+  /// See [`bincode::Error`].
   #[cfg(feature = "solana")]
   Bincode(bincode::Error),
   /// See [`rmp_serde::encode::Error`].
@@ -33,6 +33,8 @@ pub enum Error {
   UnknownDecodingBytes,
   /// A word points to unknown bytes
   WordIdxDoesNotHaveCorrespondingBytes,
+  /// Word is not 32 bytes
+  WordIsNot32Bytes,
 
   // Extended
   //
@@ -128,7 +130,7 @@ pub enum Error {
 
   // SuperFrete
   //
-  /// SuperFrete error
+  /// `SuperFrete` error
   #[cfg(feature = "super-frete")]
   SuperFreteError(Box<crate::carrier::super_frete::SuperFreteError<String>>),
 }

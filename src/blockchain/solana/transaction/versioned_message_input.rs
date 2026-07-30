@@ -3,7 +3,7 @@ use core::fmt::Formatter;
 use serde::{
   Deserialize, Deserializer, Serialize, Serializer,
   de::{self, SeqAccess, Visitor},
-  ser::SerializeTuple,
+  ser::SerializeTuple as _,
 };
 
 const MESSAGE_VERSION_PREFIX: u8 = 0x80;
@@ -16,6 +16,7 @@ pub enum VersionedMessageInput {
 }
 
 impl<'de> Deserialize<'de> for VersionedMessageInput {
+  #[inline]
   fn deserialize<D>(deserializer: D) -> Result<VersionedMessageInput, D::Error>
   where
     D: Deserializer<'de>,
@@ -50,6 +51,7 @@ impl<'de> Deserialize<'de> for VersionedMessageInput {
 }
 
 impl Serialize for VersionedMessageInput {
+  #[inline]
   fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
   where
     S: Serializer,
@@ -66,6 +68,7 @@ impl Serialize for VersionedMessageInput {
 }
 
 impl From<MessageInput> for VersionedMessageInput {
+  #[inline]
   fn from(elem: MessageInput) -> Self {
     Self::V0(elem)
   }
@@ -80,19 +83,19 @@ impl<'de> Deserialize<'de> for MessageVersion {
   {
     struct PrefixVisitor;
 
-    impl<'de> Visitor<'de> for PrefixVisitor {
+    impl Visitor<'_> for PrefixVisitor {
       type Value = MessageVersion;
 
       fn expecting(&self, formatter: &mut Formatter<'_>) -> core::fmt::Result {
         formatter.write_str("transaction message prefix")
       }
 
-      fn visit_u8<E>(self, byte: u8) -> Result<MessageVersion, E>
+      fn visit_u8<E>(self, v: u8) -> Result<MessageVersion, E>
       where
         E: de::Error,
       {
-        if byte & MESSAGE_VERSION_PREFIX != 0 {
-          Ok(MessageVersion(byte & !MESSAGE_VERSION_PREFIX))
+        if v & MESSAGE_VERSION_PREFIX != 0 {
+          Ok(MessageVersion(v & !MESSAGE_VERSION_PREFIX))
         } else {
           Err(de::Error::custom(crate::Error::SolanaUnsupportedMessageFormat))
         }

@@ -2,7 +2,7 @@ use crate::payment_gateway::mercado_pago::{BackUrls, Item, Payer, PaymentMethods
 use rust_decimal::Decimal;
 use wtx::{
   calendar::{DateTime, DynTz},
-  collection::Vector,
+  collections::Vector,
 };
 
 /// Differential pricing configuration.

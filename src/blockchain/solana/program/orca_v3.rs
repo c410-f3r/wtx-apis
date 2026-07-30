@@ -13,7 +13,7 @@ use crate::{
   misc::HashArray32Static,
 };
 pub use math::*;
-use wtx::collection::ArrayStringU8;
+use wtx::collections::ArrayStringU8;
 
 /// Public address of the program
 pub const ID: HashArray32Static = HashArray32Static::new(
@@ -35,6 +35,7 @@ pub const NFT_UPDATE_AUTH: HashArray32Static = HashArray32Static::new(
 pub const TICK_ARRAY_SIZE: u16 = 88;
 
 /// Derives the position account address for a given mint key.
+#[inline]
 pub fn position_account(
   mint_key: &SolanaAddressHash,
   program_id: &SolanaAddressHash,
@@ -43,6 +44,7 @@ pub fn position_account(
 }
 
 /// Returns an iterator of position account addresses derived from a set of token addresses.
+#[inline]
 pub fn positions<'iter_addr, 'pi_addr, I>(
   program_id: &'pi_addr SolanaAddressHash,
   token_addresses: I,
@@ -61,6 +63,7 @@ where
 }
 
 /// Derives the tick array public key for a given tick index.
+#[inline]
 pub fn tick_array_pubk_from_tick_idx(
   program_id: &SolanaAddressHash,
   tick_idx: i32,
@@ -71,6 +74,7 @@ pub fn tick_array_pubk_from_tick_idx(
 }
 
 /// Derives a set of 5 tick array public keys centered around the given tick index.
+#[inline]
 pub fn tick_array_pubks_from_tick_idx(
   program_id: &SolanaAddressHash,
   tick_idx: i32,

@@ -10,7 +10,7 @@ pub(crate) mod pkg {
     },
     misc::MaxNumberStr,
   };
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

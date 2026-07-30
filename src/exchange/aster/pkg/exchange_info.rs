@@ -3,7 +3,7 @@ use crate::{
   exchange::aster::{OrderType, TimeInForce},
 };
 use rust_decimal::Decimal;
-use wtx::collection::{ArrayStringU8, ArrayVectorU8, Vector};
+use wtx::collections::{ArrayStringU8, ArrayVectorU8, Vector};
 
 /// Time interval for rate limiting
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
@@ -204,7 +204,7 @@ pub struct Symbol {
 #[wtx::pkg(data_format(json), id(crate::exchange::aster::AsterId), transport(http))]
 pub(crate) mod pkg {
   use crate::exchange::aster::{Aster, ExchangeInfo, HttpPkgsAux};
-  use wtx::client_api_framework::network::{HttpParams, transport::TransportParams};
+  use wtx::client_api_framework::network::{HttpParams, transport::TransportParams as _};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

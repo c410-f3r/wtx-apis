@@ -2,7 +2,7 @@ use crate::payment_gateway::mercado_pago::{Item, Payer, Shipments};
 use rust_decimal::Decimal;
 use wtx::{
   calendar::{DateTime, DynTz},
-  collection::Vector,
+  collections::Vector,
 };
 
 /// Represents additional information about the payment.
@@ -42,10 +42,10 @@ pub struct Payment<T> {
   pub additional_info: Option<AdditionalInfo<T>>,
   /// Acquirer.
   pub acquirer: Option<T>,
-  /// Authorization code for transaction payments with "payment_method_type" of "credit_card", "debit_card", and
-  /// "voucher_card".
+  /// Authorization code for transaction payments with `payment_method_type` of `credit_card`, `debit_card`, and
+  /// `voucher_card`.
   pub authorization_code: Option<T>,
-  /// When set to TRUE, payments can only be approved or rejected. Otherwise, they can also result in "in_process".
+  /// When set to TRUE, payments can only be approved or rejected. Otherwise, they can also result in `in_process`.
   pub binary_mode: Option<bool>,
   /// Identifier provided to the issuing bank so that payments can be authorized.
   pub call_for_authorize_id: Option<T>,
@@ -54,7 +54,7 @@ pub struct Payment<T> {
   /// Card identifier.
   pub card: Option<Card<T>>,
   /// User who receives the money. For example, a user (payer) buys a phone on the marketplace. The identifier of
-  /// the store/vendor receiving the payment is the collector_id.
+  /// the store/vendor receiving the payment is the `collector_id`.
   pub collector_id: Option<u64>,
   /// Essentially, an object that will allow the conversion of CBT (Cross Border Trade) payments into dollars.
   pub counter_currency: Option<T>,

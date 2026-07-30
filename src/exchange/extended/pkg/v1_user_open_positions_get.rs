@@ -1,7 +1,7 @@
 #[wtx::pkg(data_format(json), id(crate::exchange::extended::ExtendedId), transport(http))]
 pub(crate) mod pkg {
   use crate::exchange::extended::{Extended, HttpPkgsAux, HttpResponse, Position};
-  use wtx::{client_api_framework::network::HttpParams, collection::Vector};
+  use wtx::{client_api_framework::network::HttpParams, collections::Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

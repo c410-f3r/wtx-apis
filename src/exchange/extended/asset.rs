@@ -1,6 +1,6 @@
 use crate::AssetName;
 use rust_decimal::{Decimal, RoundingStrategy, prelude::ToPrimitive};
-use wtx::collection::ArrayStringU8;
+use wtx::collections::ArrayStringU8;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

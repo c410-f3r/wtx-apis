@@ -1,5 +1,5 @@
 use crate::{AddressString, AssetString};
-use wtx::collection::{ArrayStringU8, Vector};
+use wtx::collections::{ArrayStringU8, Vector};
 
 /// Represents the query parameters for the Get All Deposit Assets endpoint
 #[derive(Debug, serde::Serialize)]

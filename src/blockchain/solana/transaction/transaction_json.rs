@@ -6,12 +6,13 @@ use crate::blockchain::solana::{
   },
 };
 use alloc::string::String;
-use wtx::collection::{ArrayStringU8, Vector};
+use wtx::collections::{ArrayStringU8, Vector};
 
 /// A json instruction can be expressed in different formats.
 #[allow(
-  // Only used in tx deserialization that is already boxed
-  variant_size_differences
+  clippy::large_enum_variant,
+  variant_size_differences,
+  reason = "Only used in tx deserialization that is already boxed"
 )]
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
@@ -23,6 +24,11 @@ pub enum InstructionJsonGeneric {
 }
 
 /// A parsed json instruction can be expressed in even more different formats
+#[allow(
+  clippy::large_enum_variant,
+  variant_size_differences,
+  reason = "Only used in tx deserialization that is already boxed"
+)]
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum InstructionJsonParsedGeneric {
@@ -33,6 +39,11 @@ pub enum InstructionJsonParsedGeneric {
 }
 
 /// Contains known instructions that can be represented.
+#[allow(
+  clippy::large_enum_variant,
+  variant_size_differences,
+  reason = "Only used in tx deserialization that is already boxed"
+)]
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum InstructionJsonParsedInfo {

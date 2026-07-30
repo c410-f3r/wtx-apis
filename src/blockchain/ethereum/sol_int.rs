@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{SolTy, Word};
-use crypto_bigint::{Encoding, I256, U256};
-use wtx::collection::Vector;
+use crypto_bigint::{Encoding as _, I256, U256};
+use wtx::collections::Vector;
 
 /// Solidity Integer
 #[derive(Debug, serde::Serialize)]
@@ -21,34 +21,41 @@ where
   type DeToken<'any> = Self;
   type Token<'any> = Word;
 
+  #[inline]
   fn abi_encode_packed(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     <Self as SolIntParams>::encode_packed(self, buffer)
   }
 
+  #[inline]
   fn abi_encoded_size(&self) -> usize {
     const { Self::ENCODED_SIZE.unwrap() }
   }
 
+  #[inline]
   fn abi_packed_encoded_size(&self) -> usize {
     const { Self::PACKED_ENCODED_SIZE.unwrap() }
   }
 
+  #[inline]
   fn detokenize(token: Self::Token<'_>) -> crate::Result<Self> {
     Ok(<Self as SolIntParams>::detokenize(token))
   }
 
+  #[inline]
   fn eip712_data_word(&self, _: &mut Vector<u8>) -> crate::Result<Word> {
     Ok(<Self as SolIntParams>::tokenize(self))
   }
 
+  #[inline]
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
     Ok(<Self as SolIntParams>::tokenize(self))
   }
 
+  #[inline]
   fn valid_token(token: &Self::Token<'_>) -> bool {
     let zeros = [0u8; 32];
     let slice = zeros.get(..<SolInt<T, BITS> as SolIntParams>::WORD_MSB).unwrap_or_default();
-    &token.0[..<SolInt<T, BITS> as SolIntParams>::WORD_MSB] == slice
+    token.0.get(..<SolInt<T, BITS> as SolIntParams>::WORD_MSB) == Some(slice)
   }
 }
 
@@ -71,8 +78,8 @@ macro_rules! generic_impl {
     #[inline]
     fn detokenize(mut token: Word) -> Self {
       token.0[Self::WORD_MSB - Self::SKIP_BYTES..Self::WORD_MSB].fill(0);
-      let s = &token.0[Self::WORD_MSB - Self::SKIP_BYTES..];
-      Self(<$uty>::from_be_bytes(s.try_into().unwrap()))
+      let str = &token.0[Self::WORD_MSB - Self::SKIP_BYTES..];
+      Self(<$uty>::from_be_bytes(str.try_into().unwrap()))
     }
 
     #[inline]
@@ -92,20 +99,24 @@ macro_rules! generic_impl {
     #[inline]
     fn detokenize(mut token: Word) -> Self {
       token.0[..Self::SKIP_BYTES].fill(0);
-      let s = &token.0[Self::WORD_MSB - Self::SKIP_BYTES..];
-      Self(<$uty>::from_be_bytes(s.try_into().unwrap()))
+      let str = &token.0[Self::WORD_MSB - Self::SKIP_BYTES..];
+      Self(<$uty>::from_be_bytes(str.try_into().unwrap()))
     }
 
     #[inline]
     fn encode_packed(&self, out: &mut Vector<u8>) -> crate::Result<()> {
-      out.extend_from_copyable_slice(&self.0.to_be_bytes()[Self::SKIP_BYTES..])?;
+      if let Some(elem) = self.0.to_be_bytes().get(Self::SKIP_BYTES..) {
+        out.extend_from_copyable_slice(elem)?;
+      }
       Ok(())
     }
 
     #[inline]
     fn tokenize(&self) -> Word {
       let mut word = Word([0; 32]);
-      word.0[Self::WORD_MSB..].copy_from_slice(&self.0.to_be_bytes()[Self::SKIP_BYTES..]);
+      if let Some(elem) = self.0.to_be_bytes().get(Self::SKIP_BYTES..) {
+        word.0[Self::WORD_MSB..].copy_from_slice(elem);
+      }
       word
     }
   };
@@ -137,6 +148,7 @@ macro_rules! overall_impl {
     $(
       impl SolIntParams for SolInt<$u, $n> {
         const BITS: usize = $n;
+        #[expect(clippy::as_conversions, reason = "compiler support")]
         const SKIP_BYTES: usize = (<$i>::BITS as usize - <Self as SolIntParams>::BITS) / 8;
         const UINT_NAME: &'static str = concat!("uint", $n);
 

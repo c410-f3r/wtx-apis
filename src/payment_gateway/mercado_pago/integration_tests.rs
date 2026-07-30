@@ -11,12 +11,17 @@ use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   codec::format::SerdeJson,
-  collection::{ArrayVectorU8, Vector},
-  http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
+  collections::{ArrayVectorU8, Vector},
+  executor::TokioExecutor,
+  http::http2_client_pool::{Http2ClientPool, Http2ClientPoolBuilder},
+  tls::{TlsConfig, TlsModeVerified},
 };
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
-  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
+static CLIENT: LazyLock<Http2ClientPool<TokioExecutor, TlsModeVerified>> = LazyLock::new(|| {
+  Http2ClientPoolBuilder::tokio(1, TlsConfig::from_ccadb(TlsModeVerified::new()).unwrap())
+    .unwrap()
+    .build()
+});
 static MERCADO_PAGO: LazyLock<Mutex<MercadoPago>> = LazyLock::new(|| {
   Mutex::new(MercadoPago::new(
     _VARS.mercado_pago_client_id.clone(),

@@ -5,7 +5,7 @@ use crate::{
   },
   misc::HashArray32Unit,
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
@@ -17,19 +17,22 @@ create_data_struct! {
 impl PackData for NewAddresses<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::new(8, None);
 
+  #[inline]
   fn len(&self) -> usize {
     self.new_addresses.len().checked_mul(32).and_then(|el| el.checked_add(8)).unwrap_or(usize::MAX)
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { new_addresses } = self;
     u64::try_from(new_addresses.len()).map_err(wtx::Error::from)?.pack_data(buffer)?;
-    for hash in new_addresses.iter() {
+    for hash in new_addresses {
       buffer.extend_from_copyable_slice(hash.bytes())?;
     }
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     let mut end = 8;
     let len =
@@ -48,10 +51,12 @@ impl PackData for NewAddresses<HashArray32Unit> {
 }
 
 impl TestingInstances for NewAddresses<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self { new_addresses: Vector::new() })
   }
 
+  #[inline]
   fn variable_instance() -> crate::Result<Self> {
     Ok(Self { new_addresses: Vector::from_iterator([HashArray32Unit::from_bytes([1; 32])])? })
   }

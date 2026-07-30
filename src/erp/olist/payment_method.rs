@@ -1,7 +1,7 @@
 /// Payment method
 #[derive(Debug, Clone, Copy, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum PaymentMethod {
-  /// BankSlip
+  /// Bank slip
   #[serde(rename = "boleto")]
   BankSlip,
   /// Cash
@@ -10,7 +10,7 @@ pub enum PaymentMethod {
   /// Check
   #[serde(rename = "cheque")]
   Check,
-  /// CommercialInvoice
+  /// Commercial invoice
   #[serde(rename = "duplicata_mercantil")]
   CommercialInvoice,
   /// Credit
@@ -22,13 +22,13 @@ pub enum PaymentMethod {
   /// Deposit
   #[serde(rename = "deposito")]
   Deposit,
-  /// InstallmentPlan
+  /// Installment plan
   #[serde(rename = "crediario")]
   InstallmentPlan,
   /// Multiple payments
   #[serde(rename = "multiplas")]
   Multiple,
-  /// MPix
+  /// Pix
   #[serde(rename = "pix")]
   Pix,
 }

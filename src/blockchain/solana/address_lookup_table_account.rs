@@ -1,5 +1,5 @@
 use crate::blockchain::solana::SolanaAddressHash;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Address lookup table accounts used in v0 messages
 #[derive(Debug, PartialEq, Eq, Clone)]

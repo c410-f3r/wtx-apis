@@ -9,7 +9,7 @@ use serde::{Serialize, Serializer, ser::SerializeStruct};
 use wtx::{
   calendar::Instant,
   client_api_framework::network::{WsParams, transport::TransportParams},
-  collection::{ArrayWrapper, Vector},
+  collections::{ArrayWrapper, Vector},
   misc::Lease,
 };
 
@@ -110,7 +110,7 @@ pub(crate) fn sign_l1_action(
 mod tests {
   use crate::exchange::hyperliquid::misc::sign_l1_action;
   use k256::ecdsa::SigningKey;
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[test]
   fn sign_l1_action_has_correct_output() {

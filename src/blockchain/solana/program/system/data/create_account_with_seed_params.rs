@@ -6,7 +6,7 @@ use crate::{
   misc::HashArray32Unit,
 };
 use wtx::{
-  collection::{ArrayStringU8, Vector},
+  collections::{ArrayStringU8, Vector},
   misc::{Usize, from_utf8_basic},
 };
 
@@ -24,10 +24,12 @@ create_data_struct! {
 impl PackData for CreateAccountWithSeedParams<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::new(88, Some(96));
 
+  #[inline]
   fn len(&self) -> usize {
     88usize.wrapping_add(*Usize::from(self.seed.len()))
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { base, seed, lamports, space, owner } = self;
     buffer.extend_from_copyable_slice(base.bytes())?;
@@ -41,6 +43,7 @@ impl PackData for CreateAccountWithSeedParams<HashArray32Unit> {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     let base =
       HashArray32Unit::from_bytes(sub_slice(bytes, 0..32).try_into().map_err(wtx::Error::from)?);
@@ -66,6 +69,7 @@ impl PackData for CreateAccountWithSeedParams<HashArray32Unit> {
 }
 
 impl TestingInstances for CreateAccountWithSeedParams<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       base: HashArray32Unit::from_bytes([1; 32]),
@@ -76,6 +80,7 @@ impl TestingInstances for CreateAccountWithSeedParams<HashArray32Unit> {
     })
   }
 
+  #[inline]
   fn variable_instance() -> crate::Result<Self> {
     Ok(Self {
       base: HashArray32Unit::from_bytes([1; 32]),

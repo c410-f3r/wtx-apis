@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   misc::sub_slice,
   program::{LenBounds, PackData, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 macro_rules! create_and_impl_std_data {
   ($struct_be:ident, $struct_le:ident, $elem:ty, $bytes:literal) => {
@@ -16,12 +16,14 @@ macro_rules! create_and_impl_std_data {
     }
 
     impl From<$elem> for $struct_be {
+      #[inline]
       fn from(from: $elem) -> Self {
         $struct_be { elem: from }
       }
     }
 
     impl From<$struct_be> for $elem {
+      #[inline]
       fn from(from: $struct_be) -> Self {
         from.elem
       }
@@ -30,11 +32,13 @@ macro_rules! create_and_impl_std_data {
     impl PackData for $struct_be {
       const LEN_BOUNDS: LenBounds = LenBounds::from_same($bytes);
 
+      #[inline]
       fn pack_data(&self, bytes: &mut Vector<u8>) -> crate::Result<()> {
         bytes.extend_from_copyable_slice(&self.elem.to_be_bytes())?;
         Ok(())
       }
 
+      #[inline]
       fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
         let opt = sub_slice(bytes, 0..$bytes).try_into().ok().map(<$elem>::from_be_bytes);
         Ok(Self { elem: opt.ok_or(crate::Error::SolanaInvalidAccountData)? })
@@ -42,6 +46,7 @@ macro_rules! create_and_impl_std_data {
     }
 
     impl TestingInstances for $struct_be {
+      #[inline]
       fn min_instance() -> crate::Result<Self> {
         Ok(Self::from($bytes))
       }
@@ -57,12 +62,14 @@ macro_rules! create_and_impl_std_data {
     }
 
     impl From<$elem> for $struct_le {
+      #[inline]
       fn from(from: $elem) -> Self {
         $struct_le { elem: from }
       }
     }
 
     impl From<$struct_le> for $elem {
+      #[inline]
       fn from(from: $struct_le) -> Self {
         from.elem
       }
@@ -71,11 +78,13 @@ macro_rules! create_and_impl_std_data {
     impl PackData for $struct_le {
       const LEN_BOUNDS: LenBounds = LenBounds::from_same($bytes);
 
+      #[inline]
       fn pack_data(&self, bytes: &mut Vector<u8>) -> crate::Result<()> {
         bytes.extend_from_copyable_slice(&self.elem.to_le_bytes())?;
         Ok(())
       }
 
+      #[inline]
       fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
         let opt = sub_slice(bytes, 0..$bytes).try_into().ok().map(<$elem>::from_le_bytes);
         Ok(Self { elem: opt.ok_or(crate::Error::SolanaInvalidAccountData)? })
@@ -83,6 +92,7 @@ macro_rules! create_and_impl_std_data {
     }
 
     impl TestingInstances for $struct_le {
+      #[inline]
       fn min_instance() -> crate::Result<Self> {
         Ok(Self::from($bytes))
       }
@@ -93,16 +103,19 @@ macro_rules! create_and_impl_std_data {
     impl PackData for $elem {
       const LEN_BOUNDS: LenBounds = LenBounds::from_same($bytes);
 
+      #[inline]
       fn pack_data(&self, bytes: &mut Vector<u8>) -> crate::Result<()> {
         $struct_le::from(*self).pack_data(bytes)
       }
 
+      #[inline]
       fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
         Ok($struct_le::unpack_data(bytes)?.into())
       }
     }
 
     impl TestingInstances for $elem {
+      #[inline]
       fn min_instance() -> crate::Result<Self> {
         Ok($bytes)
       }
@@ -125,11 +138,13 @@ create_and_impl_std_data!(U128GE, U128LE, u128, 16);
 impl PackData for bool {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(1);
 
-  fn pack_data(&self, bytes: &mut Vector<u8>) -> crate::Result<()> {
-    bytes.push((*self).into())?;
+  #[inline]
+  fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
+    buffer.push((*self).into())?;
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(match bytes.first() {
       Some(&0) => false,
@@ -140,6 +155,7 @@ impl PackData for bool {
 }
 
 impl TestingInstances for bool {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(true)
   }

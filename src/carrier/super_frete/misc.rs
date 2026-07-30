@@ -10,7 +10,7 @@ pub(crate) fn manage_token(
   trans_params: &mut HttpParams,
 ) -> crate::Result<()> {
   let headers = &mut trans_params.ext_req_params_mut().msg_buffer.headers;
-  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.token))?;
+  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", api.token))?;
   trans_params.ext_req_params_mut().method = Method::Post;
   trans_params.ext_req_params_mut().msg_buffer.uri.push_path(format_args!("{endpoint}"))?;
   Ok(())

@@ -5,7 +5,7 @@ use crate::blockchain::solana::{
     orca_v3::data::{AccountsType, RemainingAccountsInfo, RemainingAccountsSlice},
   },
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
@@ -18,10 +18,12 @@ create_data_struct! {
 impl PackData for CollectRewardV2Params {
   const LEN_BOUNDS: LenBounds = LenBounds::new(2, Some(8));
 
+  #[inline]
   fn len(&self) -> usize {
     if self.remaining_accounts_info.is_none() { 2 } else { 8 }
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { reward_index, remaining_accounts_info } = self;
     reward_index.pack_data(buffer)?;
@@ -29,6 +31,7 @@ impl PackData for CollectRewardV2Params {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       reward_index: u8::unpack_data(sub_slice(bytes, 0..1))?,
@@ -38,10 +41,12 @@ impl PackData for CollectRewardV2Params {
 }
 
 impl TestingInstances for CollectRewardV2Params {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self { reward_index: 1, remaining_accounts_info: None })
   }
 
+  #[inline]
   fn variable_instance() -> crate::Result<Self> {
     Ok(Self {
       reward_index: 1,

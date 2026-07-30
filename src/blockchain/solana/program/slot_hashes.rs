@@ -1,6 +1,6 @@
 use crate::blockchain::solana::SolanaAddressHash;
 use core::ops::Deref;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 pub(crate) const MAX_ENTRIES: usize = 512; // about 2.5 minutes to get your vote in
 
@@ -13,6 +13,7 @@ pub struct SlotHashes(Vector<SlotHash>);
 
 impl SlotHashes {
   /// Returns the index of the given slot in the collection.
+  #[inline]
   pub fn position(&self, slot: &u64) -> Option<usize> {
     self.binary_search_by(|(probe, _)| slot.cmp(probe)).ok()
   }
@@ -21,6 +22,7 @@ impl SlotHashes {
 impl Deref for SlotHashes {
   type Target = Vector<SlotHash>;
 
+  #[inline]
   fn deref(&self) -> &Self::Target {
     &self.0
   }

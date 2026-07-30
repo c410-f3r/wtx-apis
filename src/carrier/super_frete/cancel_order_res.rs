@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 use serde::{
   Deserialize, Deserializer,
-  de::{Error, MapAccess, Visitor},
+  de::{Error as _, MapAccess, Visitor},
 };
 
 /// Cancel order response

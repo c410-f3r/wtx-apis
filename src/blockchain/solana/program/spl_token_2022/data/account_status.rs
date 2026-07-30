@@ -1,5 +1,5 @@
 use crate::blockchain::solana::program::{LenBounds, PackData};
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_enum! {
   #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -13,6 +13,7 @@ create_data_enum! {
 impl PackData for AccountStatus {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(1);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     match *self {
       Self::Uninitialized => 0u8,
@@ -23,6 +24,7 @@ impl PackData for AccountStatus {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(match bytes.first() {
       Some(&0) => Self::Uninitialized,

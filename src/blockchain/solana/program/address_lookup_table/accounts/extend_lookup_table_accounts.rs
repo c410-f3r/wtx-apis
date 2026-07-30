@@ -3,7 +3,7 @@ use crate::blockchain::solana::{
   misc::next_iter_elem,
   program::{AccountAddress, PackAccounts, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_account_struct! {
   #[derive(Debug, PartialEq)]
@@ -19,6 +19,7 @@ impl<A> PackAccounts<A> for ExtendLookupTableAccounts<A>
 where
   A: AccountAddress,
 {
+  #[inline]
   fn len(&self) -> usize {
     let mut sum: usize = 2;
     if self.payer_address.is_some() {
@@ -30,6 +31,7 @@ where
     sum
   }
 
+  #[inline]
   fn push_accounts(&self, vec: &mut Vector<InstructionAccountInput>) -> crate::Result<()>
   where
     A: AccountAddress,
@@ -37,13 +39,14 @@ where
     let Self { lookup_table_address, authority_address, payer_address, system_program } = self;
     vec.push(InstructionAccountInput::writable(lookup_table_address.to_account_address()?))?;
     vec.push(InstructionAccountInput::sign(authority_address.to_account_address()?))?;
-    if let (Some(a), Some(b)) = (payer_address, system_program) {
-      vec.push(InstructionAccountInput::sign_and_writable(a.to_account_address()?))?;
-      vec.push(InstructionAccountInput::none(b.to_account_address()?))?;
+    if let (Some(lhs), Some(rhs)) = (payer_address, system_program) {
+      vec.push(InstructionAccountInput::sign_and_writable(lhs.to_account_address()?))?;
+      vec.push(InstructionAccountInput::none(rhs.to_account_address()?))?;
     }
     Ok(())
   }
 
+  #[inline]
   fn unpack_accounts(iter: &mut impl Iterator<Item = A>) -> crate::Result<Self> {
     Ok(Self {
       lookup_table_address: next_iter_elem(iter)?,
@@ -55,6 +58,7 @@ where
 }
 
 impl TestingInstances for ExtendLookupTableAccounts<[u8; 32]> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       lookup_table_address: [1; 32],

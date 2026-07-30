@@ -1,6 +1,6 @@
 use crate::{AssetName, PairName, exchange::extended::Asset};
 use rust_decimal::Decimal;
-use wtx::collection::{ArrayStringU8, ArrayVectorU8};
+use wtx::collections::{ArrayStringU8, ArrayVectorU8};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

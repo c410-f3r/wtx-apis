@@ -4,10 +4,10 @@ use crate::blockchain::solana::{
   TransactionVersion, program::spl_token::AccountBalance,
 };
 use alloc::string::String;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// A transaction can be represented in various formats.
-#[allow(clippy::large_enum_variant)]
+#[allow(clippy::large_enum_variant, reason = "defined by solana")]
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum GenericTransaction {
@@ -21,13 +21,12 @@ pub enum GenericTransaction {
 
 /// An instruction wasn't successful.
 #[allow(
-  // Probably little will be gained boxing a variant of 28 bytes
-  variant_size_differences
+  variant_size_differences,
+  reason = "Probably little will be gained boxing a variant of 28 bytes"
 )]
 #[derive(Debug, serde::Deserialize)]
 pub enum InstructionError {
-  /// Deprecated! Use CustomError instead!
-  /// The program instruction returned an error
+  /// The program instruction returned an error (Deprecated).
   GenericError,
 
   /// The arguments provided to a program were invalid
@@ -82,7 +81,7 @@ pub enum InstructionError {
   /// Executable bit on account changed, but shouldn't have
   ExecutableModified,
 
-  /// Rent_epoch account changed, but shouldn't have
+  /// Rent epoch account changed, but shouldn't have
   RentEpochModified,
 
   /// The instruction expected additional account keys

@@ -1,5 +1,5 @@
 use crate::blockchain::solana::program::{LenBounds, PackData, TestingInstances};
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
@@ -11,18 +11,21 @@ create_data_struct! {
 impl PackData for TransferParams {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(8);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { lamports } = self;
     lamports.pack_data(buffer)?;
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self { lamports: <_>::unpack_data(bytes)? })
   }
 }
 
 impl TestingInstances for TransferParams {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self { lamports: 1 })
   }

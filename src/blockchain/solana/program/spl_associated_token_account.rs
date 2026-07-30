@@ -25,6 +25,7 @@ pub const ID: HashArray32Static = HashArray32Static::new(
 );
 
 /// Derives the associated token account address for the given wallet address, token mint and token program id
+#[inline]
 pub fn get_associated_token_address(
   allow_owner_off_curve: bool,
   token_mint_address: &SolanaAddressHash,

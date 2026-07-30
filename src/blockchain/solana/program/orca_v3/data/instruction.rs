@@ -9,7 +9,7 @@ use crate::blockchain::solana::{
     },
   },
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_enum! {
   #[derive(Debug, Eq, PartialEq)]
@@ -30,10 +30,9 @@ create_data_enum! {
 impl PackData for Instruction {
   const LEN_BOUNDS: LenBounds = LenBounds::new(8, Some(49));
 
+  #[inline]
   fn len(&self) -> usize {
     let instance_len = match self {
-      Instruction::ClosePositionWithTokenExtensions => 0,
-      Instruction::CollectFees => 0,
       Instruction::CollectRewardV2(el) => el.len(),
       Instruction::DecreaseLiquidity(el) => el.len(),
       Instruction::IncreaseLiquidity(el) => el.len(),
@@ -41,11 +40,14 @@ impl PackData for Instruction {
       Instruction::OpenPosition(el) => el.len(),
       Instruction::OpenPositionWithTokenExtensions(el) => el.len(),
       Instruction::SwapV2(el) => el.len(),
-      Instruction::UpdateFeesAndRewards => 0,
+      Instruction::ClosePositionWithTokenExtensions
+      | Instruction::CollectFees
+      | Instruction::UpdateFeesAndRewards => 0,
     };
     instance_len.saturating_add(8)
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     match self {
       Self::ClosePositionWithTokenExtensions => {
@@ -89,6 +91,7 @@ impl PackData for Instruction {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     match *sub_slice(bytes, 0..8) {
       [1, 182, 135, 59, 155, 25, 99, 223] => Ok(Self::ClosePositionWithTokenExtensions),

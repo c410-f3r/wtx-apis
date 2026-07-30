@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{Eip712, Encoder, Signature, SolTy, Word};
-use sha3::{Digest, digest::FixedOutput};
-use wtx::collection::Vector;
+use sha3::{Digest as _, digest::FixedOutput as _};
+use wtx::collections::Vector;
 
 pub(crate) fn abi_encode_from_buffer<'st, T>(
   buffer: &mut Vector<u8>,
@@ -43,12 +43,12 @@ pub(crate) fn sign_payload<T>(
 where
   T: Eip712,
 {
-  Ok(wallet.sign_prehash_recoverable(&payload.eip712_signing_hash(buffer)?)?.into())
+  Ok(wallet.sign_prehash_recoverable(&payload.eip712_signing_hash(buffer)?).into())
 }
 
 pub(crate) fn word_idx(word: &Word) -> crate::Result<usize> {
-  let [.., a, b, c, d, e, f, g, h] = word.0;
-  Ok(u64::from_be_bytes([a, b, c, d, e, f, g, h]).try_into().map_err(wtx::Error::from)?)
+  let [.., b0, b1, b2, b3, b4, b5, b6, b7] = word.0;
+  Ok(u64::from_be_bytes([b0, b1, b2, b3, b4, b5, b6, b7]).try_into().map_err(wtx::Error::from)?)
 }
 
 pub(crate) const fn words_for(data: &[u8]) -> usize {

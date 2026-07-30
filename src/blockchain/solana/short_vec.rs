@@ -6,12 +6,12 @@ use core::marker::PhantomData;
 use serde::{
   Deserialize, Serialize,
   de::{self, Deserializer, SeqAccess},
-  ser::{self, SerializeTuple, Serializer},
+  ser::{self, SerializeTuple as _, Serializer},
 };
-use short_u16::*;
-use short_u16_visitor::*;
-use short_vec_visitor::*;
-use wtx::{collection::TryExtend, misc::SingleTypeStorage};
+use short_u16::ShortU16;
+use short_u16_visitor::ShortU16Visitor;
+use short_vec_visitor::ShortVecVisitor;
+use wtx::collections::{SingleTypeStorage, TryExtend};
 
 const MAX_ENCODING_LENGTH: usize = 3;
 
@@ -21,9 +21,7 @@ where
   T: Serialize,
 {
   let mut seq = serializer.serialize_tuple(1)?;
-  let len_u16 = if let Ok(elem) = u16::try_from(elements.len()) {
-    elem
-  } else {
+  let Ok(len_u16) = u16::try_from(elements.len()) else {
     return Err(ser::Error::custom("length larger than u16"));
   };
   let short_len = ShortU16(len_u16);
@@ -94,7 +92,6 @@ fn visit_byte(elem: u8, val: u16, nth_byte: usize) -> Result<VisitStatus, VisitE
     return Err(VisitError::TooLong(nth_byte.saturating_add(1)));
   } else if nth_byte == MAX_ENCODING_LENGTH.saturating_sub(1) && !elem_done {
     return Err(VisitError::ByteThreeContinues);
-  } else {
   }
 
   let shift = u32::try_from(nth_byte).ok().and_then(|el| el.checked_mul(7)).unwrap_or(u32::MAX);

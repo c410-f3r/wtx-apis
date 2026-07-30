@@ -1,6 +1,6 @@
 use wtx::{
   calendar::{DateTime, DynTz},
-  collection::Vector,
+  collections::Vector,
 };
 
 /// Status of a chargeback

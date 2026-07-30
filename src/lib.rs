@@ -28,8 +28,8 @@ pub use error::Error;
 pub type Result<T> = core::result::Result<T, Error>;
 
 /// SOL, ETH or BTC encoded address
-pub type AddressString = wtx::collection::ArrayStringU8<66>;
+pub type AddressString = wtx::collections::ArrayStringU8<66>;
 /// For example, a token, a stock or a commodity.
-pub type AssetString = wtx::collection::ArrayStringU8<10>;
+pub type AssetString = wtx::collections::ArrayStringU8<10>;
 /// For example, BTC/USDT or KCH26/USD
-pub type PairString = wtx::collection::ArrayStringU8<14>;
+pub type PairString = wtx::collections::ArrayStringU8<14>;

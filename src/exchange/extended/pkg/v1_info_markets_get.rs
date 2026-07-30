@@ -3,7 +3,7 @@ pub(crate) mod pkg {
   use crate::exchange::extended::{Extended, HttpPkgsAux, HttpResponse, Market};
   use wtx::{
     client_api_framework::network::{HttpParams, transport::TransportParams},
-    collection::Vector,
+    collections::Vector,
   };
 
   #[pkg::aux]

@@ -155,6 +155,7 @@ macro_rules! create_and_impl_build_ix_input {
       type PackData = $pack_data;
       type TransformedPackData = $transformed_pack_data;
 
+      #[inline]
       fn transform_pack_data(pack_data: Self::PackData) -> Self::TransformedPackData {
         let cb: fn(Self::PackData) -> Self::TransformedPackData;
         cb = $cb;

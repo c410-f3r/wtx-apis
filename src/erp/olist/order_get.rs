@@ -2,7 +2,7 @@ use crate::erp::olist::{
   FreightResponsibility, OrderStatus, PersonTy, associated_entity::AssociatedEntityIdName,
 };
 use rust_decimal::Decimal;
-use wtx::{calendar::Date, collection::Vector};
+use wtx::{calendar::Date, collections::Vector};
 
 /// Represents an order with various optional fields.
 #[derive(Debug, serde::Deserialize)]
@@ -81,7 +81,7 @@ pub struct OrderGetClient<S> {
   pub codigo: Option<S>,
   /// Business name
   pub fantasia: Option<S>,
-  /// See [PersonTy].
+  /// See [`PersonTy`].
   pub tipo_pessoa: Option<PersonTy>,
   /// Federal registration
   pub cpf_cnpj: Option<S>,
@@ -146,7 +146,7 @@ pub struct OrderGetDeliveryAddress<S> {
   pub nome_destinatario: Option<S>,
   /// Registration
   pub cpf_cnpj: Option<S>,
-  /// See [PersonTy]
+  /// See [`PersonTy`]
   pub tipo_pessoa: Option<PersonTy>,
 }
 
@@ -255,7 +255,7 @@ pub struct OrderGetTransporter<S> {
   pub id: Option<u32>,
   /// Name
   pub nome: Option<S>,
-  /// See [FreightResponsibility]
+  /// See [`FreightResponsibility`]
   pub frete_por_conta: Option<FreightResponsibility>,
   /// Sending type
   pub forma_envio: Option<AssociatedEntityIdName<S>>,

@@ -24,7 +24,7 @@ use wtx::{
   codec::{
     Base64Alphabet, base64_decode, base64_decoded_len_ub, base64_encode, base64_encoded_len,
   },
-  collection::{ArrayStringU8, CapacityUpperBound, LinearStorageLen, Truncate, TryExtend},
+  collections::{ArrayStringU8, CapacityUpperBound, LinearStorageLen, Truncate, TryExtend},
   misc::{Lease as _, LeaseMut},
 };
 
@@ -62,9 +62,9 @@ where
   B: CapacityUpperBound + LeaseMut<[u8]> + Truncate<L> + TryExtend<(u8, usize)>,
   L: LinearStorageLen,
 {
-  let max_decoded_len = (bytes.len() * 80) / 100;
+  let max_decoded_len = bytes.len().saturating_mul(80) / 100;
   decode_into_buffer(buffer, max_decoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
-    bs58::decode(bytes).onto(slice).map_err(|_| crate::Error::Bs58Error)
+    bs58::decode(bytes).onto(slice).map_err(|_err| crate::Error::Bs58Error)
   })
 }
 
@@ -109,9 +109,9 @@ pub fn deserialize_array_from_base58<'de, D, const N: usize>(
 where
   D: Deserializer<'de>,
 {
-  let s: &str = Deserialize::deserialize(deserializer)?;
+  let str: &str = Deserialize::deserialize(deserializer)?;
   let mut array = [0; N];
-  bs58::decode(s)
+  bs58::decode(str)
     .onto(&mut array)
     .ok()
     .and_then(|len| {
@@ -133,8 +133,8 @@ where
   T::Err: core::fmt::Display,
   D: Deserializer<'de>,
 {
-  let s: &str = Deserialize::deserialize(deserializer)?;
-  T::from_str(s).map_err(serde::de::Error::custom)
+  let str: &str = Deserialize::deserialize(deserializer)?;
+  T::from_str(str).map_err(serde::de::Error::custom)
 }
 
 /// Deserializes an arbitrary type ignoring its contents.
@@ -162,12 +162,13 @@ where
 {
   match <Option<&str>>::deserialize(deserializer)? {
     None | Some("") => Ok(None),
-    Some(s) => T::deserialize(s.into_deserializer()).map(Some),
+    Some(str) => T::deserialize(str.into_deserializer()).map(Some),
   }
 }
 
 /// Encodes to Base58
 #[cfg(feature = "bs58")]
+#[inline]
 pub fn encode_base58<'buffer, B, L>(
   buffer: &'buffer mut B,
   bytes: &[u8],
@@ -176,7 +177,7 @@ where
   B: CapacityUpperBound + LeaseMut<[u8]> + Truncate<L> + TryExtend<(u8, usize)>,
   L: LinearStorageLen,
 {
-  let max_encoded_len = ((bytes.len() * 140) / 100).wrapping_add(1);
+  let max_encoded_len = (bytes.len().saturating_mul(140) / 100).wrapping_add(1);
   encode_into_buffer(buffer, max_encoded_len.min(B::CAPACITY_UPPER_BOUND), |slice| {
     bs58::encode(bytes).onto(slice).map_err(|_err| crate::Error::Bs58Error)
   })
@@ -226,12 +227,12 @@ where
 }
 
 #[cfg(all(feature = "hyperliquid", feature = "serde"))]
-pub(crate) fn _serialize_hex<S, T>(val: T, s: S) -> Result<S::Ok, S::Error>
+pub(crate) fn _serialize_hex<S, T>(val: T, str: S) -> Result<S::Ok, S::Error>
 where
   T: core::fmt::LowerHex,
   S: Serializer,
 {
-  s.collect_str(&format_args!("0x{val:x}"))
+  str.collect_str(&format_args!("0x{val:x}"))
 }
 
 #[inline]

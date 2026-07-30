@@ -1,4 +1,4 @@
-//! HashiCorp Vault
+//! `HashiCorp` Vault
 
 mod pair_vector;
 mod pkg;
@@ -31,6 +31,7 @@ impl Api for Vault {
   type Error = crate::Error;
   type Id = VaultId;
 
+  #[inline]
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     Ok(())
   }

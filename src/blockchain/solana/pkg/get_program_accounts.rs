@@ -7,7 +7,7 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Account, AccountEncoding, Commitment, DataSlice, Filter, HttpPkgsAux,
   };
-  use wtx::collection::{ArrayStringU8, Vector};
+  use wtx::collections::{ArrayStringU8, Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

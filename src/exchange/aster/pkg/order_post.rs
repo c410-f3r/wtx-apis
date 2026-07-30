@@ -32,7 +32,7 @@ pub struct OrderPostReqParams<'any> {
   /// Client-specified unique order identifier.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub new_client_order_id: Option<ClientOrderIdTy>,
-  /// Stop price for STOP/STOP_MARKET or TAKE_PROFIT/TAKE_PROFIT_MARKET orders.
+  /// Stop price for STOP/`STOP_MARKET` or `TAKE_PROFIT`/`TAKE_PROFIT_MARKET` orders.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub stop_price: Option<Decimal>,
   /// See [`CentralizedSignParams`].

@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   misc::sub_slice,
   program::{LenBounds, PackData, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
   pub struct DecreaseLiquidityParams<> {
@@ -15,6 +15,7 @@ create_data_struct! {
 impl PackData for DecreaseLiquidityParams {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(32);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { liquidity_amount, token_min_a, token_min_b } = self;
     liquidity_amount.pack_data(buffer)?;
@@ -23,6 +24,7 @@ impl PackData for DecreaseLiquidityParams {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       liquidity_amount: u128::unpack_data(sub_slice(bytes, 0..16))?,
@@ -33,6 +35,7 @@ impl PackData for DecreaseLiquidityParams {
 }
 
 impl TestingInstances for DecreaseLiquidityParams {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self { liquidity_amount: 1, token_min_a: 2, token_min_b: 3 })
   }

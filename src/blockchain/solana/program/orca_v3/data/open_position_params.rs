@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   misc::sub_slice,
   program::{LenBounds, PackData, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
@@ -16,6 +16,7 @@ create_data_struct! {
 impl PackData for OpenPositionParams {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(9);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { bumps, tick_lower_index, tick_upper_index } = self;
     bumps.pack_data(buffer)?;
@@ -24,6 +25,7 @@ impl PackData for OpenPositionParams {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       bumps: u8::unpack_data(sub_slice(bytes, 0..1))?,
@@ -34,6 +36,7 @@ impl PackData for OpenPositionParams {
 }
 
 impl TestingInstances for OpenPositionParams {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self { bumps: 1, tick_lower_index: 2, tick_upper_index: 3 })
   }

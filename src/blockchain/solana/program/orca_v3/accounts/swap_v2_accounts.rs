@@ -3,7 +3,7 @@ use crate::blockchain::solana::{
   misc::next_iter_elem,
   program::{AccountAddress, PackAccounts, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_account_struct! {
   #[derive(Debug, PartialEq)]
@@ -31,10 +31,12 @@ impl<A> PackAccounts<A> for SwapV2Accounts<A>
 where
   A: AccountAddress,
 {
+  #[inline]
   fn len(&self) -> usize {
     17
   }
 
+  #[inline]
   fn push_accounts(&self, vec: &mut Vector<InstructionAccountInput>) -> crate::Result<()>
   where
     A: AccountAddress,
@@ -55,7 +57,7 @@ where
       tick_array_1,
       tick_array_2,
       oracle,
-      remaining_accounts: [a, b],
+      remaining_accounts: [el0, el1],
     } = self;
     vec.push(InstructionAccountInput::none(token_program_a.to_account_address()?))?;
     vec.push(InstructionAccountInput::none(token_program_b.to_account_address()?))?;
@@ -72,11 +74,12 @@ where
     vec.push(InstructionAccountInput::writable(tick_array_1.to_account_address()?))?;
     vec.push(InstructionAccountInput::writable(tick_array_2.to_account_address()?))?;
     vec.push(InstructionAccountInput::writable(oracle.to_account_address()?))?;
-    vec.push(InstructionAccountInput::writable(a.to_account_address()?))?;
-    vec.push(InstructionAccountInput::writable(b.to_account_address()?))?;
+    vec.push(InstructionAccountInput::writable(el0.to_account_address()?))?;
+    vec.push(InstructionAccountInput::writable(el1.to_account_address()?))?;
     Ok(())
   }
 
+  #[inline]
   fn unpack_accounts(iter: &mut impl Iterator<Item = A>) -> crate::Result<Self> {
     Ok(Self {
       token_program_a: next_iter_elem(iter)?,
@@ -100,6 +103,7 @@ where
 }
 
 impl TestingInstances for SwapV2Accounts<[u8; 32]> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       token_program_a: [1; 32],

@@ -8,7 +8,7 @@ pub(crate) mod pkg {
     Account, AccountEncoding, Commitment, DataSlice, HttpPkgsAux, JsonRpcResponseResultWithContext,
     MintOrProgramId, SolanaAddressHashStr,
   };
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}
@@ -44,7 +44,7 @@ pub(crate) mod pkg {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commitment: Option<Commitment>,
     /// Encoding
-    encoding: Option<AccountEncoding>,
+    pub encoding: Option<AccountEncoding>,
     /// Data slice.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data_slice: Option<DataSlice>,

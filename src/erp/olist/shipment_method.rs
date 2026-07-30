@@ -1,25 +1,25 @@
 /// Shipment method
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 pub enum ShipmentMethod {
-  /// AliExpressEnvios
+  /// `AliExpressEnvios`
   #[serde(rename = "ali_envios")]
   AliExpressEnvios,
-  /// AmazonDba
+  /// `AmazonDba`
   #[serde(rename = "amazon_dba")]
   AmazonDba,
-  /// B2WEntrega
+  /// `B2WEntrega`
   #[serde(rename = "b")]
   B2WEntrega,
   /// Correios
   #[serde(rename = "c")]
   Correios,
-  /// CorreiosEFulfillment
+  /// `CorreiosEFulfillment`
   #[serde(rename = "e")]
   CorreiosEFulfillment,
-  /// ConectaLaEtiquetas
+  /// `ConectaLaEtiquetas`
   #[serde(rename = "d")]
   ConectaLaEtiquetas,
-  /// GatewayLogistico
+  /// `GatewayLogistico`
   #[serde(rename = "gateway")]
   GatewayLogistico,
   /// Jadlog
@@ -28,40 +28,40 @@ pub enum ShipmentMethod {
   /// Loggi
   #[serde(rename = "loggi")]
   Loggi,
-  /// MagaluEntregas
+  /// `MagaluEntregas`
   #[serde(rename = "magalu_entregas")]
   MagaluEntregas,
-  /// MagaluEntregasPorNetshoes
+  /// `MagaluEntregasPorNetshoes`
   #[serde(rename = "ns_magalu_entregas")]
   MagaluEntregasPorNetshoes,
-  /// MagaluFulfillment
+  /// `MagaluFulfillment`
   #[serde(rename = "magalu_fulfillment")]
   MagaluFulfillment,
-  /// MadeiraEnvios
+  /// `MadeiraEnvios`
   #[serde(rename = "madeira_envios")]
   MadeiraEnvios,
-  /// MercadoEnvios
+  /// `MercadoEnvios`
   #[serde(rename = "m")]
   MercadoEnvios,
-  /// NetshoesEntregas
+  /// `NetshoesEntregas`
   #[serde(rename = "ns_entregas")]
   NetshoesEntregas,
   /// Olist
   #[serde(rename = "olist")]
   Olist,
-  /// SemFrete
+  /// `SemFrete`
   #[serde(rename = "s")]
   SemFrete,
-  /// ShopeeEnvios
+  /// `ShopeeEnvios`
   #[serde(rename = "shopee_envios")]
   ShopeeEnvios,
   /// Transportadora
   #[serde(rename = "t")]
   Transportadora,
-  /// TotalExpress
+  /// `TotalExpress`
   #[serde(rename = "totalexpress")]
   TotalExpress,
-  /// ViaVarejoEnvvias
+  /// `ViaVarejoEnvvias`
   #[serde(rename = "viavarejo_envvias")]
   ViaVarejoEnvvias,
   /// Customizada

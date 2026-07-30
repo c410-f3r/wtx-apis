@@ -68,7 +68,7 @@ pub struct UserTradeResParams {
 #[wtx::pkg(data_format(verbatim), id(crate::exchange::aster::AsterId), transport(http))]
 pub(crate) mod pkg {
   use crate::exchange::aster::{Aster, HttpPkgsAux, UserTradeResParams, UserTradesReqParams};
-  use wtx::{client_api_framework::pkg::PkgsAux, collection::Vector, misc::LeaseMut};
+  use wtx::{client_api_framework::pkg::PkgsAux, collections::Vector, misc::LeaseMut};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR>

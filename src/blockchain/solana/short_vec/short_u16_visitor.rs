@@ -22,7 +22,7 @@ impl<'de> Visitor<'de> for ShortU16Visitor {
       let elem: u8 = seq
         .next_element()?
         .ok_or_else(|| VisitError::TooShort(nth_byte.saturating_add(1)).into_de_error::<A>())?;
-      match visit_byte(elem, val, nth_byte).map_err(|e| e.into_de_error::<A>())? {
+      match visit_byte(elem, val, nth_byte).map_err(VisitError::into_de_error::<A>)? {
         VisitStatus::Done(new_val) => return Ok(ShortU16(new_val)),
         VisitStatus::More(new_val) => val = new_val,
       }

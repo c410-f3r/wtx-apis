@@ -3,7 +3,7 @@ use crate::blockchain::solana::{
   misc::next_iter_elem,
   program::{AccountAddress, PackAccounts, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_account_struct! {
   #[derive(Debug, PartialEq)]
@@ -18,10 +18,12 @@ impl<A> PackAccounts<A> for CloseLookupTableAccounts<A>
 where
   A: AccountAddress,
 {
+  #[inline]
   fn len(&self) -> usize {
     3
   }
 
+  #[inline]
   fn push_accounts(&self, vec: &mut Vector<InstructionAccountInput>) -> crate::Result<()>
   where
     A: AccountAddress,
@@ -33,6 +35,7 @@ where
     Ok(())
   }
 
+  #[inline]
   fn unpack_accounts(iter: &mut impl Iterator<Item = A>) -> crate::Result<Self> {
     Ok(Self {
       lookup_table_address: next_iter_elem(iter)?,
@@ -43,6 +46,7 @@ where
 }
 
 impl TestingInstances for CloseLookupTableAccounts<[u8; 32]> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       lookup_table_address: [0; 32],

@@ -5,7 +5,7 @@ use crate::{
   },
   exchange::aster::misc::eip712_domain,
 };
-use wtx::collection::{ArrayWrapper, Vector};
+use wtx::collections::{ArrayWrapper, Vector};
 
 /// Used to encode a decentralized message
 #[derive(Debug)]

@@ -4,7 +4,7 @@ use crate::blockchain::solana::{
   program::{AccountAddress, MAX_SIGNERS, PackAccounts, TestingInstances},
 };
 use wtx::{
-  collection::{ArrayVectorU8, Vector},
+  collections::{ArrayVectorU8, Vector},
   misc::Usize,
 };
 
@@ -14,7 +14,7 @@ create_account_struct! {
     source: A,
     destination: A,
     authority: A,
-    pub signers: ArrayVectorU8<A, MAX_SIGNERS>,
+    signers: ArrayVectorU8<A, MAX_SIGNERS>,
   }
 }
 
@@ -22,12 +22,14 @@ impl<A> PackAccounts<A> for TransferAccounts<A>
 where
   A: AccountAddress,
 {
+  #[inline]
   fn len(&self) -> usize {
     let mut sum: usize = 3;
     sum = sum.wrapping_add(*Usize::from(self.signers.len()));
     sum
   }
 
+  #[inline]
   fn push_accounts(&self, vec: &mut Vector<InstructionAccountInput>) -> crate::Result<()>
   where
     A: AccountAddress,
@@ -48,6 +50,7 @@ where
     Ok(())
   }
 
+  #[inline]
   fn unpack_accounts(iter: &mut impl Iterator<Item = A>) -> crate::Result<Self> {
     let rslt = Self {
       source: next_iter_elem(iter)?,
@@ -60,6 +63,7 @@ where
 }
 
 impl TestingInstances for TransferAccounts<[u8; 32]> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       source: [1; 32],

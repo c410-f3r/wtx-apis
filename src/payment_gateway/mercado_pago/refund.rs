@@ -1,7 +1,7 @@
 use rust_decimal::Decimal;
 use wtx::{
   calendar::{DateTime, DynTz},
-  collection::Vector,
+  collections::Vector,
 };
 
 /// Response's result

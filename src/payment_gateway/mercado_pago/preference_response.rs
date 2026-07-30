@@ -2,10 +2,10 @@ use crate::payment_gateway::mercado_pago::{BackUrls, Item, Payer, PaymentMethods
 use rust_decimal::Decimal;
 use wtx::{
   calendar::{DateTime, DynTz},
-  collection::Vector,
+  collections::Vector,
 };
 
-/// Struct representing a preference for MercadoPago.
+/// Struct representing a preference for `MercadoPago`.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PreferenceResponse<T> {
   /// Additional information.
@@ -50,8 +50,6 @@ pub struct PreferenceResponse<T> {
   /// Maximum allowed characters for this parameter is 248. The URL must use the "https" protocol.
   pub notification_url: Option<T>,
   /// Data type of the operation.
-  /// regular_payment: Normal payment.
-  /// money_transfer: Money request.
   pub operation_type: T,
   /// Information about the buyer, such as name, surname, email, phone, personal identification, address, and registration date.
   pub payer: Option<Payer<T>>,

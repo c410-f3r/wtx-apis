@@ -1,5 +1,5 @@
 use crate::blockchain::solana::{InstructionAccountInput, program::AccountAddress};
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Trait for types that can pack accounts into instructions or unpack them from account lists.
 pub trait PackAccounts<A>
@@ -21,10 +21,12 @@ impl<A> PackAccounts<A> for ()
 where
   A: AccountAddress,
 {
+  #[inline]
   fn len(&self) -> usize {
     0
   }
 
+  #[inline]
   fn push_accounts(&self, _: &mut Vector<InstructionAccountInput>) -> crate::Result<()>
   where
     A: AccountAddress,
@@ -32,6 +34,7 @@ where
     Ok(())
   }
 
+  #[inline]
   fn unpack_accounts(_: &mut impl Iterator<Item = A>) -> crate::Result<Self> {
     Ok(())
   }

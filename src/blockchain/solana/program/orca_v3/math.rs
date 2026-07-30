@@ -1,9 +1,10 @@
 use wtx::misc::ArithmeticError;
 
 use crate::misc::U256;
-use core::ops::Shr;
+use core::ops::Shr as _;
 
 /// Estimates the liquidity for a position based on a range of ticks and token amounts.
+#[inline]
 #[track_caller]
 pub fn estimate_liquidity_from_token_amounts(
   [lower_tick, curr_tick, upper_tick]: [i32; 3],
@@ -24,6 +25,7 @@ pub fn estimate_liquidity_from_token_amounts(
 }
 
 /// Estimates the expected token amounts for a position based on a range of ticks and liquidity.
+#[inline]
 pub fn estimate_token_amounts_from_liquidity(
   [lower_tick, curr_tick, upper_tick]: [i32; 3],
   liquidity: u128,
@@ -118,60 +120,61 @@ fn position_status(
 
 fn tick_idx_to_sqrt_price_x64_negative(tick_idx: i32) -> u128 {
   let tick = tick_idx.abs();
-  let mut ratio: u128 = if (tick & 1) != 0 { 18445821805675392311 } else { 18446744073709551616 };
+  let mut ratio: u128 =
+    if (tick & 1) != 0 { 18_445_821_805_675_392_311 } else { 18_446_744_073_709_551_616 };
   if (tick & 2) != 0 {
-    ratio = ratio.wrapping_mul(18444899583751176498) >> 64;
+    ratio = ratio.wrapping_mul(18_444_899_583_751_176_498) >> 64;
   }
   if (tick & 4) != 0 {
-    ratio = ratio.wrapping_mul(18443055278223354162) >> 64;
+    ratio = ratio.wrapping_mul(18_443_055_278_223_354_162) >> 64;
   }
   if (tick & 8) != 0 {
-    ratio = ratio.wrapping_mul(18439367220385604838) >> 64;
+    ratio = ratio.wrapping_mul(18_439_367_220_385_604_838) >> 64;
   }
   if (tick & 16) != 0 {
-    ratio = ratio.wrapping_mul(18431993317065449817) >> 64;
+    ratio = ratio.wrapping_mul(18_431_993_317_065_449_817) >> 64;
   }
   if (tick & 32) != 0 {
-    ratio = ratio.wrapping_mul(18417254355718160513) >> 64;
+    ratio = ratio.wrapping_mul(18_417_254_355_718_160_513) >> 64;
   }
   if (tick & 64) != 0 {
-    ratio = ratio.wrapping_mul(18387811781193591352) >> 64;
+    ratio = ratio.wrapping_mul(18_387_811_781_193_591_352) >> 64;
   }
   if (tick & 128) != 0 {
-    ratio = ratio.wrapping_mul(18329067761203520168) >> 64;
+    ratio = ratio.wrapping_mul(18_329_067_761_203_520_168) >> 64;
   }
   if (tick & 256) != 0 {
-    ratio = ratio.wrapping_mul(18212142134806087854) >> 64;
+    ratio = ratio.wrapping_mul(18_212_142_134_806_087_854) >> 64;
   }
   if (tick & 512) != 0 {
-    ratio = ratio.wrapping_mul(17980523815641551639) >> 64;
+    ratio = ratio.wrapping_mul(17_980_523_815_641_551_639) >> 64;
   }
   if (tick & 1024) != 0 {
-    ratio = ratio.wrapping_mul(17526086738831147013) >> 64;
+    ratio = ratio.wrapping_mul(17_526_086_738_831_147_013) >> 64;
   }
   if (tick & 2048) != 0 {
-    ratio = ratio.wrapping_mul(16651378430235024244) >> 64;
+    ratio = ratio.wrapping_mul(16_651_378_430_235_024_244) >> 64;
   }
   if (tick & 4096) != 0 {
-    ratio = ratio.wrapping_mul(15030750278693429944) >> 64;
+    ratio = ratio.wrapping_mul(15_030_750_278_693_429_944) >> 64;
   }
   if (tick & 8192) != 0 {
-    ratio = ratio.wrapping_mul(12247334978882834399) >> 64;
+    ratio = ratio.wrapping_mul(12_247_334_978_882_834_399) >> 64;
   }
   if (tick & 16384) != 0 {
-    ratio = ratio.wrapping_mul(8131365268884726200) >> 64;
+    ratio = ratio.wrapping_mul(8_131_365_268_884_726_200) >> 64;
   }
   if (tick & 32768) != 0 {
-    ratio = ratio.wrapping_mul(3584323654723342297) >> 64;
+    ratio = ratio.wrapping_mul(3_584_323_654_723_342_297) >> 64;
   }
   if (tick & 65536) != 0 {
-    ratio = ratio.wrapping_mul(696457651847595233) >> 64;
+    ratio = ratio.wrapping_mul(696_457_651_847_595_233) >> 64;
   }
-  if (tick & 131072) != 0 {
-    ratio = ratio.wrapping_mul(26294789957452057) >> 64;
+  if (tick & 131_072) != 0 {
+    ratio = ratio.wrapping_mul(26_294_789_957_452_057) >> 64;
   }
-  if (tick & 262144) != 0 {
-    ratio = ratio.wrapping_mul(37481735321082) >> 64;
+  if (tick & 262_144) != 0 {
+    ratio = ratio.wrapping_mul(37_481_735_321_082) >> 64;
   }
   ratio
 }
@@ -187,61 +190,64 @@ fn tick_idx_to_sqrt_price_x64_positive(tick_idx: i32) -> u128 {
   }
 
   let tick = tick_idx.abs();
-  let mut ratio: u128 =
-    if (tick & 1) != 0 { 79232123823359799118286999567 } else { 79228162514264337593543950336 };
+  let mut ratio: u128 = if (tick & 1) != 0 {
+    79_232_123_823_359_799_118_286_999_567
+  } else {
+    79_228_162_514_264_337_593_543_950_336
+  };
   if (tick & 2) != 0 {
-    ratio = mul_shift_96(ratio, 79236085330515764027303304731);
+    ratio = mul_shift_96(ratio, 79_236_085_330_515_764_027_303_304_731);
   }
   if (tick & 4) != 0 {
-    ratio = mul_shift_96(ratio, 79244008939048815603706035061);
+    ratio = mul_shift_96(ratio, 79_244_008_939_048_815_603_706_035_061);
   }
   if (tick & 8) != 0 {
-    ratio = mul_shift_96(ratio, 79259858533276714757314932305);
+    ratio = mul_shift_96(ratio, 79_259_858_533_276_714_757_314_932_305);
   }
   if (tick & 16) != 0 {
-    ratio = mul_shift_96(ratio, 79291567232598584799939703904);
+    ratio = mul_shift_96(ratio, 79_291_567_232_598_584_799_939_703_904);
   }
   if (tick & 32) != 0 {
-    ratio = mul_shift_96(ratio, 79355022692464371645785046466);
+    ratio = mul_shift_96(ratio, 79_355_022_692_464_371_645_785_046_466);
   }
   if (tick & 64) != 0 {
-    ratio = mul_shift_96(ratio, 79482085999252804386437311141);
+    ratio = mul_shift_96(ratio, 79_482_085_999_252_804_386_437_311_141);
   }
   if (tick & 128) != 0 {
-    ratio = mul_shift_96(ratio, 79736823300114093921829183326);
+    ratio = mul_shift_96(ratio, 79_736_823_300_114_093_921_829_183_326);
   }
   if (tick & 256) != 0 {
-    ratio = mul_shift_96(ratio, 80248749790819932309965073892);
+    ratio = mul_shift_96(ratio, 80_248_749_790_819_932_309_965_073_892);
   }
   if (tick & 512) != 0 {
-    ratio = mul_shift_96(ratio, 81282483887344747381513967011);
+    ratio = mul_shift_96(ratio, 81_282_483_887_344_747_381_513_967_011);
   }
   if (tick & 1024) != 0 {
-    ratio = mul_shift_96(ratio, 83390072131320151908154831281);
+    ratio = mul_shift_96(ratio, 83_390_072_131_320_151_908_154_831_281);
   }
   if (tick & 2048) != 0 {
-    ratio = mul_shift_96(ratio, 87770609709833776024991924138);
+    ratio = mul_shift_96(ratio, 87_770_609_709_833_776_024_991_924_138);
   }
   if (tick & 4096) != 0 {
-    ratio = mul_shift_96(ratio, 97234110755111693312479820773);
+    ratio = mul_shift_96(ratio, 97_234_110_755_111_693_312_479_820_773);
   }
   if (tick & 8192) != 0 {
-    ratio = mul_shift_96(ratio, 119332217159966728226237229890);
+    ratio = mul_shift_96(ratio, 119_332_217_159_966_728_226_237_229_890);
   }
   if (tick & 16384) != 0 {
-    ratio = mul_shift_96(ratio, 179736315981702064433883588727);
+    ratio = mul_shift_96(ratio, 179_736_315_981_702_064_433_883_588_727);
   }
   if (tick & 32768) != 0 {
-    ratio = mul_shift_96(ratio, 407748233172238350107850275304);
+    ratio = mul_shift_96(ratio, 407_748_233_172_238_350_107_850_275_304);
   }
   if (tick & 65536) != 0 {
-    ratio = mul_shift_96(ratio, 2098478828474011932436660412517);
+    ratio = mul_shift_96(ratio, 2_098_478_828_474_011_932_436_660_412_517);
   }
-  if (tick & 131072) != 0 {
-    ratio = mul_shift_96(ratio, 55581415166113811149459800483533);
+  if (tick & 131_072) != 0 {
+    ratio = mul_shift_96(ratio, 55_581_415_166_113_811_149_459_800_483_533);
   }
-  if (tick & 262144) != 0 {
-    ratio = mul_shift_96(ratio, 38992368544603139932233054999993551);
+  if (tick & 262_144) != 0 {
+    ratio = mul_shift_96(ratio, 38_992_368_544_603_139_932_233_054_999_993_551);
   }
   ratio >> 32
 }
@@ -259,6 +265,7 @@ fn to_x64(num: u64) -> u128 {
   u128::from(num) << 64
 }
 
+#[expect(clippy::arithmetic_side_effects, reason = "64 does not extrapolate 256")]
 fn token_a_from_liquidity(
   liquidity: u128,
   sqrt_price0_x64: u128,
@@ -271,6 +278,7 @@ fn token_a_from_liquidity(
   u128::try_from(num.div(den)?)
 }
 
+#[expect(clippy::arithmetic_side_effects, reason = "64 does not extrapolate 256")]
 fn token_b_from_liquidity(
   liquidity: u128,
   sqrt_price0_x64: u128,

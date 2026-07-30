@@ -19,6 +19,7 @@ pub const ID: HashArray32Static = HashArray32Static::new(
 );
 
 /// Derives the address of a lookup table using an authority address and a recent slot.
+#[inline]
 pub fn derive_lookup_table_address(
   authority_address: &[u8; 32],
   recent_slot: u64,
