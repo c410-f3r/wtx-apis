@@ -1,9 +1,9 @@
 use crate::blockchain::ethereum::{
-  PackedSeq, SolToken, SolTokenSeq, Word,
+  PackedSeq, SolToken, SolTokenSeq as _, Word,
   encoder::Encoder,
   misc::{has_only_zeros, keccak256, padded_len},
 };
-use wtx::collection::{ArrayWrapper, Vector};
+use wtx::collections::{ArrayWrapper, Vector};
 
 /// Solidity Type
 pub trait SolTy<'de>: Sized {
@@ -22,6 +22,7 @@ pub trait SolTy<'de>: Sized {
   type DeToken<'any>;
 
   /// Encodes itself into a standard byte array.
+  #[inline]
   fn abi_encode(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
     let token = self.tokenize()?;
     (token,).encode_sequence(enc)?;
@@ -29,7 +30,7 @@ pub trait SolTy<'de>: Sized {
   }
 
   /// Non-standard Packed Mode ABI encoding.
-  fn abi_encode_packed(&self, babi_encodeuffer: &mut Vector<u8>) -> crate::Result<()>;
+  fn abi_encode_packed(&self, buffer: &mut Vector<u8>) -> crate::Result<()>;
 
   /// Encoded size returned by [`SolTy::abi_encoded_size`].
   fn abi_encoded_size(&self) -> usize;
@@ -61,30 +62,37 @@ where
   type DeToken<'any> = T::DeToken<'de>;
   type Token<'any> = T::Token<'any>;
 
+  #[inline]
   fn abi_encode_packed(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     (**self).abi_encode_packed(buffer)
   }
 
+  #[inline]
   fn abi_encoded_size(&self) -> usize {
     (**self).abi_encoded_size()
   }
 
+  #[inline]
   fn abi_packed_encoded_size(&self) -> usize {
     (**self).abi_packed_encoded_size()
   }
 
+  #[inline]
   fn detokenize(token: Self::Token<'de>) -> crate::Result<Self::DeToken<'de>> {
     T::detokenize(token)
   }
 
+  #[inline]
   fn eip712_data_word(&self, buffer: &mut Vector<u8>) -> crate::Result<Word> {
     (**self).eip712_data_word(buffer)
   }
 
+  #[inline]
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
     (**self).tokenize()
   }
 
+  #[inline]
   fn valid_token(token: &Self::Token<'_>) -> bool {
     T::valid_token(token)
   }
@@ -101,30 +109,37 @@ where
   type DeToken<'any> = T::DeToken<'de>;
   type Token<'any> = T::Token<'any>;
 
+  #[inline]
   fn abi_encode_packed(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     (**self).abi_encode_packed(buffer)
   }
 
+  #[inline]
   fn abi_encoded_size(&self) -> usize {
     (**self).abi_encoded_size()
   }
 
+  #[inline]
   fn abi_packed_encoded_size(&self) -> usize {
     (**self).abi_packed_encoded_size()
   }
 
+  #[inline]
   fn detokenize(token: Self::Token<'de>) -> crate::Result<Self::DeToken<'de>> {
     T::detokenize(token)
   }
 
+  #[inline]
   fn eip712_data_word(&self, buffer: &mut Vector<u8>) -> crate::Result<Word> {
     (**self).eip712_data_word(buffer)
   }
 
+  #[inline]
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
     (**self).tokenize()
   }
 
+  #[inline]
   fn valid_token(token: &Self::Token<'_>) -> bool {
     T::valid_token(token)
   }
@@ -138,31 +153,38 @@ impl<'de> SolTy<'de> for &'de [u8] {
   type DeToken<'any> = Self;
   type Token<'any> = PackedSeq<'any>;
 
+  #[inline]
   fn abi_encode_packed(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     buffer.extend_from_copyable_slice(self)?;
     Ok(())
   }
 
+  #[inline]
   fn abi_encoded_size(&self) -> usize {
     if self.is_empty() { 64 } else { padded_len(self).wrapping_add(64) }
   }
 
+  #[inline]
   fn abi_packed_encoded_size(&self) -> usize {
     self.len()
   }
 
+  #[inline]
   fn detokenize(token: Self::Token<'de>) -> crate::Result<Self::DeToken<'de>> {
     Ok(token.0)
   }
 
+  #[inline]
   fn eip712_data_word(&self, _: &mut Vector<u8>) -> crate::Result<Word> {
     Ok(Word(keccak256([self])))
   }
 
+  #[inline]
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
     Ok(PackedSeq(self))
   }
 
+  #[inline]
   fn valid_token(_: &Self::Token<'_>) -> bool {
     true
   }
@@ -179,35 +201,42 @@ where
   type DeToken<'any> = Self;
   type Token<'any> = Word;
 
+  #[inline]
   fn abi_encode_packed(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     buffer.extend_from_copyable_slice(&self.0)?;
     Ok(())
   }
 
+  #[inline]
   fn abi_encoded_size(&self) -> usize {
     const { Self::ENCODED_SIZE.unwrap() }
   }
 
+  #[inline]
   fn abi_packed_encoded_size(&self) -> usize {
     const { Self::PACKED_ENCODED_SIZE.unwrap() }
   }
 
+  #[inline]
   fn detokenize(token: Self::Token<'de>) -> crate::Result<Self::DeToken<'de>> {
     Ok(Self(token.0.as_ref().try_into().map_err(wtx::Error::from)?))
   }
 
+  #[inline]
   fn eip712_data_word(&self, _: &mut Vector<u8>) -> crate::Result<Word> {
     self.tokenize()
   }
 
+  #[inline]
   fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
     let mut word = Word::default();
     word.0.get_mut(..N).ok_or(crate::Error::BytesAreGreaterThanWord)?.copy_from_slice(&self.0);
     Ok(word)
   }
 
+  #[inline]
   fn valid_token(token: &Self::Token<'_>) -> bool {
-    has_only_zeros(&token.0[N..])
+    has_only_zeros(token.0.get(N..).unwrap_or_default())
   }
 }
 

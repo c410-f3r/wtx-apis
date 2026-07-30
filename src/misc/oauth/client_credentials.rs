@@ -12,11 +12,11 @@ use wtx::{
     Api,
     network::{
       HttpParams,
-      transport::{SendingReceivingTransport, TransportParams},
+      transport::{SendingReceivingTransport, TransportParams as _},
     },
   },
   codec::{Decode, GenericCodec, protocol::VerbatimDecoder},
-  collection::Vector,
+  collections::Vector,
   misc::LeaseMut,
 };
 
@@ -36,7 +36,7 @@ impl OauthClientCredentials {
       access_token: String::new(),
       client_id,
       client_secret,
-      timer: Instant::now(),
+      timer: Instant::new(),
       token_ttl_slack,
       token_ttl: 0,
     }
@@ -51,7 +51,7 @@ impl Debug for OauthClientCredentials {
 }
 
 #[inline]
-pub(crate) async fn _manage_client_credentials<A, DRSR, T>(
+pub(crate) async fn manage_client_credentials<A, DRSR, T>(
   (api, drsr, trans, trans_params): (&mut A, &mut DRSR, T, &mut HttpParams),
   bytes: &mut Vector<u8>,
   enc_cb: impl FnOnce(&mut Vector<u8>) -> crate::Result<()>,

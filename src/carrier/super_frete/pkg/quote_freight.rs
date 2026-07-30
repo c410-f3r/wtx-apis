@@ -5,7 +5,7 @@ pub(crate) mod pkg {
     misc::manage_token,
     quote_freight_res::{QuoteFreightResGeneric, QuoteFreightResPackage},
   };
-  use wtx::{client_api_framework::network::HttpParams, collection::Vector};
+  use wtx::{client_api_framework::network::HttpParams, collections::Vector};
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

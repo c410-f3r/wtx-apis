@@ -4,7 +4,7 @@ use serde::{
   Deserialize,
   de::{self, SeqAccess, Visitor},
 };
-use wtx::{collection::TryExtend, misc::SingleTypeStorage};
+use wtx::collections::{SingleTypeStorage, TryExtend};
 
 pub(crate) struct ShortVecVisitor<T>(pub(crate) PhantomData<T>);
 

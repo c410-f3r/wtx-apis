@@ -1,8 +1,5 @@
 /// Filters results using additive objects.
-#[allow(
-  // Determined by the Solana devs
-  variant_size_differences
-)]
+#[allow(variant_size_differences, reason = "Determined by the Solana devs")]
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Filter<'bytes> {

@@ -7,7 +7,7 @@ use crate::{
   },
   misc::{Hash, HashArray32Unit},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
@@ -27,6 +27,7 @@ create_data_struct! {
 impl PackData for AccountState<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(165);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let AccountState {
       mint,
@@ -49,6 +50,7 @@ impl PackData for AccountState<HashArray32Unit> {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(AccountState {
       mint: HashArray32Unit::from_bytes(
@@ -72,6 +74,7 @@ impl PackData for AccountState<HashArray32Unit> {
 }
 
 impl TestingInstances for AccountState<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       mint: HashArray32Unit::from_bytes([1; 32]),

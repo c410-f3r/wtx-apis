@@ -20,7 +20,7 @@ use wtx::{
     misc::{PairMut, RequestCounter, RequestLimit},
     network::{HttpParams, WsParams, transport::SendingReceivingTransport},
   },
-  collection::Vector,
+  collections::Vector,
   codec::format::SerdeJson,
   http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
 };

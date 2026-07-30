@@ -3,7 +3,7 @@ use crate::blockchain::solana::{
   misc::next_iter_elem,
   program::{AccountAddress, PackAccounts, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_account_struct! {
   #[derive(Debug, PartialEq)]
@@ -18,10 +18,12 @@ impl<A> PackAccounts<A> for CreateAccountWithSeedAccounts<A>
 where
   A: AccountAddress,
 {
+  #[inline]
   fn len(&self) -> usize {
     3
   }
 
+  #[inline]
   fn push_accounts(&self, vec: &mut Vector<InstructionAccountInput>) -> crate::Result<()>
   where
     A: AccountAddress,
@@ -33,6 +35,7 @@ where
     Ok(())
   }
 
+  #[inline]
   fn unpack_accounts(iter: &mut impl Iterator<Item = A>) -> crate::Result<Self> {
     Ok(Self {
       from_pubkey: next_iter_elem(iter)?,
@@ -43,6 +46,7 @@ where
 }
 
 impl TestingInstances for CreateAccountWithSeedAccounts<[u8; 32]> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self { from_pubkey: [1; 32], to_pubkey: [2; 32], base: [3; 32] })
   }

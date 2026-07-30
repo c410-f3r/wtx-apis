@@ -5,7 +5,7 @@
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::HttpPkgsAux;
-  use wtx::collection::ArrayStringU8;
+  use wtx::collections::ArrayStringU8;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

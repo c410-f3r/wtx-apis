@@ -5,7 +5,7 @@ use crate::{
   },
   misc::HashArray32Unit,
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_enum! {
   #[derive(Debug, Eq, PartialEq)]
@@ -25,6 +25,7 @@ create_data_enum! {
 impl PackData for Instruction {
   const LEN_BOUNDS: LenBounds = LenBounds::new(4, None);
 
+  #[inline]
   fn len(&self) -> usize {
     let instance_len = match self {
       Self::CloseLookupTable | Self::DeactivateLookupTable => 0,
@@ -34,6 +35,7 @@ impl PackData for Instruction {
     4usize.saturating_add(instance_len)
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     match self {
       Self::CloseLookupTable => {
@@ -54,6 +56,7 @@ impl PackData for Instruction {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(match u32::unpack_data(sub_slice(bytes, 0..4))? {
       0 => Self::CreateLookupTable(<_>::unpack_data(sub_slice(bytes, 4..13))?),

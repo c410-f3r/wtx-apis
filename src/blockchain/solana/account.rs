@@ -46,7 +46,7 @@ pub struct AccountDataJson {
   pub space: u64,
 }
 
-/// Data payload of [AccountDataJson].
+/// Data payload of [`AccountDataJson`].
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum AccountDataJsonParsed {

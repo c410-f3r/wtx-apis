@@ -57,7 +57,7 @@ pub struct WebhookData<S> {
   pub self_tracking: Option<S>,
   /// Status
   pub status: Option<S>,
-  /// TRacking URL
+  /// Tracking URL
   pub tracking_url: Option<S>,
   /// Tracking
   pub tracking: Option<S>,

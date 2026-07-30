@@ -5,7 +5,7 @@ use crate::blockchain::solana::{
     spl_token_2022::data::{TransferCheckedParams, TransferParams},
   },
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_enum! {
   #[derive(Debug, Eq, PartialEq)]
@@ -22,6 +22,7 @@ create_data_enum! {
 impl PackData for Instruction {
   const LEN_BOUNDS: LenBounds = LenBounds::new(1, Some(10));
 
+  #[inline]
   fn len(&self) -> usize {
     let instance_len = match self {
       Instruction::CloseAccount
@@ -34,6 +35,7 @@ impl PackData for Instruction {
     instance_len.saturating_add(1)
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     match self {
       Self::InitializeAccount => 1u8.pack_data(buffer)?,
@@ -52,6 +54,7 @@ impl PackData for Instruction {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(match bytes.first() {
       Some(&1) => Self::InitializeAccount,

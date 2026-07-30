@@ -29,15 +29,15 @@ use wtx::{
     misc::RequestCounter,
     network::{
       HttpParams, HttpReqParams,
-      transport::{SendingReceivingTransport, TransportParams},
+      transport::{SendingReceivingTransport, TransportParams as _},
     },
   },
   codec::{
     Decode, DecodeWrapper, FormUrlSerializer, GenericCodec, hex_encode, protocol::VerbatimDecoder,
     u64_string,
   },
-  collection::{ArrayStringU8, ArrayVectorU8, Vector},
-  crypto::{Hmac, HmacSha256Global},
+  collections::{ArrayStringU8, ArrayVectorU8, Vector},
+  crypto::{Hmac as _, HmacSha256Global},
   http::{Header, Method},
   misc::Secret,
 };
@@ -61,8 +61,8 @@ pub const TESTNET_SPOT_WS_URI: &str = "wss://sstream.asterdex-testnet.com";
 pub type ClientOrderIdTy = ArrayStringU8<22>;
 
 /// Manages endpoints
-#[derive(Debug)]
 #[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http, ws))]
+#[derive(Debug)]
 pub struct Aster {
   chain_id: u16,
   is_dex: bool,
@@ -77,6 +77,7 @@ impl Aster {
   ///
   /// If `is_dex` is `false`, then `signer` is equal to `api key`, `secret` is equal to `api secret`
   /// and `user` as well as `chain_id` won't be used.
+  #[inline]
   pub const fn new(
     chain_id: u16,
     is_dex: bool,
@@ -89,6 +90,7 @@ impl Aster {
   }
 
   /// Mutable chain id
+  #[inline]
   pub const fn chain_id_mut(&mut self) -> &mut u16 {
     &mut self.chain_id
   }
@@ -130,7 +132,8 @@ impl Aster {
         b"&signer=",
         self.signer.as_bytes(),
       ])?;
-      let signature = self.secret.peek(&mut ArrayVectorU8::<_, { 132 + 28 }>::new(), |pk| {
+      let buffer = &mut ArrayVectorU8::<_, { 132 + 28 }>::new();
+      let signature = self.secret.peek(&mut buffer.into(), |pk| {
         sign_payload(
           &mut msg_buffer.body,
           &Message { chain_id: self.chain_id, msg: bytes_buffer },
@@ -155,10 +158,11 @@ impl Aster {
         "timestamp=".as_bytes(),
         timestamp_string.as_bytes(),
       ])?;
-      let array = self.secret.peek(&mut ArrayVectorU8::<_, { 64 + 28 }>::new(), |bytes| {
+      let buffer = &mut ArrayVectorU8::<_, { 132 + 28 }>::new();
+      let array = self.secret.peek(&mut buffer.into(), |bytes| {
         let mut mac = HmacSha256Global::from_key(&bytes)?;
         mac.update(bytes_buffer);
-        crate::Result::Ok(mac.digest())
+        crate::Result::Ok(mac.finalize())
       })??;
       let _ = bytes_buffer.extend_from_copyable_slices([
         b"&signature=",
@@ -189,6 +193,7 @@ impl Api for Aster {
   type Error = crate::Error;
   type Id = AsterId;
 
+  #[inline]
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     self.rt.update_params().await?;
     Ok(())
@@ -196,6 +201,7 @@ impl Api for Aster {
 }
 
 /// Dedicated method to fetch deposited assets.
+#[inline]
 pub async fn deposit_assets<DRSR, T>(
   params: &DepositAssetsReqParams<'_>,
   (api, drsr, trans, trans_params): (&mut Aster, &mut DRSR, T, &mut HttpParams),
@@ -254,7 +260,7 @@ mod tests {
       network::{HttpParams, transport::TransportParams},
     },
     codec::hex_decode,
-    collection::Vector,
+    collections::Vector,
     misc::{Secret, SecretContext},
     rng::{ChaCha20, CryptoSeedableRng},
   };

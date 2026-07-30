@@ -40,6 +40,7 @@ pub struct SuperFrete {
 
 impl SuperFrete {
   /// Creates a new instance with the given token.
+  #[inline]
   pub fn new(token: String) -> Self {
     SuperFrete { token }
   }

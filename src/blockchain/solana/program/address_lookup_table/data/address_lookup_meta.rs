@@ -9,7 +9,7 @@ use crate::{
   },
   misc::{Hash, HashArray32ArrayString44, HashArray32Unit},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, PartialEq, Eq)]
@@ -30,6 +30,7 @@ create_data_struct! {
 
 impl<H> LookupTableMeta<H> {
   /// Returns whether the lookup table is currently active.
+  #[inline]
   pub fn is_active(&self, current_slot: u64, slot_hashes: &SlotHashes) -> bool {
     match self.status(current_slot, slot_hashes) {
       LookupTableStatus::Activated | LookupTableStatus::Deactivating { .. } => true,
@@ -38,6 +39,7 @@ impl<H> LookupTableMeta<H> {
   }
 
   /// Returns the current operational status of the lookup table.
+  #[inline]
   pub fn status(&self, current_slot: u64, slot_hashes: &SlotHashes) -> LookupTableStatus {
     if self.deactivation_slot == u64::MAX {
       LookupTableStatus::Activated
@@ -56,10 +58,12 @@ impl<H> LookupTableMeta<H> {
 impl PackData for LookupTableMeta<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::new(20, Some(52));
 
+  #[inline]
   fn len(&self) -> usize {
     if self.authority.is_none() { 20 } else { 52 }
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self {
       deactivation_slot,
@@ -76,6 +80,7 @@ impl PackData for LookupTableMeta<HashArray32Unit> {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     let authority = unpack_option_address(sub_slice(bytes, 17..))?.map(HashArray32Unit::from_bytes);
     let final_range = if authority.is_none() { 18..20 } else { 50..52 };
@@ -90,6 +95,7 @@ impl PackData for LookupTableMeta<HashArray32Unit> {
 }
 
 impl TestingInstances for LookupTableMeta<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       deactivation_slot: 1,
@@ -100,6 +106,7 @@ impl TestingInstances for LookupTableMeta<HashArray32Unit> {
     })
   }
 
+  #[inline]
   fn variable_instance() -> crate::Result<Self> {
     Ok(Self {
       deactivation_slot: 1,
@@ -112,6 +119,7 @@ impl TestingInstances for LookupTableMeta<HashArray32Unit> {
 }
 
 impl<H> Default for LookupTableMeta<H> {
+  #[inline]
   fn default() -> Self {
     Self {
       deactivation_slot: u64::MAX,
@@ -126,6 +134,7 @@ impl<H> Default for LookupTableMeta<H> {
 impl TryFrom<LookupTableMeta<HashArray32Unit>> for LookupTableMeta<HashArray32ArrayString44> {
   type Error = crate::Error;
 
+  #[inline]
   fn try_from(from: LookupTableMeta<HashArray32Unit>) -> Result<Self, Self::Error> {
     Ok(Self {
       deactivation_slot: from.deactivation_slot,

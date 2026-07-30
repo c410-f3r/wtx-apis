@@ -6,14 +6,20 @@ use alloc::string::ToString;
 use std::sync::LazyLock;
 use tokio::sync::Mutex;
 use wtx::{
-  calendar::{Date, Duration, Instant},
+  calendar::{Date, Instant, SigDuration},
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   codec::format::SerdeJson,
-  http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
+  executor::TokioExecutor,
+  http::http2_client_pool::{Http2ClientPool, Http2ClientPoolBuilder},
+  tls::{TlsConfig, TlsModeVerified},
 };
 
-static CLIENT_API: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
-  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
+static CLIENT_API: LazyLock<Http2ClientPool<TokioExecutor, TlsModeVerified>> =
+  LazyLock::new(|| {
+    Http2ClientPoolBuilder::tokio(1, TlsConfig::from_ccadb(TlsModeVerified::new()).unwrap())
+      .unwrap()
+      .build()
+  });
 static OLIST: LazyLock<Mutex<Olist>> = LazyLock::new(|| {
   let this =
     Olist::new(_VARS.olist_client_id.clone(), _VARS.olist_client_secret.clone(), 0, Plan::Crescer)
@@ -23,7 +29,7 @@ static OLIST: LazyLock<Mutex<Olist>> = LazyLock::new(|| {
     .update_params(
       &_VARS.olist_access_token,
       "",
-      Instant::now_date_time(0).unwrap().add(Duration::from_seconds(120).unwrap()).unwrap(),
+      Instant::now_date_time().unwrap().add(SigDuration::from_seconds(120).unwrap()).unwrap(),
     )
     .unwrap();
   Mutex::new(this)

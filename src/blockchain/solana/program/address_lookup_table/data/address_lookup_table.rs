@@ -8,7 +8,7 @@ use crate::{
   misc::{Hash, HashArray32Unit},
 };
 use alloc::borrow::Cow;
-use wtx::{collection::Vector, misc::Wrapper};
+use wtx::{collections::Vector, misc::Wrapper};
 
 /// The fixed byte size of the address lookup table metadata.
 pub const LOOKUP_TABLE_META_SIZE: usize = 56;
@@ -22,8 +22,9 @@ pub struct AddressLookupTable<'any, H> {
   pub addresses: Cow<'any, [HashArray32Unit]>,
 }
 
-impl<'any, H> AddressLookupTable<'any, H> {
+impl<H> AddressLookupTable<'_, H> {
   /// Converts the table into an `AddressLookupTableAccount` for transaction processing.
+  #[inline]
   pub fn into_alta(self, key: SolanaAddressHash) -> crate::Result<AddressLookupTableAccount> {
     Ok(AddressLookupTableAccount {
       key,
@@ -38,8 +39,9 @@ impl<'any, H> AddressLookupTable<'any, H> {
   }
 }
 
-impl<'any> AddressLookupTable<'any, HashArray32Unit> {
+impl AddressLookupTable<'_, HashArray32Unit> {
   /// Returns the number of active addresses in the table for a specific slot.
+  #[inline]
   pub fn get_active_addresses_len(
     &self,
     current_slot: u64,
@@ -56,6 +58,7 @@ impl<'any> AddressLookupTable<'any, HashArray32Unit> {
   }
 
   /// Retrieves addresses from the table based on the provided indexes.
+  #[inline]
   pub fn lookup(
     &self,
     current_slot: u64,
@@ -86,7 +89,7 @@ mod tests {
     misc::HashArray32Unit,
   };
   use alloc::borrow::Cow;
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[test]
   fn test_lookup_from_empty_table() {

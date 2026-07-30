@@ -1,6 +1,6 @@
 use crate::erp::olist::{AssociatedEntityId, CivilStatus, Gender, PersonTy, TributaryRegime};
 use rust_decimal::Decimal;
-use wtx::{calendar::Date, collection::Vector};
+use wtx::{calendar::Date, collections::Vector};
 
 /// Represents the current situation/status of a contact
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -63,7 +63,7 @@ pub struct ContactPost<S> {
   /// Additional phone number
   #[serde(skip_serializing_if = "Option::is_none")]
   pub telefone_adicional: Option<S>,
-  /// Email address for electronic invoices (NFe)
+  /// Email address for electronic invoices (`NFe`)
   #[serde(skip_serializing_if = "Option::is_none")]
   pub email_nfe: Option<S>,
   /// Website URL

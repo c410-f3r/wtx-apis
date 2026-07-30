@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   misc::sub_slice,
   program::{LenBounds, PackData, TestingInstances},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Identifies the category of extra accounts in a Whirlpool instruction.
 #[derive(Debug, Eq, PartialEq)]
@@ -48,6 +48,7 @@ pub struct RemainingAccountsSlice {
 impl PackData for RemainingAccountsInfo {
   const LEN_BOUNDS: LenBounds = LenBounds::new(6, Some(6));
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { slices: [RemainingAccountsSlice { accounts_type, length }] } = self;
     u32::pack_data(&1, buffer)?;
@@ -69,6 +70,7 @@ impl PackData for RemainingAccountsInfo {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     let accounts_type = match u8::unpack_data(sub_slice(bytes, 4..5))? {
       0 => AccountsType::TransferHookA,
@@ -92,6 +94,7 @@ impl PackData for RemainingAccountsInfo {
 }
 
 impl TestingInstances for RemainingAccountsInfo {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       slices: [RemainingAccountsSlice {

@@ -53,8 +53,8 @@ use wtx::{
     DecodeSeq, GenericCodec,
     protocol::{JsonRpcDecoder, JsonRpcEncoder},
   },
-  collection::{ArrayStringU8, ArrayVectorU8, ArrayWrapper},
-  misc::FnMutFut,
+  collections::{ArrayStringU8, ArrayVectorU8, ArrayWrapper},
+  futures::FnMutFut,
 };
 
 pub(crate) type Epoch = u128;
@@ -81,12 +81,14 @@ pub struct Solana {
 
 impl Solana {
   /// If desired, it is possible to instantiate directly instead of using this method.
+  #[inline]
   pub const fn new(rt: Option<RequestCounter>) -> Self {
     Self { rc: rt }
   }
 
-  /// If existing, extracts the parsed spl token account ([program::spl_token::MintAccount]) out of
-  /// a generic [AccountData].
+  /// If existing, extracts the parsed spl token account ([`program::spl_token::MintAccount`]) out of
+  /// a generic [`AccountData`].
+  #[inline]
   pub fn spl_token_mint_account(
     account_data: &AccountData,
   ) -> crate::Result<&program::spl_token::MintAccount> {
@@ -99,7 +101,8 @@ impl Solana {
     }
   }
 
-  /// If existing, extracts the parsed spl token account out of a generic [AccountData].
+  /// If existing, extracts the parsed spl token account out of a generic [`AccountData`].
+  #[inline]
   pub fn spl_token_normal_account(
     account_data: &AccountData,
   ) -> crate::Result<&program::spl_token::TokenAccount> {
@@ -114,6 +117,7 @@ impl Solana {
 
   /// Sometimes a received blockhash is not valid so this function tries to perform additional calls
   /// with different blockhashes.
+  #[inline]
   pub async fn try_with_blockhashes<AUX, API, DRSR, E, O, T>(
     mut aux: AUX,
     additional_tries: u8,
@@ -181,8 +185,8 @@ impl Solana {
   }
 
   fn spl_token_account(account_data: &AccountData) -> Option<&program::spl_token::GenericAccount> {
-    if let &AccountData::Json(AccountDataJson {
-      parsed: AccountDataJsonParsed::SplTokenAccount(ref spl_token_account),
+    if let AccountData::Json(AccountDataJson {
+      parsed: AccountDataJsonParsed::SplTokenAccount(spl_token_account),
       ..
     }) = account_data
     {
@@ -197,6 +201,7 @@ impl Api for Solana {
   type Error = crate::Error;
   type Id = SolanaId;
 
+  #[inline]
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     if let Some(rc) = &mut self.rc {
       rc.update_params().await?;
@@ -206,6 +211,7 @@ impl Api for Solana {
 }
 
 /// Makes a single HTTP request to see the status of the provided signatures.
+#[inline]
 pub async fn check_signatures<'th, A, DRSR, T, const N: usize>(
   commitment: Commitment,
   pair: &mut PairMut<'_, HttpPkgsAux<A, DRSR>, T>,
@@ -246,6 +252,7 @@ where
 
 /// Makes successive HTTP requests over a period defined in `cto` until the transaction is
 /// successful or expired.
+#[inline]
 pub async fn confirm_signatures<'th, A, DRSR, T, const N: usize>(
   commitment: Commitment,
   cto: ConfirmTransactionOptions,
@@ -296,7 +303,7 @@ where
         }
       }
       for _ in iter {
-        wtx::misc::sleep(interval).await?;
+        wtx::futures::Sleep::new(interval)?.await?;
         let array = check_signatures(commitment, pair, signatures, &mut cb).await?;
         if should_stop(&array) {
           return Ok(array);

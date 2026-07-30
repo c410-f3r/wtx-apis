@@ -4,7 +4,7 @@ use crate::{
     BulkCancel, BulkCancelCloid, BulkModify, BulkOrder, SpotSend, SpotUser, usd_send::UsdSend,
   },
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 #[derive(Debug, serde::Serialize)]
 #[serde(tag = "type")]

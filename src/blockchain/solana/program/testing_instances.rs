@@ -4,6 +4,7 @@ pub trait TestingInstances: Sized {
   fn min_instance() -> crate::Result<Self>;
 
   /// Creates an instance with variable or typical values.
+  #[inline]
   fn variable_instance() -> crate::Result<Self> {
     Self::min_instance()
   }
@@ -14,6 +15,7 @@ where
   A: TestingInstances,
   B: TestingInstances,
 {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok((A::min_instance()?, B::min_instance()?))
   }

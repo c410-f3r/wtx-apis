@@ -8,7 +8,7 @@ pub(crate) mod pkg {
     Account, AccountEncoding, Commitment, DataSlice, HttpPkgsAux, JsonRpcResponseResultWithContext,
     MintOrProgramId, SolanaAddressHashStr,
   };
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

@@ -5,7 +5,7 @@ pub(crate) mod pkg {
   };
   use alloc::string::String;
   use wtx::{
-    client_api_framework::network::{HttpParams, transport::TransportParams},
+    client_api_framework::network::{HttpParams, transport::TransportParams as _},
     http::Method,
   };
 

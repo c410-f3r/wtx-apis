@@ -1,6 +1,6 @@
 use crate::PairName;
 use rust_decimal::Decimal;
-use wtx::collection::ArrayStringU8;
+use wtx::collections::ArrayStringU8;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]

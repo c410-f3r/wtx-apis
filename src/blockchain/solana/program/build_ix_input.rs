@@ -2,7 +2,7 @@ use crate::blockchain::solana::{
   InstructionInput,
   program::{AccountAddress, PackAccounts, PackData},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Trait for constructing Solana instruction inputs from packed accounts and data.
 pub trait BuildIxInput<A>
@@ -17,6 +17,7 @@ where
   type TransformedPackData: PackData;
 
   /// Constructs an instruction input using the provided accounts, data, and program ID.
+  #[inline]
   fn build_ix_input(
     pack_accounts: Self::PackAccounts,
     pack_data: Self::PackData,

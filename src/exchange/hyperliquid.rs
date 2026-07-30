@@ -39,7 +39,7 @@ pub static WS_MAINNET_URI: &str = "wss://api.hyperliquid.xyz/ws";
 pub static WS_TESTNET_URI: &str = "wss://api.hyperliquid-testnet.xyz/ws";
 
 /// Client Order ID
-pub type Cloid = wtx::collection::ArrayStringU8<34>;
+pub type Cloid = wtx::collections::ArrayStringU8<34>;
 
 #[derive(Debug)]
 #[doc = _generic_api_doc!()]

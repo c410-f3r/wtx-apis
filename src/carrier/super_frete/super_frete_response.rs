@@ -1,4 +1,4 @@
-/// SuperFrete response
+/// `SuperFrete` response
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum SuperFreteResponse<S, T> {
@@ -8,7 +8,7 @@ pub enum SuperFreteResponse<S, T> {
   Err(SuperFreteError<S>),
 }
 
-/// SuperFrete error
+/// `SuperFrete` error
 #[derive(Debug, serde::Deserialize)]
 pub struct SuperFreteError<S> {
   /// Message

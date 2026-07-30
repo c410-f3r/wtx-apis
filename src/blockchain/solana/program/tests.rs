@@ -1,6 +1,6 @@
 use crate::blockchain::solana::program::{AccountAddress, PackAccounts, PackData};
 use core::fmt::Debug;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 pub(crate) fn test_account<A, T>(instance: T)
 where

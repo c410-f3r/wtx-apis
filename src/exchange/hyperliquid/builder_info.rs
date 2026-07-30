@@ -1,4 +1,4 @@
-use wtx::collection::ArrayStringU8;
+use wtx::collections::ArrayStringU8;
 
 /// Those who build applications on Hyperliquid.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

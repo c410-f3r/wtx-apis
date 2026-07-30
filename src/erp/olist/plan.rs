@@ -1,5 +1,5 @@
 /// Contracted plan
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum Plan {
   /// Crescer
   Crescer,

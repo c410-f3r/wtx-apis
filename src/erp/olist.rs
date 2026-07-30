@@ -93,6 +93,7 @@ impl Olist {
   }
 
   /// Manages tokens in concurrent scenarios.
+  #[inline]
   pub fn sync(&self) -> &Arc<OauthRefreshTokenSync> {
     &self.common.sync
   }
@@ -102,6 +103,7 @@ impl Api for Olist {
   type Error = crate::Error;
   type Id = OlistId;
 
+  #[inline]
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     self.rc.update_params().await?;
     Ok(())

@@ -245,10 +245,10 @@ pub struct Position {
   /// Entry Price
   #[serde(rename = "ep")]
   pub entry_price: Decimal,
-  /// (Pre-fee) Accumulated Realized PnL
+  /// (Pre-fee) Accumulated Realized `PnL`
   #[serde(rename = "cr")]
   pub accumulated_realized: Decimal,
-  /// Unrealized PnL
+  /// Unrealized `PnL`
   #[serde(rename = "up")]
   pub unrealized_pnl: Decimal,
   /// Margin Type

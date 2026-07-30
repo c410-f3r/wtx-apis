@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Request parameters for the depth endpoint
 #[derive(Debug, serde::Serialize)]

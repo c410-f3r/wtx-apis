@@ -3,14 +3,14 @@ use wtx::{
   codec::U64String,
 };
 
-/// WebHook notification
+/// `WebHook` notification
 #[derive(Debug, Eq, PartialEq, serde::Deserialize)]
 pub struct Notification {
-  /// See [NotificationAction].
+  /// See [`NotificationAction`].
   pub action: NotificationAction,
-  /// See [ApiVersion].
+  /// See [`ApiVersion`].
   pub api_version: ApiVersion,
-  /// See [NotificationData].
+  /// See [`NotificationData`].
   pub data: NotificationData,
   /// Date created
   pub date_created: DateTime<DynTz>,
@@ -18,7 +18,7 @@ pub struct Notification {
   pub id: u64,
   /// Live mode
   pub live_mode: bool,
-  /// See [NotificationTy].
+  /// See [`NotificationTy`].
   pub r#type: NotificationTy,
   /// User id
   pub user_id: U64String,

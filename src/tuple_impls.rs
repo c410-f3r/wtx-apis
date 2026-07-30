@@ -6,7 +6,7 @@ macro_rules! impl_tuples {
       use crate::blockchain::ethereum::{SolToken, SolTokenSeq, SolTy, Word};
       use crate::blockchain::ethereum::Decoder;
       use crate::blockchain::ethereum::Encoder;
-      use wtx::collection::Vector;
+      use wtx::collections::Vector;
       use crate::blockchain::ethereum::misc::keccak256;
 
       $(
@@ -16,6 +16,7 @@ macro_rules! impl_tuples {
         {
           const IS_DYN_TOKEN: bool = $( <$T as SolToken>::IS_DYN_TOKEN || )* false;
 
+          #[inline]
           fn decode_from(dec: &mut Decoder<'de>) -> crate::Result<Self> {
             if Self::IS_DYN_TOKEN {
               Self::decode_sequence(&mut dec.take_tail()?)
@@ -24,6 +25,7 @@ macro_rules! impl_tuples {
             }
           }
 
+          #[inline]
           fn head_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
             if Self::IS_DYN_TOKEN {
               enc.push_last_tail_idx()?;
@@ -34,15 +36,17 @@ macro_rules! impl_tuples {
             Ok(())
           }
 
+          #[inline]
           fn head_words(&self) -> usize {
             if Self::IS_DYN_TOKEN {
               1
             } else {
               let ($($T,)*) = self;
-              0 $( + $T.total_words() )*
+              0usize $(.wrapping_add($T.total_words()))*
             }
           }
 
+          #[inline]
           fn tail_push(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
             if Self::IS_DYN_TOKEN {
               self.encode_sequence(enc)?;
@@ -50,10 +54,11 @@ macro_rules! impl_tuples {
             Ok(())
           }
 
+          #[inline]
           fn tail_words(&self) -> usize {
             if Self::IS_DYN_TOKEN {
               let ($($T,)*) = self;
-              0 $( + $T.total_words() )*
+              0usize $(.wrapping_add($T.total_words()))*
             } else {
               0
             }
@@ -75,6 +80,7 @@ macro_rules! impl_tuples {
             )*))
           }
 
+          #[inline]
           fn encode_sequence(&self, enc: &mut Encoder<'_>) -> crate::Result<()> {
             let ($($T,)*) = self;
             enc.push_tail_idx_by_words(0usize $( .wrapping_add($T.head_words()) )*)?;
@@ -125,36 +131,41 @@ macro_rules! impl_tuples {
           type DeToken<'any> = ($( $T::DeToken<'any>, )*);
           type Token<'any> = ($( $T::Token<'any>, )*);
 
+          #[inline]
           fn abi_encode_packed(&self, _buffer: &mut Vector<u8>) -> crate::Result<()> {
             let ($($T,)*) = self;
             $( $T.abi_encode_packed(_buffer)?; )*
             Ok(())
           }
 
+          #[inline]
           fn abi_encoded_size(&self) -> usize {
             if let Some(size) = <($($T,)*) as SolTy<'de>>::ENCODED_SIZE {
               return size
             }
 
             let ($($T,)*) = self;
-            let sum = 0 $( + $T.abi_encoded_size() )*;
+            let sum = 0usize $(.wrapping_add($T.abi_encoded_size()))*;
             if <($($T,)*) as SolTy<'de>>::IS_DYN_TY {
-              32 + sum
+              sum.wrapping_add(32)
             } else {
               sum
             }
           }
 
+          #[inline]
           fn abi_packed_encoded_size(&self) -> usize {
             let ($($T,)*) = self;
-            0 $(+ $T.abi_packed_encoded_size())*
+            0usize $(.wrapping_add($T.abi_packed_encoded_size()))*
           }
 
+          #[inline]
           fn detokenize(token: Self::Token<'de>) -> crate::Result<Self::DeToken<'de>> {
             let ($($T,)*) = token;
             Ok(($( <$T as SolTy<'de>>::detokenize($T)?, )*))
           }
 
+          #[inline]
           fn eip712_data_word(&self, _buffer: &mut Vector<u8>) -> crate::Result<Word> {
             let ($($T,)*) = self;
             let encoding: [[u8; 32]; $total] = [$( <$T as SolTy>::eip712_data_word($T, _buffer)?.0, )*];
@@ -163,11 +174,13 @@ macro_rules! impl_tuples {
             Ok(Word(keccak256([encoding])))
           }
 
+          #[inline]
           fn tokenize(&self) -> crate::Result<Self::Token<'_>> {
             let ($($T,)*) = self;
             Ok(($($T.tokenize()?,)*))
           }
 
+          #[inline]
           fn valid_token(token: &Self::Token<'_>) -> bool {
             let ($($T,)*) = token;
             $(<$T as SolTy>::valid_token($T) &&)* true
@@ -197,14 +210,12 @@ macro_rules! impl_tuples {
         }
 
         const fn pop(mut self) -> Option<Self> {
-          let len = match self.len.checked_sub(1) {
-            None => return None,
-            Some(elem) => elem,
-          };
+          let Some(len) = self.len.checked_sub(1) else { return None };
           self.len = len;
           Some(self)
         }
 
+        #[expect(clippy::indexing_slicing, reason = "compiler support")]
         const fn write_str(mut self, str: &str) -> Self {
           let bytes = str.as_bytes();
           let mut idx = 0;
@@ -222,10 +233,10 @@ macro_rules! impl_tuples {
 
 impl_tuples! {
   [0,]
-  [1, A(0)]
-  [2, A(0) B(1)]
-  [3, A(0) B(1) C(2)]
-  [4, A(0) B(1) C(2) D(3)]
-  [5, A(0) B(1) C(2) D(3) E(4)]
-  [6, A(0) B(1) C(2) D(3) E(4) F(5)]
+  [1, T0(0)]
+  [2, T0(0) T1(1)]
+  [3, T0(0) T1(1) T2(2)]
+  [4, T0(0) T1(1) T2(2) T3(3)]
+  [5, T0(0) T1(1) T2(2) T3(3) T4(4)]
+  [6, T0(0) T1(1) T2(2) T3(3) T4(4) T5(5)]
 }

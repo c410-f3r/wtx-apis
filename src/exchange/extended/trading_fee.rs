@@ -1,5 +1,5 @@
 use rust_decimal::Decimal;
-use wtx::collection::ArrayStringU8;
+use wtx::collections::ArrayStringU8;
 
 pub struct TradingFee {
   pub builder_fee_rate: Decimal,

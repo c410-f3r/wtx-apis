@@ -6,7 +6,7 @@
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux, SolanaBlockhash};
   use alloc::collections::BTreeMap;
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[derive(Debug, serde::Serialize)]
   #[pkg::req_data]

@@ -1,8 +1,8 @@
 use crate::blockchain::solana::{AddressLookupTableAccount, SolanaAddressHash, SolanaBlockhash};
 use alloc::collections::BTreeMap;
-use wtx::{collection::Vector, misc::Wrapper};
+use wtx::{collections::Vector, misc::Wrapper};
 
-/// Compiled [InstructionInput]
+/// Compiled [`InstructionInput`]
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CompiledInstructionInput {
@@ -44,21 +44,25 @@ pub struct InstructionAccountInput {
 
 impl InstructionAccountInput {
   /// Account is not a signer nor writable.
+  #[inline]
   pub fn none(pubkey: SolanaAddressHash) -> Self {
     Self { pubkey, is_signer: false, is_writable: false }
   }
 
   /// Account is signer but not writable.
+  #[inline]
   pub fn sign(pubkey: SolanaAddressHash) -> Self {
     Self { pubkey, is_signer: true, is_writable: false }
   }
 
   /// Account is signer and writable
+  #[inline]
   pub fn sign_and_writable(pubkey: SolanaAddressHash) -> Self {
     Self { pubkey, is_signer: true, is_writable: true }
   }
 
   /// Account is writable but not signer.
+  #[inline]
   pub fn writable(pubkey: SolanaAddressHash) -> Self {
     Self { pubkey, is_signer: false, is_writable: true }
   }
@@ -119,6 +123,7 @@ pub struct MessageInput {
 impl MessageInput {
   /// Takes all the necessary parameters to validate and transform data into a suitable format for
   /// submission.
+  #[inline]
   pub fn with_params(
     altas: &[AddressLookupTableAccount],
     buffer: &mut MessageBuffer,
@@ -221,7 +226,7 @@ impl MessageInput {
         .then(second.1.is_writable.cmp(&first.1.is_writable))
     });
 
-    for (_, elem) in buffer.adhocs.iter() {
+    for (_, elem) in &buffer.adhocs {
       match [elem.is_signer, elem.is_writable] {
         [true, true] => num_of_writable_signers = num_of_writable_signers.wrapping_add(1),
         [true, false] => num_of_readonly_signers = num_of_readonly_signers.wrapping_add(1),
@@ -230,7 +235,7 @@ impl MessageInput {
       }
     }
 
-    let convert = |n: usize| u8::try_from(n).map_err(|_| crate::Error::SolanaU8Overflow);
+    let convert = |num: usize| u8::try_from(num).map_err(|_err| crate::Error::SolanaU8Overflow);
     Ok((
       MessageHeaderInput {
         num_readonly_signed_accounts: convert(num_of_readonly_signers)?,
@@ -260,7 +265,7 @@ impl MessageInput {
     #[expect(clippy::unwrap_used, reason = "`retain` does not allow the use of results")]
     buffer.all.retain(|pubkey, elem| {
       let mut alta_idx: u8 = 0;
-      for alta_pubkey in alta.addresses.iter() {
+      for alta_pubkey in &alta.addresses {
         if pubkey != alta_pubkey {
           alta_idx = alta_idx.wrapping_add(1);
           continue;
@@ -298,12 +303,12 @@ impl MessageInput {
     instructions: &[InstructionInput],
     payer: Option<SolanaAddressHash>,
   ) {
-    for instruction in instructions.iter() {
+    for instruction in instructions {
       let _ = buffer.all.insert(
         instruction.program_id,
         MessageBufferUniqueElem { idx: 0, is_invoked: true, is_signer: false, is_writable: false },
       );
-      for instruction_account in instruction.accounts.iter() {
+      for instruction_account in &instruction.accounts {
         let _ = buffer.all.insert(
           instruction_account.pubkey,
           MessageBufferUniqueElem {
@@ -346,7 +351,7 @@ struct MessageBufferUniqueElem {
 
 #[cfg(test)]
 mod tests {
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   use crate::blockchain::solana::{
     CompiledInstructionInput, InstructionAccountInput, InstructionInput, MessageAddressTableLookup,

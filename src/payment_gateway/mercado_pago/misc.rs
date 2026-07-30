@@ -1,17 +1,17 @@
 use crate::{
-  misc::{_manage_client_credentials, OauthResponse},
+  misc::{OauthResponse, manage_client_credentials},
   payment_gateway::mercado_pago::{MercadoPago, OauthReq},
 };
 use wtx::{
   client_api_framework::network::{
     HttpParams,
-    transport::{SendingReceivingTransport, TransportParams},
+    transport::{SendingReceivingTransport, TransportParams as _},
   },
   codec::{
     DecodeSeq, Encode, GenericCodec,
     protocol::{VerbatimDecoder, VerbatimEncoder},
   },
-  collection::Vector,
+  collections::Vector,
   http::ReqBuilder,
 };
 
@@ -28,7 +28,7 @@ where
 {
   trans_params.ext_req_params_mut().msg_buffer.uri.push_path(format_args!("/oauth/token"))?;
   let is_test = api.is_test;
-  _manage_client_credentials((api, drsr, trans, trans_params), buffer, |local_bytes| {
+  manage_client_credentials((api, drsr, trans, trans_params), buffer, |local_bytes| {
     let _ = local_bytes.extend_from_copyable_slices([
       "&test_token=".as_bytes(),
       if is_test { "true".as_bytes() } else { "false".as_bytes() },
@@ -37,7 +37,7 @@ where
   })
   .await?;
   let headers = &mut trans_params.ext_req_params_mut().msg_buffer.headers;
-  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.common.access_token))?;
+  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", api.common.access_token))?;
   trans_params.ext_req_params_mut().msg_buffer.uri.truncate_with_initial_len();
   Ok(())
 }

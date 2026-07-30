@@ -1,5 +1,5 @@
 use crate::blockchain::solana::{SolanaAddressHash, misc::sub_slice};
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 pub(crate) fn pack_coption_address(
   src: Option<&SolanaAddressHash>,

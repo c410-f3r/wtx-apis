@@ -7,7 +7,7 @@ use crate::{
 };
 use alloc::string::ToString;
 use rust_decimal::Decimal;
-use wtx::collection::{ArrayWrapper, Vector};
+use wtx::collections::{ArrayWrapper, Vector};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

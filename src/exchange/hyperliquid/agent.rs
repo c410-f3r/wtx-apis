@@ -2,7 +2,7 @@ use crate::blockchain::ethereum::{
   Address, Eip712, Eip712Domain, PackedSeq, SolStruct, SolTy, Word,
 };
 use k256::U256;
-use wtx::collection::{ArrayWrapper, Vector};
+use wtx::collections::{ArrayWrapper, Vector};
 
 type AgentTuple = (&'static [u8], ArrayWrapper<u8, 32>);
 
@@ -100,7 +100,7 @@ mod tests {
     blockchain::ethereum::{PackedSeq, SolTy, Word},
     exchange::hyperliquid::agent::Agent,
   };
-  use wtx::{collection::Vector, de::hex_decode};
+  use wtx::{collections::Vector, de::hex_decode};
 
   #[test]
   fn basic() {

@@ -5,7 +5,7 @@ use serde::{
   Deserialize, Deserializer,
   de::{MapAccess, Visitor},
 };
-use wtx::collection::{ArrayStringU8, ArrayVectorU8};
+use wtx::collections::{ArrayStringU8, ArrayVectorU8};
 
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]

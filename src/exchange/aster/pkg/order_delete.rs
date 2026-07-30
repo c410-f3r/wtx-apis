@@ -2,7 +2,7 @@
 pub(crate) mod pkg {
   use crate::exchange::aster::{Aster, HttpPkgsAux, OrderReqParams, OrderResParams};
   use wtx::{
-    client_api_framework::{network::transport::TransportParams, pkg::PkgsAux},
+    client_api_framework::{network::transport::TransportParams as _, pkg::PkgsAux},
     http::Method,
     misc::LeaseMut,
   };

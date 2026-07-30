@@ -5,7 +5,7 @@ use crate::{
   },
   misc::HashArray32Unit,
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_enum! {
   #[allow(clippy::large_enum_variant)]
@@ -19,6 +19,7 @@ create_data_enum! {
 impl PackData for ProgramState {
   const LEN_BOUNDS: LenBounds = LenBounds::new(4, Some(56));
 
+  #[inline]
   fn len(&self) -> usize {
     let n = match self {
       ProgramState::Uninitialized => 0,
@@ -27,6 +28,7 @@ impl PackData for ProgramState {
     n.saturating_add(4)
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     match self {
       ProgramState::Uninitialized => 0u32.pack_data(buffer)?,
@@ -38,6 +40,7 @@ impl PackData for ProgramState {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(match u32::unpack_data(sub_slice(bytes, ..4))? {
       0 => Self::Uninitialized,

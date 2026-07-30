@@ -8,7 +8,7 @@ pub(crate) mod pkg {
     Commitment, HttpPkgsAux, SendTransactionEncoding, SolanaTransactionHashStr, TransactionInput,
   };
   use wtx::{
-    client_api_framework::network::transport::TransportParams,
+    client_api_framework::network::transport::TransportParams as _,
     codec::{
       Base64Alphabet, Encode, EncodeWrapper, GenericCodec, base64_encode, protocol::VerbatimEncoder,
     },

@@ -147,7 +147,7 @@ pub struct OrderResParams {
   pub ty: OrderType,
   /// See [`OrderSide`].
   pub side: OrderSide,
-  /// Stop price for stop orders (ignore when order type is TRAILING_STOP_MARKET).
+  /// Stop price for stop orders (ignore when order type is [`OrderType::TrailingStopMarket`]).
   #[serde(skip_serializing_if = "Option::is_none")]
   pub stop_price: Option<Decimal>,
   /// Original order type. See [`OrderType`].

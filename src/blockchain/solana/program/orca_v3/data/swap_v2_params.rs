@@ -5,14 +5,14 @@ use crate::blockchain::solana::{
     orca_v3::data::{AccountsType, RemainingAccountsInfo, RemainingAccountsSlice},
   },
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, Eq, PartialEq)]
   pub struct SwapV2Params<> {
-    /// The amount of input or output token to swap from (depending on amount_specified_is_input).
+    /// The amount of input or output token to swap from (depending on `amount_specified_is_input`).
     pub amount: u64,
-    /// The maximum/minimum of input/output token to swap into (depending on amount_specified_is_input).
+    /// The maximum/minimum of input/output token to swap into (depending on `amount_specified_is_input`).
     pub other_amount_threshold: u64,
     /// The maximum/minimum price the swap will swap to.
     pub sqrt_price_limit: u128,
@@ -28,10 +28,12 @@ create_data_struct! {
 impl PackData for SwapV2Params {
   const LEN_BOUNDS: LenBounds = LenBounds::new(35, Some(41));
 
+  #[inline]
   fn len(&self) -> usize {
     if self.remaining_accounts_info.is_none() { 35 } else { 41 }
   }
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self {
       amount,
@@ -50,6 +52,7 @@ impl PackData for SwapV2Params {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       amount: u64::unpack_data(sub_slice(bytes, 0..8))?,
@@ -63,6 +66,7 @@ impl PackData for SwapV2Params {
 }
 
 impl TestingInstances for SwapV2Params {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       amount: 1,
@@ -74,6 +78,7 @@ impl TestingInstances for SwapV2Params {
     })
   }
 
+  #[inline]
   fn variable_instance() -> crate::Result<Self> {
     Ok(Self {
       amount: 1,

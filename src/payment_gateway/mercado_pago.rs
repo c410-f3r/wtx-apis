@@ -56,8 +56,8 @@ use wtx::{
 pub static PROD_URI: &str = "https://api.mercadopago.com";
 
 #[derive(Debug)]
-#[doc = _generic_api_doc!()]
 #[wtx::api(error(crate::Error), pkgs_aux(PkgsAux), transport(http))]
+#[doc = _generic_api_doc!()]
 pub struct MercadoPago {
   common: OauthClientCredentials,
   is_test: bool,
@@ -65,6 +65,7 @@ pub struct MercadoPago {
 
 impl MercadoPago {
   /// Creates a new instance with the given crendentials.
+  #[inline]
   pub fn new(
     client_id: String,
     client_secret: String,
@@ -82,6 +83,7 @@ impl Api for MercadoPago {
   type Error = crate::Error;
   type Id = MercadoPagoId;
 
+  #[inline]
   async fn before_sending(&mut self) -> Result<(), Self::Error> {
     Ok(())
   }

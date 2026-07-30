@@ -8,7 +8,7 @@ pub(crate) mod pkg {
   use wtx::{
     calendar::{DateTime, DynTz},
     client_api_framework::network::HttpParams,
-    collection::{ArrayVectorU8, Vector},
+    collections::{ArrayVectorU8, Vector},
   };
 
   #[pkg::aux]
@@ -39,7 +39,7 @@ pub(crate) mod pkg {
     Vector<QuoteFreightResGeneric<Vector<QuoteFreightResPackage>, &'any str>>,
   >;
 
-  /// Create WebHook Response Data
+  /// Create `WebHook` Response Data
   #[derive(Debug, serde::Deserialize)]
   pub struct CreateWebhookResData<'str> {
     /// Created at

@@ -1,9 +1,9 @@
 use crate::blockchain::solana::{SolanaSignatureHash, VersionedMessageInput};
-use wtx::collection::{ArrayWrapper, Vector};
+use wtx::collections::{ArrayWrapper, Vector};
 #[cfg(feature = "ed25519-dalek")]
 use {
   crate::blockchain::solana::SolanaBlockhash,
-  ed25519_dalek::{Signer, SigningKey},
+  ed25519_dalek::{Signer as _, SigningKey},
 };
 
 /// Transport format suitable for user input.
@@ -21,6 +21,7 @@ impl TransactionInput {
   /// Takes all the necessary parameters to validate and transform data into a suitable format for
   /// submission.
   #[cfg(feature = "ed25519-dalek")]
+  #[inline]
   pub fn new<'sk>(
     buffer: &mut Vector<u8>,
     blockhash: SolanaBlockhash,
@@ -28,16 +29,17 @@ impl TransactionInput {
     sk: impl Clone + IntoIterator<Item = &'sk SigningKey>,
   ) -> crate::Result<Self> {
     let mut this = Self { signatures: <_>::default(), message };
-    let VersionedMessageInput::V0(message) = &mut this.message;
-    if blockhash != message.recent_blockhash {
-      message.recent_blockhash = blockhash;
+    let VersionedMessageInput::V0(elem) = &mut this.message;
+    if blockhash != elem.recent_blockhash {
+      elem.recent_blockhash = blockhash;
     }
-    this._set_empty_signatures()?;
+    this.set_empty_signatures()?;
     this.do_sign(buffer, sk)?;
     Ok(this)
   }
 
   /// Checks if all signatures are actually signed.
+  #[inline]
   pub fn check_signatures(&self) -> crate::Result<()> {
     let mut filled: usize = 0;
     let all_are_signed = self.signatures.iter().all(|signature| {
@@ -57,6 +59,7 @@ impl TransactionInput {
 
   /// Signs or re-signs the contained message with the provided `blockhash` and `keypairs`.
   #[cfg(feature = "ed25519-dalek")]
+  #[inline]
   pub fn sign<'sk>(
     &mut self,
     blockhash: SolanaBlockhash,
@@ -92,14 +95,11 @@ impl TransactionInput {
     };
     for (opt, keypair) in signing_keypair_positions.zip(sk) {
       let signature = keypair.try_sign(buffer.as_ref())?.to_bytes();
-      let signature_mut = match opt.and_then(|idx| self.signatures.get_mut(idx)) {
-        None => {
-          return Err(crate::Error::SolanaInexistentOrOutOfBoundsSignatureIndex(
-            self.signatures.len(),
-            opt,
-          ));
-        }
-        Some(elem) => elem,
+      let Some(signature_mut) = opt.and_then(|idx| self.signatures.get_mut(idx)) else {
+        return Err(crate::Error::SolanaInexistentOrOutOfBoundsSignatureIndex(
+          self.signatures.len(),
+          opt,
+        ));
       };
       *signature_mut = signature.into();
     }
@@ -108,7 +108,7 @@ impl TransactionInput {
     Ok(())
   }
 
-  fn _set_empty_signatures(&mut self) -> crate::Result<()> {
+  fn set_empty_signatures(&mut self) -> crate::Result<()> {
     let VersionedMessageInput::V0(message) = &self.message;
     let len: usize = message.header.num_required_signatures.into();
     self.signatures.clear();

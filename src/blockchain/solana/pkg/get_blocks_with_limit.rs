@@ -5,7 +5,7 @@
 )]
 pub(crate) mod pkg {
   use crate::blockchain::solana::{Commitment, HttpPkgsAux};
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

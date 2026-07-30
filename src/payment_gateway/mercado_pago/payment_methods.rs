@@ -1,4 +1,4 @@
-use wtx::collection::ArrayVectorU8;
+use wtx::collections::ArrayVectorU8;
 
 wtx::create_enum! {
   /// Invidial payment method

@@ -2,7 +2,7 @@ use crate::{
   solana::{misc::next_iter_elem, PackAccounts, TestingInstances},
   AccountAddress,
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 use crate::blockchain::solana::InstructionAccountInput;
 
 create_account_struct! {

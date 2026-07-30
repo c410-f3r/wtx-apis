@@ -5,7 +5,7 @@ use crate::{
   },
   misc::{HashArray32ArrayString44, HashArray32Unit},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, PartialEq)]
@@ -21,6 +21,7 @@ create_data_struct! {
 impl PackData for WhirlpoolRewardInfo<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(128);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self { mint, vault, authority, emissions_per_second_x64, growth_global_x64 } = self;
     buffer.extend_from_copyable_slice(mint.bytes())?;
@@ -31,6 +32,7 @@ impl PackData for WhirlpoolRewardInfo<HashArray32Unit> {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       mint: HashArray32Unit::from_bytes(
@@ -49,6 +51,7 @@ impl PackData for WhirlpoolRewardInfo<HashArray32Unit> {
 }
 
 impl TestingInstances for WhirlpoolRewardInfo<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       mint: HashArray32Unit::from_bytes([1; 32]),
@@ -65,6 +68,7 @@ impl TryFrom<WhirlpoolRewardInfo<HashArray32Unit>>
 {
   type Error = crate::Error;
 
+  #[inline]
   fn try_from(from: WhirlpoolRewardInfo<HashArray32Unit>) -> Result<Self, Self::Error> {
     Ok(Self {
       mint: HashArray32ArrayString44::from_base58_bytes(from.mint.into_bytes())?,

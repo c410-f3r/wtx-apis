@@ -1,6 +1,6 @@
 use crate::erp::olist::{AssociatedEntityId, FreightResponsibility, OrderStatus, PersonTy};
 use rust_decimal::Decimal;
-use wtx::{calendar::Date, collection::Vector};
+use wtx::{calendar::Date, collections::Vector};
 
 /// Derive common traits for serialization, deserialization, and debugging
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

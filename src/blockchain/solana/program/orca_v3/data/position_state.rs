@@ -5,7 +5,7 @@ use crate::{
   },
   misc::{HashArray32ArrayString44, HashArray32Unit},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, PartialEq)]
@@ -37,6 +37,7 @@ create_data_struct! {
 impl PackData for Position<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(216);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self {
       whirlpool,
@@ -64,6 +65,7 @@ impl PackData for Position<HashArray32Unit> {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       whirlpool: HashArray32Unit::from_bytes(
@@ -85,6 +87,7 @@ impl PackData for Position<HashArray32Unit> {
 }
 
 impl TestingInstances for Position<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       whirlpool: HashArray32Unit::from_bytes([1; 32]),
@@ -104,6 +107,7 @@ impl TestingInstances for Position<HashArray32Unit> {
 impl TryFrom<Position<HashArray32Unit>> for Position<HashArray32ArrayString44> {
   type Error = crate::Error;
 
+  #[inline]
   fn try_from(from: Position<HashArray32Unit>) -> Result<Self, Self::Error> {
     Ok(Self {
       whirlpool: HashArray32ArrayString44::from_base58_bytes(from.whirlpool.into_bytes())?,

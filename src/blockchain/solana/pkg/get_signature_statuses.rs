@@ -7,7 +7,7 @@ pub(crate) mod pkg {
   use crate::blockchain::solana::{
     Commitment, HttpPkgsAux, JsonRpcResponseResultWithContext, TransactionError,
   };
-  use wtx::collection::ArrayVectorU8;
+  use wtx::collections::ArrayVectorU8;
 
   #[pkg::aux]
   impl<A, DRSR> HttpPkgsAux<A, DRSR> {}

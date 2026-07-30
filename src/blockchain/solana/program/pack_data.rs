@@ -1,6 +1,6 @@
 use crate::blockchain::solana::{misc::sub_slice, program::LenBounds};
 use core::ops::Range;
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Trait for types that can be packed into or unpacked from byte buffers.
 pub trait PackData
@@ -13,6 +13,7 @@ where
   const LEN_BOUNDS: LenBounds;
 
   /// Returns the actual length of the packed data.
+  #[inline]
   fn len(&self) -> usize {
     const {
       if let Some(max) = Self::LEN_BOUNDS.max() {
@@ -37,10 +38,12 @@ where
 impl PackData for () {
   const LEN_BOUNDS: LenBounds = LenBounds::new(0, None);
 
+  #[inline]
   fn pack_data(&self, _: &mut Vector<u8>) -> crate::Result<()> {
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(_: &[u8]) -> crate::Result<Self> {
     Ok(())
   }
@@ -56,21 +59,23 @@ where
     let max = match [A::LEN_BOUNDS.max(), B::LEN_BOUNDS.max()] {
       [None, None] => None,
       [None, Some(el)] | [Some(el), None] => Some(el),
-      [Some(a), Some(b)] => Some(a + b),
+      [Some(lhs), Some(rhs)] => Some(lhs + rhs),
     };
     LenBounds::new(min, max)
   };
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     self.0.pack_data(buffer)?;
     self.1.pack_data(buffer)?;
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
-    let a = A::unpack_data(bytes)?;
-    let b = B::unpack_data(sub_slice(bytes, a.len()..))?;
-    Ok((a, b))
+    let lhs = A::unpack_data(bytes)?;
+    let rhs = B::unpack_data(sub_slice(bytes, lhs.len()..))?;
+    Ok((lhs, rhs))
   }
 }
 
@@ -80,6 +85,7 @@ where
 {
   const LEN_BOUNDS: LenBounds = T::LEN_BOUNDS;
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     if let Some(el) = self {
       1u8.pack_data(buffer)?;
@@ -90,6 +96,7 @@ where
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     match bytes {
       [0] => Ok(None),
@@ -107,6 +114,7 @@ where
 {
   const LEN_BOUNDS: LenBounds = T::LEN_BOUNDS.saturating_add(&T::LEN_BOUNDS);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Range { start, end } = self;
     start.pack_data(buffer)?;
@@ -114,6 +122,7 @@ where
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     let start = T::unpack_data(bytes)?;
     let end = T::unpack_data(sub_slice(bytes, start.len()..))?;

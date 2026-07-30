@@ -1,6 +1,6 @@
 use crate::blockchain::ethereum::{Word, misc::pad_u64};
 use wtx::{
-  collection::{ArrayVectorU8, Vector},
+  collections::{ArrayVectorU8, Vector},
   misc::Usize,
 };
 
@@ -68,7 +68,7 @@ impl<'buffer> Encoder<'buffer> {
 
 #[cfg(test)]
 mod tests {
-  use wtx::collection::Vector;
+  use wtx::collections::Vector;
 
   use crate::blockchain::ethereum::{Word, encoder::Encoder};
 

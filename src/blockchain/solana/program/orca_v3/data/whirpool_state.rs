@@ -5,7 +5,7 @@ use crate::{
   },
   misc::{HashArray32ArrayString44, HashArray32Unit},
 };
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 create_data_struct! {
   #[derive(Debug, PartialEq)]
@@ -35,6 +35,7 @@ create_data_struct! {
 impl PackData for Whirlpool<HashArray32Unit> {
   const LEN_BOUNDS: LenBounds = LenBounds::from_same(653);
 
+  #[inline]
   fn pack_data(&self, buffer: &mut Vector<u8>) -> crate::Result<()> {
     let Self {
       whirlpools_config,
@@ -55,7 +56,7 @@ impl PackData for Whirlpool<HashArray32Unit> {
       token_vault_b,
       fee_growth_global_b,
       reward_last_updated_timestamp,
-      reward_infos: [a, b, c],
+      reward_infos: [el0, el1, el2],
     } = self;
     0u64.pack_data(buffer)?;
     buffer.extend_from_copyable_slice(whirlpools_config.bytes())?;
@@ -76,12 +77,13 @@ impl PackData for Whirlpool<HashArray32Unit> {
     buffer.extend_from_copyable_slice(token_vault_b.bytes())?;
     fee_growth_global_b.pack_data(buffer)?;
     reward_last_updated_timestamp.pack_data(buffer)?;
-    a.pack_data(buffer)?;
-    b.pack_data(buffer)?;
-    c.pack_data(buffer)?;
+    el0.pack_data(buffer)?;
+    el1.pack_data(buffer)?;
+    el2.pack_data(buffer)?;
     Ok(())
   }
 
+  #[inline]
   fn unpack_data(bytes: &[u8]) -> crate::Result<Self> {
     Ok(Self {
       whirlpools_config: HashArray32Unit::from_bytes(
@@ -122,6 +124,7 @@ impl PackData for Whirlpool<HashArray32Unit> {
 }
 
 impl TestingInstances for Whirlpool<HashArray32Unit> {
+  #[inline]
   fn min_instance() -> crate::Result<Self> {
     Ok(Self {
       whirlpools_config: HashArray32Unit::from_bytes([1; 32]),
@@ -154,6 +157,7 @@ impl TestingInstances for Whirlpool<HashArray32Unit> {
 impl TryFrom<Whirlpool<HashArray32Unit>> for Whirlpool<HashArray32ArrayString44> {
   type Error = crate::Error;
 
+  #[inline]
   fn try_from(from: Whirlpool<HashArray32Unit>) -> Result<Self, Self::Error> {
     Ok(Self {
       whirlpools_config: HashArray32ArrayString44::from_base58_bytes(
@@ -177,11 +181,11 @@ impl TryFrom<Whirlpool<HashArray32Unit>> for Whirlpool<HashArray32ArrayString44>
       fee_growth_global_b: from.fee_growth_global_b,
       reward_last_updated_timestamp: from.reward_last_updated_timestamp,
       reward_infos: {
-        let [a, b, c] = from.reward_infos;
+        let [el0, el1, el2] = from.reward_infos;
         [
-          WhirlpoolRewardInfo::try_from(a)?,
-          WhirlpoolRewardInfo::try_from(b)?,
-          WhirlpoolRewardInfo::try_from(c)?,
+          WhirlpoolRewardInfo::try_from(el0)?,
+          WhirlpoolRewardInfo::try_from(el1)?,
+          WhirlpoolRewardInfo::try_from(el2)?,
         ]
       },
     })

@@ -13,9 +13,11 @@ use tokio::sync::Mutex;
 use wtx::{
   client_api_framework::network::{HttpParams, transport::SendingReceivingTransport},
   codec::format::SerdeJson,
-  collection::Vector,
-  http::client_pool::{ClientPoolBuilder, ClientPoolTokioRustls},
+  collections::Vector,
+  executor::TokioExecutor,
+  http::http2_client_pool::{Http2ClientPool, Http2ClientPoolBuilder},
   misc::Wrapper,
+  tls::{TlsConfig, TlsModeVerified},
 };
 
 const DEST_ZIPCODE: &str = "04571000";
@@ -37,8 +39,11 @@ static PRODUCTS: [QuoteFreightReqProduct; 2] = [
   },
 ];
 
-static CLIENT: LazyLock<ClientPoolTokioRustls<fn(&()), ()>> =
-  LazyLock::new(|| ClientPoolBuilder::tokio_rustls(1).build());
+static CLIENT: LazyLock<Http2ClientPool<TokioExecutor, TlsModeVerified>> = LazyLock::new(|| {
+  Http2ClientPoolBuilder::tokio(1, TlsConfig::from_ccadb(TlsModeVerified::new()).unwrap())
+    .unwrap()
+    .build()
+});
 static SUPER_FRETE: LazyLock<Mutex<SuperFrete>> =
   LazyLock::new(|| Mutex::new(SuperFrete::new(_VARS.super_frete_token.clone())));
 

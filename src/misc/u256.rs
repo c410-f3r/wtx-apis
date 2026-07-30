@@ -321,6 +321,7 @@ impl Shr<u32> for U256 {
 impl TryFrom<rust_decimal::Decimal> for U256 {
   type Error = crate::Error;
 
+  #[inline]
   fn try_from(from: rust_decimal::Decimal) -> Result<Self, Self::Error> {
     Ok(U256::from(u128::try_from(from).map_err(|_err| crate::Error::InvalidU256Conversion)?))
   }

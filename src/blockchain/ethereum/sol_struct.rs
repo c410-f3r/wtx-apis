@@ -1,5 +1,5 @@
 use crate::blockchain::ethereum::{SolTy, misc::keccak256};
-use wtx::collection::Vector;
+use wtx::collections::Vector;
 
 /// Solidity Structure
 pub trait SolStruct<'de>: SolTy<'de> {

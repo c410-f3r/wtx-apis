@@ -3,7 +3,7 @@ pub(crate) mod pkg {
   use crate::secret_management::vault::{HttpPkgsAux, PairVector, Vault, VaultResponse};
   use alloc::string::String;
   use wtx::{
-    client_api_framework::network::{HttpParams, transport::TransportParams},
+    client_api_framework::network::{HttpParams, transport::TransportParams as _},
     http::Header,
   };
 

@@ -1,8 +1,8 @@
 use crate::erp::olist::Olist;
 use wtx::{
-  client_api_framework::network::{HttpParams, transport::TransportParams},
+  client_api_framework::network::{HttpParams, transport::TransportParams as _},
   http::ReqBuilder,
-  misc::UriString,
+  net::UriString,
 };
 
 pub(crate) async fn manage_before_sending(
@@ -13,6 +13,6 @@ pub(crate) async fn manage_before_sending(
   api.common.manage_access_token().await;
   cb(&mut trans_params.ext_req_params_mut().msg_buffer.uri)?;
   let headers = &mut trans_params.ext_req_params_mut().msg_buffer.headers;
-  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", &api.common.access_token))?;
+  let _ = ReqBuilder::get(headers).auth_bearer(format_args!("{}", api.common.access_token))?;
   Ok(())
 }
