@@ -1405,7 +1405,7 @@ dependencies = [
 
 [[package]]
 name = "wtx-apis"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "bincode",
  "bs58",
